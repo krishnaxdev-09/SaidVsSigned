@@ -1,0 +1,9 @@
+# Canonical thresholds (doc 08 §5). Initial values are ASSUMPTIONS [A]; calibrated in Phase 4. Not used in Phase 0.
+version: "0.2.2-initial"
+T_asr_num: 0.85
+T_asr_avg: 0.70
+T_ocr: 0.70
+T_ocr_num: 0.80
+T_ret: null          # calibrated in E6
+T_nli_contra: null   # calibrated in E6
+T_nli_entail: null   # calibrated in E6

@@ -1,0 +1,36 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env: { POSTGRES_USER: saidsigned, POSTGRES_PASSWORD: ci-only-password, POSTGRES_DB: saidsigned }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U saidsigned" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      DATABASE_URL: postgresql+asyncpg://saidsigned:ci-only-password@localhost:5432/saidsigned
+      JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else-0123456789
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with: { version: "0.11.26" }
+      - run: uv sync --frozen --python 3.12
+      - run: uv run ruff check .
+      - run: uv run mypy app
+      - run: uv run pytest -q -p no:warnings
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
