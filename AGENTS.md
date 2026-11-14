@@ -146,7 +146,7 @@ Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role
 |---|---|---|
 | HC-1 | Docs + plan | ✅ Approved 2026-11-13 |
 | HC-2 | Claim schema, reason codes, evidence rules, wording | ✅ Approved 2026-11-14 (English wording; Hindi later) |
-| HC-3 | STT/diarization results, languages | ⬜ Pending (Stage 1 exit) |
+| HC-3 | STT/diarization results, languages | ✅ Approved 2026-11-14 (quote confirmation for numeric CONFLICTs; EN Supported, Hinglish Beta, Hindi Not yet supported; ElevenLabs only) |
 | HC-4 | OCR, retrieval, embeddings | ⬜ Pending (Stage 2 exit) |
 | HC-5 | Finance formulas and visibility | ⬜ Pending (Stage 3 exit) |
 | HC-6 | Each regulatory rule | ⬜ Pending (Stage 4) |

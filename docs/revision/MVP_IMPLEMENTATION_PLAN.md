@@ -1,6 +1,6 @@
 # SaidSigned — MVP Implementation Plan (v0.2.1, 2026-11-13)
 
-> **HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED 2026-11-14** (§4). HC-3…HC-8: **pending**. Phase 0 is complete; Phase 1 is authorised by the user (2026-11-14). Implementation status is reported per task, never assumed.
+> **HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED 2026-11-14** (§4). **HC-3: APPROVED 2026-11-14** (conditions in `MVP_TASK_STATUS.md`). HC-4…HC-8: **pending**. Phase 0 is complete; Phase 1 is authorised by the user (2026-11-14). Implementation status is reported per task, never assumed.
 >
 > **v0.2.1 corrections** (from your review of v0.2):
 > 1. HC-6 is restored in the graph, the checkpoint sequence and the roadmap.
@@ -106,7 +106,7 @@ flowchart TD
 |---|---|---|---|---|
 | 1 | **HC-1 ✅ APPROVED 2026-11-13 (user)** | Before Phase 0 | v0.2.1 docs and this plan. Architecture and upload-first scope: ADR-001, ADR-002, **ADR-015** (upload-first MVP, P0-1 deferred), ADR-016, ADR-017, **ADR-018** (canonical owners, present in doc 14), plus Proposed ADR-006/012/014 as written. Accepted user decisions (ADR-003/007/008/009/010/011) are presented for confirmation | Phase 0 |
 | 2 | **HC-2 ✅ APPROVED 2026-11-14 (user)** | Before Phase 1 code | Claim schema, reason codes, CONFLICT evidence combinations, wording templates (docs 04, 08) | T1.4 onward |
-| 3 | **HC-3** | Phase 1 exit | E2/E3/E10 results, languages, ADR-019 confirm-quote fallback, ElevenLabs config/pricing, fallback STT | T3.1 |
+| 3 | **HC-3 ✅ APPROVED 2026-11-14 (user)** | Phase 1 exit | E2/E3/E10 results, languages, ADR-019 confirm-quote fallback, ElevenLabs config/pricing, fallback STT | T3.1 |
 | 4 | **HC-4** | Phase 2 exit | OCR backend, thresholds, retrieval/NLI, embedding model (ADR-005/013) | T3.1 |
 | 5 | **HC-5** | Phase 3 exit | Finance formulas, tolerances, GST assumption, synthetic results. Enables user visibility of the **MVP formula set only** (§7) | Phase 4; user-facing finance |
 | 6 | **HC-6** | Phase 4, on T3.7 | Each curated regulatory rule and any user-facing regulatory finding. Until approved, **all rules stay in shadow** | User-facing regulatory findings only (not HC-8) |

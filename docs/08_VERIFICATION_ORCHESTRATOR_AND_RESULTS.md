@@ -204,7 +204,7 @@ Thresholds are stored in `config/thresholds.yaml` with a `thresholds_version`. I
 4. **Vagueness:** `vague` → CONFLICT/MATCH become `UNCLEAR(vague_claim)`.
 5. **ASR gate:** `T_asr_num` / `T_asr_avg`, as above.
    - **Missing confidence:** `None` counts as below threshold.
-   - **[Proposed — decide at HC-3]:** `quote_confirmed_by_user = true` (the user played the snippet and confirmed the words) lifts the ASR gate for that quote. This is the fallback if E3 shows Scribe batch returns no usable word confidence.
+   - **Approved at HC-3 (2026-11-14):** a numeric CONFLICT, in any language, additionally requires `quote_confirmed_by_user = true` (the customer played the original audio and confirmed the words). ASR confidence alone never allows a numeric CONFLICT; without confirmation the verdict is `UNCLEAR(low_asr_confidence)`. In Hindi sessions (Hindi: not yet supported) a numeric CONFLICT is never shown and quote confirmation is not offered for numeric claims; the verdict stays `UNCLEAR(low_asr_confidence)`. No reason codes are added or changed (ADR-019).
 6. **OCR gate:** in the contract engine (doc 05).
 7. **Assumption gate:** in the finance engine (doc 06).
 8. **Public-data cap:** at most `UNCLEAR(public_data_only)`.
@@ -303,7 +303,7 @@ If a primary engine errored, MATCH is impossible (rule 2 requires every primary 
 
 ## 13. Human review
 - **HC-2 (approved 2026-11-14):** taxonomy, reason codes, the evidence combinations, the primary-comparison table and the English wording templates. C-CALC-DOC, finance and regulatory findings stay hidden until HC-5 / HC-6; Hindi wording is reviewed later.
-- **HC-3:** the `quote_confirmed_by_user` proposal.
+- **HC-3 (approved 2026-11-14):** the `quote_confirmed_by_user` rule (ADR-019; wording in §5).
 - **Phase 4:** the calibration report.
 
 ## 14. Common failures

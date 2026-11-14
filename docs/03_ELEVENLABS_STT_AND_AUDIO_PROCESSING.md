@@ -93,9 +93,15 @@ Two separate fields, used by docs 04, 08, 10 and 11:
 - MVP: loudness normalisation only, on the STT copy.
 - **[Proposed — ADR-012]:** no denoiser unless experiment **E9** (uploads × {none, RNNoise, DeepFilterNet3}) shows at least 2 points of numeric-token accuracy gain without hurting clean audio. Advanced enhancement is Later-L8.
 
-## 8. Hinglish policy [MVP-limited]
-- Supported languages in the MVP are declared **only** from the E2 results at HC-3.
-- If Hinglish numeric-token accuracy is below 95%, Hinglish sessions are labelled "beta". Every numeric CONFLICT in them needs `quote_confirmed_by_user` (doc 08 §5, proposal pending HC-3), or stays UNCLEAR.
+## 8. Language policy [MVP-limited]
+- Supported languages in the MVP were declared at HC-3 (approved by the user 2026-11-14).
+- **Approved at HC-3 (2026-11-14):**
+  - **English: Supported.**
+  - **Hinglish: Beta**, labelled "Beta" in the UI and report.
+  - **Hindi: Not yet supported**, labelled clearly. Upload, transcription and claim extraction still run, but numeric CONFLICTs are never shown and quote confirmation is not offered; such results stay `UNCLEAR(low_asr_confidence)`.
+  - In every language, a numeric CONFLICT needs the customer's quote confirmation (ADR-019, doc 08 §5).
+  - The STT output cannot tell Hindi from Hinglish (both `hin`), so the rule uses the session's `language_hint` plus the detected segment language.
+  - These labels come from decisions and synthetic-speech evaluation, not real calls; to be revisited after real-recording validation.
 
 ## 9. Error handling
 | Case | Class | Behaviour |

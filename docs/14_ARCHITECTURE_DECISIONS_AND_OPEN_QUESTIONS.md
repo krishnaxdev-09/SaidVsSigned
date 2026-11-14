@@ -14,7 +14,7 @@
 |---|---|---|---|
 | 001 | Modular monolith + one worker | **Accepted (HC-1, 2026-11-13)** | Unchanged |
 | 002 | Postgres as DB, vector store, job queue and event bus | **Accepted (HC-1, 2026-11-13)** | v0.2 adds `dedupe_key` and the idempotency table (doc 11 §2) |
-| 003 | ElevenLabs Scribe behind `STTProvider` | Accepted (provider, from brief); fallback Open (HC-3) | MVP uses **batch** only; realtime deferred to Later-L1 |
+| 003 | ElevenLabs Scribe behind `STTProvider` | **Approved at HC-3 (2026-11-14):** Accepted — ElevenLabs Scribe v2 batch only for the MVP; no second STT provider | Realtime deferred to Later-L1 |
 | 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13. **Decided 2026-11-14 by the user: Gemma 4 31B on Amazon Bedrock, model ID `google.gemma-4-31b`** (verified listed and callable in us-east-1). The interface stays provider-agnostic | Accepted; T1.8 still reports extraction quality |
 | 005 | Embedding model (reranker deferred) | Open (HC-4) | Dimension is a migration parameter; reranker → Later-L4 |
 | 006 | Semantic CONFLICT needs NLI + LLM-judge agreement | Working design (HC-1, 2026-11-13). **Not approved:** it was not among the HC-2 items approved on 2026-11-14; final confirmation is still open (needed before semantic CONFLICTs, T2.6) | Unchanged |
@@ -30,7 +30,7 @@
 | **016** | **MATCH requires the claim's primary comparison** | **Accepted 2026-11-13**; confirmed at HC-1 | Spoken-only consistency → sub-check note; inconsistency → `UNCLEAR(internal_inconsistency)` |
 | **017** | **Document input = PDF + photo upload** | **Accepted 2026-11-13**; confirmed at HC-1 | In-app camera with edge guides deferred |
 | **018** | **Canonical ownership of shared definitions** | **Accepted (HC-1, 2026-11-13)** | Statuses, reasons, evidence, thresholds → doc 08; tolerances → doc 06; retry and errors → doc 01; idempotency, events and DDL → doc 11; speaker model → doc 03 §5 |
-| **019** | **`quote_confirmed_by_user` lifts the ASR gate** | Proposed (HC-3) | Fallback if batch confidences are absent or weak |
+| **019** | **Numeric CONFLICT requires customer quote confirmation** | **Approved at HC-3 (2026-11-14):** in every language (English, Hinglish, Hindi), a numeric CONFLICT is shown only after the customer plays the original audio quote and confirms the words (`quote_confirmed_by_user = true`); ASR confidence alone is never enough. Without confirmation the result stays `UNCLEAR(low_asr_confidence)`. Hindi sessions (Hindi not yet supported) never show a numeric CONFLICT and are not offered quote confirmation for numeric claims; they stay `UNCLEAR(low_asr_confidence)`. No reason codes added or changed. To be reconsidered after real-recording validation | Evidence: T1.8 E3 — a misheard Hindi number (60,000 → ₹7000) had confidence 0.975, and confidences did not separate errors |
 
 ### ADR-015 detail
 - **Context:** the user re-scoped the MVP to upload-first on 2026-11-13.
@@ -40,7 +40,7 @@
   - The batch pipeline is designed so that Later-L1 adds an ingestion front-end (realtime STT, incremental extraction) and reuses claims, engines, the orchestrator and the UI results.
 
 ### HC-1 approval scope and record
-**HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED** 2026-11-14 (conditions: `revision/MVP_IMPLEMENTATION_PLAN.md` §4). HC-3…HC-8: **pending**.
+**HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED** 2026-11-14 (conditions: `revision/MVP_IMPLEMENTATION_PLAN.md` §4). **HC-3: APPROVED** 2026-11-14 (ADR-003, ADR-019, language policy in doc 03 §8; gaps KG-1, KG-2 accepted as open). HC-4…HC-8: **pending**.
 
 HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-002, **ADR-015** (upload-first MVP, P0-1 live verification deferred — confirm), ADR-016, ADR-017, **ADR-018** (canonical definition owners) and the Proposed ADRs 006/012/014 as written. The accepted user decisions recorded in ADR-003, 007, 008, 009, 010 and 011 are presented for confirmation only. ADR-004, 005, 013 and 019 remain Open or Proposed for their own checkpoints.
 
@@ -54,7 +54,7 @@ HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-00
 | Q-5 | Primary device (Android Chrome?) | Open — user |
 | Q-6 | Agent notification method | **Deferred** (live modes, Later-L1); for uploads see Q-13 |
 | Q-7 | Lender-side users | Deferred — Later-L9 |
-| Q-8 | Second STT provider | Open — HC-3 |
+| Q-8 | Second STT provider | **Approved at HC-3 (2026-11-14):** closed for the MVP (ElevenLabs only, ADR-003); revisit after real-call evaluation |
 | Q-9 | UI languages beyond en/hi | Open — user |
 | Q-10 | Malware scanning (ClamAV) | Open — user/security |
 | Q-11 | Retention period (30 days proposed) | Open — user + HC-7 |
@@ -67,7 +67,7 @@ HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-00
 ## Technical assumptions & experiments
 | ID | Assumption | Experiment | MVP? | Blocks |
 |---|---|---|---|---|
-| A2 | Scribe batch handles Hinglish numbers ≥ 95% | E2 | ✅ | HC-3 |
+| A2 | Scribe batch handles Hinglish numbers ≥ 95% | E2 | ✅ (synthetic TTS only: 97.3%; not validated on real calls) | HC-3 |
 | A3 | Batch returns usable word confidence | E3 | ✅ | ASR gate / ADR-019 |
 | A5 | Docling + OCR reads phone photos ≥ 97% with obtainable confidences | E5 | ✅ | HC-4 |
 | A6 | NLI + LLM-judge semantic CONFLICT precision ≥ 0.9; hybrid R@5 ≥ 0.9 | E6 | ✅ | HC-4 |

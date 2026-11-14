@@ -174,3 +174,8 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - Dataset `conversations-v1` (30 synthetic TTS calls) and `eval/tools/{gen_conversations,run_phase1_eval}.py`; report `eval/reports/2026-11-14_phase1_E2_E3_E10_extraction.md`.
 - Critical finding for HC-3: a high-confidence Hindi number error (60,000 → ₹7000, confidence 0.975) passes the ASR gate; supports ADR-019 before numeric CONFLICTs.
 - Fix found by E10: speaker-role keyword cross-check used per-word density, flagging every correct suggestion uncertain; now absolute counts (regression test added).
+
+## 2026-11-14 — HC-3 approved
+- **HC-3 approved by the user.** ADR-003: ElevenLabs Scribe v2 batch only for the MVP (Q-8 closed). ADR-019: a numeric CONFLICT, in every language, needs the customer to play and confirm the original quote; ASR confidence alone is never enough. Hindi: not yet supported — no quote confirmation offered and no numeric CONFLICT; such results stay `UNCLEAR(low_asr_confidence)`. Languages: English Supported, Hinglish Beta, Hindi Not yet supported (doc 03 §8). No reason codes added or changed.
+- Accepted as open gaps (not complete): KG-1 (5-user usability test), KG-2 (no real-call evaluation). T1.8 stays partial.
+- Synthetic-speech limitations documented in the T1.8 report.

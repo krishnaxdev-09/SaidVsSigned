@@ -4,6 +4,14 @@
 
 - Dataset `conversations-v1` (sha256 of scripts `f00f8ca14e8d`): 30 calls = 15 English + 15 Hinglish, 20 mono + 10 stereo_split. STT `scribe_v2` (diarize, num_speakers=2 for mono); LLM `google.gemma-4-31b` on Bedrock; prompt `claim_extract_v2`; normaliser `norm-1.0`.
 
+## Limitations of this evaluation
+- All 30 calls are **macOS synthetic speech**: clean, evenly paced, no phone-line noise, overlap or accents beyond the voices, scripted by us. Results are optimistic.
+- Hindi uses **one voice** (Lekha); the Hinglish customer is an English voice (Rishi) reading romanised Hindi, which is unnatural.
+- WER is measured against the text given to the speech engine, so digits vs number words and script differences count as errors; WER is not meaningful here.
+- The set **cannot calibrate confidence thresholds** (E3): non-matching words average 0.975 vs 0.980 for matching ones.
+- Language support is declared from decisions, not real-call measurement. Real recordings are needed before Hinglish leaves Beta or Hindi becomes supported.
+- The E10 confirmation-screen usability test with 5 users was **not run**.
+
 ## Key findings for HC-3
 
 1. **A wrong Hindi number with high confidence (critical).** In C04HI and C04ST the hi-IN voice said "साठ हज़ार" (60,000) and
@@ -11,6 +19,9 @@
    `T_asr_num` 0.85. The ASR gate would not catch it; with a document stating 60,000, a correct agent statement would
    become a **false "Possible mismatch"**. This supports ADR-019 (customer plays and confirms the quote) before any
    numeric CONFLICT, at least for Hinglish/Hindi, or a stricter Hindi threshold. Decision for HC-3.
+
+   *Note added 2026-11-14:* the HC-3 proposal goes further — quote confirmation before any numeric CONFLICT in
+   **every** language (English included), and no numeric CONFLICT at all for Hindi (doc 14 ADR-019).
 2. **Confidences do not separate errors here (E3).** Every word has a confidence (100%), but matching words average 0.980
    and non-matching 0.975. Most "non-matching" words are format differences (digits vs words, script), so this set
    cannot calibrate thresholds; real recordings are needed (Phase 4 calibration).
