@@ -44,11 +44,11 @@ cd frontend && npm run dev                     # UI on :5173, proxies /api and /
 ## Layout
 ```
 backend/app/core/        config, db, errors (doc 01 §7), retry (doc 01 §6), idempotency, storage, security
-backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3), claims (normaliser T1.5, extraction T1.6)
+backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3), claims (normaliser T1.5, extraction T1.6), documents (T2.1–T2.4), rag (retrieval), verify (orchestrator T2.5)
 backend/app/llm/         LLM provider interface, Bedrock Mantle provider (Gemma), fakes
 backend/app/schemas/     canonical doc 08 / doc 04 schemas, reason codes, CONFLICT validator, wording (T1.4)
 backend/app/worker/      Postgres job queue, runner, handlers.register_all
-backend/alembic/         migrations 0001 foundation … 0008 chunks
+backend/alembic/         migrations 0001 foundation … 0009 verification
 frontend/src/            React PWA: features/{auth,sessions,consent,recordings,speakers}, lib (api, events), i18n en/hi
 eval/                    synthetic datasets (agreements AG01–AG10), tools, reports
 infra/                   docker-compose, MinIO Dockerfile
@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 24 / 40 tasks done (60%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 in progress.
+**Overall: 25 / 40 tasks done (62.5%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -92,7 +92,7 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.7 | Claims UI, transcript view, snippet playback | ✅ | — |
 | T1.8 | Experiments E2/E3/E10 + LLM evaluation | ◐ | Reports done (synthetic TTS); E10 5-user usability test needs people |
 
-### Stage 2 — Documents and contract verification · 7 tasks · IN PROGRESS (4/7)
+### Stage 2 — Documents and contract verification · 7 tasks · IN PROGRESS (5/7)
 Gate: HC-4 at stage exit.
 
 | Task | What | Status |
@@ -101,7 +101,7 @@ Gate: HC-4 at stage exit.
 | T2.2 | Docling/OCR + confidence pass (E5: 190/190 on simulated scans/photos) | ✅ |
 | T2.3 | Clause segmentation + doc_terms (boundary F1 1.000 digital / 0.926 photos) | ✅ |
 | T2.4 | Chunks, embeddings (E5-small, provisional ADR-005), hybrid retrieval (E6 R@5 0.993) | ✅ |
-| T2.5 | Orchestrator v1 (gates, merge, validators) — needs T1.4 | ⬜ |
+| T2.5 | Orchestrator v1 (gates, merge, validators, versioned results, triggers) | ✅ |
 | T2.6 | Contract engine (said vs signed comparison) | ⬜ |
 | T2.7 | Results dashboard + evidence drawer + document upload screen | ⬜ |
 

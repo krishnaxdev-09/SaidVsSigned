@@ -25,6 +25,7 @@ from app.modules.realtime.ws import router as ws_router
 from app.modules.sessions.router import router as sessions_router
 from app.modules.speakers.router import router as speakers_router
 from app.modules.stt.router import router as stt_router
+from app.modules.verify.router import router as results_router
 
 log = structlog.get_logger()
 
@@ -59,6 +60,7 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
     app.include_router(speakers_router)
     app.include_router(claims_router)
     app.include_router(documents_router)
+    app.include_router(results_router)
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict[str, str]:

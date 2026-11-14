@@ -22,6 +22,7 @@ from app.modules.realtime.events import EventType
 from app.modules.sessions.service import get_owned_session
 from app.modules.speakers import service
 from app.modules.speakers.service import CONFIDENT, Role
+from app.modules.verify.job import enqueue_session
 
 router = APIRouter(prefix="/api/v1", tags=["speakers"])
 
@@ -139,7 +140,7 @@ async def confirm_speakers(body: ConfirmIn, request: Request, session_id: uuid.U
         await publish(conn, session_id, EventType.SPEAKER_UPDATED, {
             "transcript_revision": rev, "role_assignment": "user_confirmed",
             "mapping": [{"speaker_label": k, "speaker_role": v} for k, v in body.roles.items()]})
-        # Re-verification on confirmation (doc 03 §5 step 5, changed_because=speaker_confirmed) arrives with T2.5.
+        await enqueue_session(conn, session_id, "speaker_confirmed", transcript_revision=rev)  # doc 03 §5 step 5
         return await _speakers(conn, session_id, rev)
 
 

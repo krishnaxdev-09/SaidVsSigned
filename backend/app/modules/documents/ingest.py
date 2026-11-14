@@ -148,6 +148,9 @@ def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | N
                 {"id": uuid.uuid4(), "d": doc_id, "v": version, "c": ids[c.ord], "p": c.page_start,
                  "sp": c.section_path, "t": piece, "e": "[" + ",".join(f"{x:.6f}" for x in vec) + "]", "m": emb.name})
         await status("ready", 1.0, None, warnings)
+        from app.modules.verify.job import enqueue_session  # doc 05 §6.9: verify every active claim
+
+        await enqueue_session(ctx.conn, sid, "document_ready" if version == 1 else "document_replaced")
 
     return handle
 

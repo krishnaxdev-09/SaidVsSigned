@@ -55,4 +55,8 @@ async def patch_claim(claim_id: uuid.UUID, body: ClaimPatch, request: Request,
                            ip=client_ip(request), meta={"state": body.state, "note_provided": bool(body.user_note)})
         claim = (await load_claims(conn, row.session_id, claim_id=claim_id))[0]
         await publish(conn, row.session_id, EventType.CLAIM_UPDATED, claim_event(claim))
+        if body.state == "active":  # restored claim: re-verify (dismissed claims keep their last result)
+            from app.modules.verify.job import enqueue_verify
+
+            await enqueue_verify(conn, row.session_id, claim_id, "claim_corrected")
     return claim

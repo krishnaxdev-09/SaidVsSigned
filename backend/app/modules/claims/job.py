@@ -88,6 +88,8 @@ def make_extract_handler(llm: LLMProvider) -> Handler:
         # Logs carry counts and the prompt version only, never transcript text (doc 04 §3, doc 12 §B.2).
         log.info("claims_extracted", session_id=str(session_id), revision=rev, prompt_version=extract.PROMPT_VERSION,
                  segments=len(segments), raw=len(claims), kept=len(kept), **vars(drops))
-        # Enqueueing verify:{claim_id} arrives with the orchestrator (T2.5).
+        from app.modules.verify.job import enqueue_session  # doc 08 §9: transcript revised → (re-)verify
+
+        await enqueue_session(ctx.conn, session_id, "transcript_revised", transcript_revision=rev)
 
     return handle
