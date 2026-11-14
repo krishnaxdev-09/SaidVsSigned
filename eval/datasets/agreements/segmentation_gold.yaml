@@ -1,0 +1,102 @@
+note: Hand-labelled clause start boundaries (page, text prefix) for T2.3 boundary F1 (doc 05 §9). Labelled from the PDF text,
+  independent of the segmenter. The header block (document title + agreement number) is one clause; each KFS table row (excluding
+  the Item/Details header) is one clause; footnotes and small print are separate clauses (a start may list alternatives `a|b` because OCR can drop the superscript marker); numbered clauses and the signature
+  line start new clauses. Lender-name title and 'Terms and Conditions' are section headings only (no body of their own).
+dataset_version: segmentation-gold-v1
+documents:
+  AG02:
+    1:
+    - Key Fact Statement
+    - Loan amount
+    - Rate of interest
+    - Tenure
+    - EMI
+    - Processing fee
+    - Net disbursed amount
+    - Total amount payable
+    - ¹|A documentation
+    2:
+    - '1.'
+    - '2.'
+    - '3.'
+    - '4.'
+    - '5.'
+    - '6.'
+    - 'Signed:'
+  AG04:
+    1:
+    - Key Fact Statement
+    - Loan amount
+    - Rate of interest
+    - Tenure
+    - EMI
+    - Processing fee
+    - Net disbursed amount
+    - Total amount payable
+    - '*|Interest is computed'
+    2:
+    - '1.'
+    - '2.'
+    - '3.'
+    - '4.'
+    - '5.'
+    - '6.'
+    - 'Signed:'
+  AG06:
+    1:
+    - Key Fact Statement
+    - Loan amount
+    - Rate of interest
+    - Tenure
+    - EMI
+    - Processing fee
+    - Net disbursed amount
+    - Total amount payable
+    - Cheque/ECS bounce
+    2:
+    - '1.'
+    - '2.'
+    - '3.'
+    - '4.'
+    - '5.'
+    - '6.'
+    - 'Signed:'
+  AG08:
+    1:
+    - Key Fact Statement
+    - Loan amount
+    - Rate of interest
+    - Tenure
+    - EMI
+    - Processing fee
+    - Net disbursed amount
+    - Total amount payable
+    - '*|Interest is computed'
+    - ¹|A documentation
+    2:
+    - '1.'
+    - '2.'
+    - '3.'
+    - '4.'
+    - '5.'
+    - '6.'
+    - '7.'
+    - 'Signed:'
+  AG10:
+    1:
+    - Key Fact Statement
+    - Loan amount
+    - Rate of interest
+    - Tenure
+    - EMI
+    - Processing fee
+    - Net disbursed amount
+    - Total amount payable
+    2:
+    - '1.'
+    - '2.'
+    - '3.'
+    - '4.'
+    - '5.'
+    - '6.'
+    - 'Signed:'

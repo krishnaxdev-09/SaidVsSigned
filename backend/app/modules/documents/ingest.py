@@ -1,6 +1,8 @@
 """Worker job `doc.ingest:{document_id}:{version}` (doc 05 §6). T2.1: step 1 sanitising. T2.2: steps 2–5 render,
-photo pre-process, Docling/OCR, confidence pass (`parse.py`); outputs pages/{n}.webp, docling.json and items.json,
-ending at status `parsed`. Clause segmentation onwards is T2.3+. Input failures end the document as failed(code)."""
+photo pre-process, Docling/OCR, confidence pass (`parse.py`); outputs pages/{n}.webp, docling.json and items.json.
+T2.3: steps 6–7 clause segmentation (`segment.py`) and doc_terms (`terms.py`), written atomically per
+(document_id, version) together with the final status `segmented`. Chunks/indexing (→ ready) are T2.4.
+Input failures end the document as failed(code)."""
 
 from __future__ import annotations
 
@@ -10,6 +12,7 @@ import tempfile
 import uuid
 from pathlib import Path
 
+import structlog
 import yaml
 from PIL import Image
 from sqlalchemy import text
@@ -18,10 +21,13 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from app.core.config import get_settings
 from app.core.retry import InputError
 from app.core.storage import ObjectStore
-from app.modules.documents import media, parse
+from app.llm.base import LLMProvider
+from app.modules.documents import media, parse, segment, terms
 from app.modules.realtime.bus import publish
 from app.modules.realtime.events import EventType
 from app.worker.runner import Handler, JobContext
+
+log = structlog.get_logger()
 
 
 def _t_ocr() -> float:
@@ -38,7 +44,8 @@ async def _progress(engine: AsyncEngine, sid: uuid.UUID, doc_id: uuid.UUID, vers
                                                               "stage": stage, "progress": p, "warnings": []})
 
 
-def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | None = None) -> Handler:
+def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | None = None,
+                            llm: LLMProvider | None = None) -> Handler:
     state: dict[str, parse.DocumentParser] = {}
 
     def get_parser() -> parse.DocumentParser:
@@ -60,7 +67,7 @@ def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | N
             await ctx.conn.execute(text(
                 "UPDATE documents SET status = :st, status_code = :c, warnings = CAST(:w AS jsonb) "
                 "WHERE id = :id AND status <> 'failed'"), {"st": st, "c": code, "w": json.dumps(warnings or []), "id": doc_id})
-            stage = {"failed": "failed", "parsed": "confidence"}.get(st, "sanitising")
+            stage = {"failed": "failed", "segmented": "segmenting"}.get(st, "sanitising")
             await publish(ctx.conn, sid, EventType.DOCUMENT_STATUS, {
                 "document_id": str(doc_id), "version": version, "stage": stage,
                 "progress": progress, **({"code": code} if code else {}), "warnings": warnings or []})
@@ -100,21 +107,33 @@ def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | N
                             warnings.append("removed_exif")
                     warnings = sorted(set(warnings))
                 await ctx.checkpoint()
-                warnings += await _render_and_parse(ctx, store, get_parser(), sid, doc_id, version, d.source,
-                                                    [p.page for p in pages], t)
+                page_warnings, parsed = await _render_and_parse(ctx, store, get_parser(), sid, doc_id, version,
+                                                                d.source, [p.page for p in pages], t)
+                warnings += page_warnings
         except InputError as exc:
             await status("failed", 1.0, exc.code)
             return
         await ctx.checkpoint()
-        await status("parsed", 1.0, None, warnings)
-        # Clause segmentation, doc_terms and chunks (doc 05 §6 steps 6–8) are T2.3/T2.4.
+        await _progress(ctx.engine, sid, doc_id, version, "segmenting", 0.9)
+        clauses = segment.segment(parsed.items)
+        doc_terms = terms.lexicon_terms(clauses)
+        if llm is not None:
+            llm_out, stats = await terms.llm_terms(llm, clauses, {t.clause_ord for t in doc_terms})
+            doc_terms += llm_out
+            log.info("doc_terms.llm", document_id=str(doc_id), version=version, **stats)
+        await ctx.checkpoint()
+        await _write_clauses(ctx, doc_id, version, clauses, doc_terms)
+        await status("segmented", 1.0, None, warnings)
+        # Chunks, embeddings and → ready (doc 05 §6 step 8) are T2.4.
 
     return handle
 
 
 async def _render_and_parse(ctx: JobContext, store: ObjectStore, parser: parse.DocumentParser, sid: uuid.UUID,
-                            doc_id: uuid.UUID, version: int, source: str, page_nos: list[int], t: Path) -> list[str]:
-    """doc 05 §6 steps 2–5. Returns page warnings (`blurry_page:N`, `page_unreadable:N`, `low_ocr_page:N`)."""
+                            doc_id: uuid.UUID, version: int, source: str, page_nos: list[int],
+                            t: Path) -> tuple[list[str], parse.ParsedDoc]:
+    """doc 05 §6 steps 2–5. Returns page warnings (`blurry_page:N`, `page_unreadable:N`, `low_ocr_page:N`) and the
+    parsed document."""
     prefix = f"{doc_id}/v{version}"
     await _progress(ctx.engine, sid, doc_id, version, "rendering", 0.2)
     quality: dict[int, dict[str, object]] = {}
@@ -170,4 +189,28 @@ async def _render_and_parse(ctx: JobContext, store: ObjectStore, parser: parse.D
                           ("items.json", {"parser": parser.name, "scores": parsed.scores, "items": parse.items_json(parsed)})):
         (t / name).write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
         await store.put_file("documents", f"{prefix}/{name}", str(t / name), "application/json")
-    return warnings
+    return warnings, parsed
+
+
+async def _write_clauses(ctx: JobContext, doc_id: uuid.UUID, version: int, clauses: list[segment.Clause],
+                         doc_terms: list[terms.Term]) -> None:
+    """doc 05 §6.9: a re-run rewrites this version's rows (same transaction as the final status)."""
+    await ctx.conn.execute(text("DELETE FROM clauses WHERE document_id = :d AND version = :v"), {"d": doc_id, "v": version})
+    ids: dict[int, uuid.UUID] = {}
+    for c in clauses:
+        ids[c.ord] = uuid.uuid4()
+        await ctx.conn.execute(text(
+            "INSERT INTO clauses (id, document_id, version, page_start, page_end, bboxes, section_path, label, text, "
+            "is_table_row, text_source, ocr_conf, ocr_min_numeric_conf, ord) VALUES (:id, :d, :v, :ps, :pe, "
+            "CAST(:bb AS jsonb), :sp, :l, :t, :tr, :ts, :c, :cn, :o)"),
+            {"id": ids[c.ord], "d": doc_id, "v": version, "ps": c.page_start, "pe": c.page_end,
+             "bb": json.dumps(c.bboxes), "sp": c.section_path, "l": c.label, "t": c.text, "tr": c.is_table_row,
+             "ts": c.text_source, "c": c.ocr_conf, "cn": c.ocr_min_numeric_conf, "o": c.ord})
+    for tm in doc_terms:
+        await ctx.conn.execute(text(
+            "INSERT INTO doc_terms (id, document_id, version, clause_id, field, value_raw, value, unit, basis, "
+            "rate_type, conditions, includes_gst, normaliser_version, source) VALUES (:id, :d, :v, :c, :f, :raw, "
+            ":val, :u, :b, :rt, CAST(:cond AS jsonb), :g, :nv, :src)"),
+            {"id": uuid.uuid4(), "d": doc_id, "v": version, "c": ids[tm.clause_ord], "f": tm.field,
+             "raw": tm.value_raw, "val": tm.value, "u": tm.unit, "b": tm.basis, "rt": tm.rate_type,
+             "cond": json.dumps(tm.conditions), "g": tm.includes_gst, "nv": tm.normaliser_version, "src": tm.source})

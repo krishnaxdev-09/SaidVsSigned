@@ -154,7 +154,8 @@ async def revoke_consent(session_id: uuid.UUID, request: Request,
                           {"recording_id": str(rec.id), "stage": "failed", "progress": 1.0, "code": "consent_revoked"})
         docs = (await conn.execute(text(  # same rule for documents still being processed (T2.1)
             "UPDATE documents SET status = 'failed', status_code = 'consent_revoked' WHERE session_id = :s "
-            "AND deleted_at IS NULL AND status IN ('queued', 'sanitising', 'sanitised', 'rendering', 'ocr', 'confidence') "
+            "AND deleted_at IS NULL "
+            "AND status IN ('queued', 'sanitising', 'sanitised', 'rendering', 'ocr', 'confidence', 'segmenting') "
             "RETURNING id, version"), {"s": session_id})).all()
         for doc in docs:
             await publish(conn, session_id, EventType.DOCUMENT_STATUS, {

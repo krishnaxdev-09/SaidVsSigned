@@ -105,9 +105,9 @@ class FakeParser:
         return ParsedDoc(items=items, ocr_lines=lines, docling_json={"name": "fake"}, scores={"ocr_score": self.ocr_conf})
 
 
-async def drain(engine, store, parser=None) -> None:  # type: ignore[no-untyped-def]
+async def drain(engine, store, parser=None, llm=None) -> None:  # type: ignore[no-untyped-def]
     reg = Registry()
-    reg.register("doc.ingest", make_doc_ingest_handler(store, parser or FakeParser()))
+    reg.register("doc.ingest", make_doc_ingest_handler(store, parser or FakeParser(), llm))
     w = Worker(engine, reg, lease_seconds=60)
     while await w.run_once():
         pass
@@ -128,7 +128,7 @@ async def test_hostile_pdf_is_sanitised(client, engine, fake_store):  # type: ig
     did = r.json()["document_id"]
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["status"], d["source"], d["page_count"]) == ("parsed", "pdf", 2)
+    assert (d["status"], d["source"], d["page_count"]) == ("segmented", "pdf", 2)
     assert {"removed_open_action", "removed_javascript", "removed_embedded_files", "removed_xfa",
             "removed_page_actions", "removed_javascript_link", "removed_file_attachment"} <= set(d["warnings"])
     clean = fake_store.objects[("documents", f"{did}/v1/sanitised/document.pdf")]
@@ -217,7 +217,7 @@ async def test_photos_lose_exif_and_gps(client, engine, fake_store):  # type: ig
     did = r.json()["document_id"]
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["status"], d["source"], d["page_count"]) == ("parsed", "photos", 2)
+    assert (d["status"], d["source"], d["page_count"]) == ("segmented", "photos", 2)
     assert "removed_exif" in d["warnings"] and d["pages"][0]["width"] == 64
     clean = fake_store.objects[("documents", f"{did}/v1/sanitised/1.jpg")]
     im = Image.open(io.BytesIO(clean))
@@ -278,7 +278,7 @@ async def test_page_replace_creates_a_new_version(client, engine, fake_store):  
     assert await scalar(engine, "SELECT content_sha256 FROM documents WHERE id = :d", d=uuid.UUID(did)) != sha1
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["version"], d["status"], d["page_count"]) == (2, "parsed", 3) and "removed_exif" in d["warnings"]
+    assert (d["version"], d["status"], d["page_count"]) == (2, "segmented", 3) and "removed_exif" in d["warnings"]
     assert ("documents", f"{did}/v2/sanitised/2.jpg") in fake_store.objects
     assert await scalar(engine, "SELECT count(*) FROM audit_log WHERE action = 'document.page_replace' AND target_id = :t",
                         t=uuid.UUID(did)) == 1
@@ -335,7 +335,7 @@ async def test_parse_outputs_pages_items_and_page_image(client, engine, fake_sto
     parser = FakeParser()
     await drain(engine, fake_store, parser)
     d = await doc(client, h, did)
-    assert d["status"] == "parsed" and d["stage"] == "confidence"
+    assert d["status"] == "segmented" and d["stage"] == "segmenting"
     assert parser.calls == [{"ocr": False, "force": False}]  # digital PDF: text layer on every page, OCR off
     assert [p["text_source"] for p in d["pages"]] == ["text_layer", "text_layer"] and d["pages"][0]["width"] == 1654
     for name in ("pages/1.webp", "pages/2.webp", "docling.json", "items.json"):
@@ -373,4 +373,90 @@ async def test_ocr_page_warnings(client, engine, fake_store, parser, warning):  
     did = (await upload(client, h, sid, [("scan.pdf", pdf_bytes(1))])).json()["document_id"]  # blank: no text layer
     await drain(engine, fake_store, parser)
     d = await doc(client, h, did)
-    assert d["status"] == "parsed" and warning in d["warnings"] and d["pages"][0]["text_source"] == "ocr"
+    assert d["status"] == "segmented" and warning in d["warnings"] and d["pages"][0]["text_source"] == "ocr"
+
+
+# ---- T2.3 clause segmentation + doc_terms ---------------------------------------------------------------------------
+
+class KfsParser:
+    """Docling-shaped output for a 2-page KFS + agreement (reading order, table with flagged header row)."""
+
+    name = "kfs-parser"
+
+    def parse(self, pdf_path, *, ocr, force_full_page_ocr):  # type: ignore[no-untyped-def]
+        def cell(r: int, c: int, t: str, hdr: bool = False) -> Item:
+            return Item(f"#/tables/0/r{r}c{c}", 1, "table_cell", t, (0.1 + 0.4 * c, 0.2 + 0.05 * r, 0.5 + 0.4 * c, 0.24 + 0.05 * r),
+                        table={"table": "#/tables/0", "row": r, "col": c, "header": hdr})
+        items = [Item("#/texts/0", 1, "page_header", "Udyam Capital — page 1", (0.1, 0.01, 0.9, 0.03)),
+                 Item("#/texts/1", 1, "section_header", "Key Fact Statement", (0.1, 0.05, 0.9, 0.08)),
+                 cell(0, 0, "Item", True), cell(0, 1, "Details", True),
+                 cell(1, 0, "Loan amount"), cell(1, 1, "Rs. 10,00,000"),
+                 cell(2, 0, "Processing fee"), cell(2, 1, "2% of loan amount + GST"),
+                 cell(3, 0, "Net disbursed amount"), cell(3, 1, "Rs. 9,57,900"),
+                 Item("#/texts/2", 2, "section_header", "Terms and Conditions", (0.1, 0.05, 0.9, 0.08)),
+                 Item("#/texts/3", 2, "list_item", "1. Prepayment. Prepayment attracts a charge of 4% of the principal "
+                      "outstanding plus GST.", (0.1, 0.1, 0.9, 0.14)),
+                 Item("#/texts/4", 2, "text", "after 6 EMIs only.", (0.1, 0.14, 0.9, 0.16)),
+                 Item("#/texts/5", 2, "text", "Signed: ________ (Borrower)", (0.1, 0.8, 0.9, 0.82))]
+        return ParsedDoc(items=items, ocr_lines=[], docling_json={"name": "kfs"}, scores={})
+
+
+async def test_clauses_and_doc_terms(client, engine, fake_store):  # type: ignore[no-untyped-def]
+    from app.llm.fakes import FakeLLMProvider
+
+    h, sid = await ready_session(client)
+    ag07 = (Path(__file__).resolve().parents[3] / "eval" / "datasets" / "agreements" / "AG07" / "agreement.pdf").read_bytes()
+    did = (await upload(client, h, sid, [("ag07.pdf", ag07)])).json()["document_id"]
+    llm = FakeLLMProvider([{"terms": [
+        {"clause": "C1", "field": "prepayment_charge", "value_raw": "4% of the principal outstanding",
+         "quantity": "percent", "includes_gst": False, "conditions": ["after 6 EMIs only"]},
+        {"clause": "C1", "field": "penal_charge", "value_raw": "5% per month", "quantity": "percent"},  # not in the clause
+        {"clause": "C9", "field": "emi", "value_raw": "Rs. 100", "quantity": "amount_inr"}]}])  # unknown ref
+    await drain(engine, fake_store, KfsParser(), llm)
+    assert (await doc(client, h, did))["status"] == "segmented"
+    r = await client.get(f"/api/v1/documents/{did}/clauses", headers=h)
+    assert r.status_code == 200, r.text
+    cl = r.json()
+    assert [c["label"] for c in cl] == ["table_row", "table_row", "table_row", "list_item", "signature"]
+    assert cl[0]["text"] == "Item | Details\nLoan amount | Rs. 10,00,000" and cl[0]["section_path"] == "Key Fact Statement"
+    assert cl[0]["is_table_row"] and len(cl[0]["bboxes"]) == 2 and cl[0]["bboxes"][0]["page"] == 1
+    assert cl[3]["text"].endswith("plus GST.\nafter 6 EMIs only.") and cl[3]["section_path"] == "Terms and Conditions"
+    terms = {t["field"]: t for c in cl for t in c["terms"]}
+    assert set(terms) == {"loan_amount", "processing_fee", "net_disbursement", "prepayment_charge"}
+    assert terms["loan_amount"]["value"] == "1000000" and terms["loan_amount"]["unit"] == "INR"
+    assert terms["processing_fee"]["value"] == "2" and terms["processing_fee"]["includes_gst"] is False
+    assert terms["net_disbursement"]["value"] == "957900" and terms["loan_amount"]["source"] == "lexicon"
+    pre = terms["prepayment_charge"]
+    assert (pre["value"], pre["unit"], pre["source"], pre["conditions"]) == ("4", "%", "llm", ["after 6 EMIs only"])
+    assert [c["ord"] for c in (await client.get(f"/api/v1/documents/{did}/clauses?page=2", headers=h)).json()] == [3, 4]
+    nv = await scalar(engine, "SELECT count(*) FROM doc_terms WHERE document_id = :d AND normaliser_version = 'norm-1.0'",
+                      d=uuid.UUID(did))
+    assert nv == 4
+
+    # A re-run of the same version rewrites its rows instead of duplicating them (doc 05 §6.9).
+    from app.worker import queue
+
+    async with engine.begin() as c:
+        await queue.enqueue(c, "doc.ingest", {"document_id": did, "version": 1}, dedupe_key=f"rerun:{did}")
+    await drain(engine, fake_store, KfsParser())  # no LLM this time: lexicon terms only
+    assert await scalar(engine, "SELECT count(*) FROM clauses WHERE document_id = :d", d=uuid.UUID(did)) == 5
+    assert await scalar(engine, "SELECT count(*) FROM doc_terms WHERE document_id = :d", d=uuid.UUID(did)) == 3
+
+    _, other_h = await register_and_login(client)
+    assert (await client.get(f"/api/v1/documents/{did}/clauses", headers=other_h)).status_code == 404
+
+
+async def test_llm_schema_failure_keeps_lexicon_terms(client, engine, fake_store):  # type: ignore[no-untyped-def]
+    from app.core.retry import SchemaError
+
+    class BrokenLLM:
+        name = "broken"
+
+        async def structured(self, **kw):  # type: ignore[no-untyped-def]
+            raise SchemaError("bad json after corrective retry")
+
+    h, sid = await ready_session(client)
+    did = (await upload(client, h, sid, [("kfs.pdf", pdf_bytes(2))])).json()["document_id"]
+    await drain(engine, fake_store, KfsParser(), BrokenLLM())
+    assert (await doc(client, h, did))["status"] == "segmented"
+    assert await scalar(engine, "SELECT count(*) FROM doc_terms WHERE document_id = :d", d=uuid.UUID(did)) == 3

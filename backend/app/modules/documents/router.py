@@ -7,6 +7,7 @@ import json
 import tempfile
 import uuid
 from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Literal
 
@@ -36,7 +37,8 @@ router = APIRouter(prefix="/api/v1", tags=["documents"])
 
 Kind = Literal["kfs", "loan_agreement", "sanction_letter", "fee_schedule", "other"]  # insurance_policy deferred
 _STAGE = {"queued": "queued", "sanitising": "sanitising", "sanitised": "sanitising", "rendering": "rendering",
-          "ocr": "ocr", "confidence": "confidence", "parsed": "confidence", "failed": "failed"}
+          "ocr": "ocr", "confidence": "confidence", "segmenting": "segmenting", "segmented": "segmenting",
+          "failed": "failed"}
 
 
 class UploadOut(BaseModel):
@@ -284,3 +286,60 @@ async def page_image(document_id: uuid.UUID, page: int, request: Request,
     if key is None:
         raise AppError("not_found", "Page image not available yet")
     return PageImageOut(url=await _store(request).get_url("documents", key, 300), expires_in=300)
+
+
+class TermOut(BaseModel):
+    field: str
+    value_raw: str
+    value: str | None  # plain decimal string ("1000000", "17.5"), never scientific notation
+    unit: str | None
+    basis: str | None
+    rate_type: str | None
+    includes_gst: bool | None
+    conditions: list[str]
+    source: str | None
+
+
+class ClauseOut(BaseModel):
+    id: uuid.UUID
+    ord: int
+    page_start: int
+    page_end: int
+    label: str | None
+    section_path: str | None
+    text: str
+    is_table_row: bool
+    bboxes: list[dict[str, Any]]
+    text_source: str | None
+    ocr_conf: float | None
+    ocr_min_numeric_conf: float | None
+    terms: list[TermOut]
+
+
+def _plain(v: Decimal | None) -> str | None:
+    return None if v is None else format(v.normalize(), "f")
+
+
+@router.get("/documents/{document_id}/clauses", response_model=list[ClauseOut])
+async def list_clauses(document_id: uuid.UUID, page: int | None = None,
+                       user_id: uuid.UUID = Depends(current_user)) -> list[ClauseOut]:
+    """Clauses of the current version (doc 05 §5), optionally only those on `page`, with their doc_terms."""
+    async with get_engine().connect() as conn:
+        doc = await load_document(conn, document_id, user_id)
+        rows = (await conn.execute(text(
+            "SELECT * FROM clauses WHERE document_id = :d AND version = :v "
+            "AND (CAST(:p AS int) IS NULL OR :p BETWEEN page_start AND page_end) ORDER BY ord"),
+            {"d": document_id, "v": doc.version, "p": page})).mappings().all()
+        trows = (await conn.execute(text(
+            "SELECT * FROM doc_terms WHERE document_id = :d AND version = :v"),
+            {"d": document_id, "v": doc.version})).mappings().all()
+    by: dict[uuid.UUID, list[TermOut]] = {}
+    for t in trows:
+        by.setdefault(t["clause_id"], []).append(TermOut(
+            field=t["field"], value_raw=t["value_raw"], value=_plain(t["value"]), unit=t["unit"], basis=t["basis"],
+            rate_type=t["rate_type"], includes_gst=t["includes_gst"], conditions=list(t["conditions"] or []),
+            source=t["source"]))
+    return [ClauseOut(id=r["id"], ord=r["ord"], page_start=r["page_start"], page_end=r["page_end"], label=r["label"],
+                      section_path=r["section_path"], text=r["text"], is_table_row=bool(r["is_table_row"]),
+                      bboxes=list(r["bboxes"] or []), text_source=r["text_source"], ocr_conf=r["ocr_conf"],
+                      ocr_min_numeric_conf=r["ocr_min_numeric_conf"], terms=by.get(r["id"], [])) for r in rows]

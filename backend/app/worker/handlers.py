@@ -29,4 +29,4 @@ def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | N
     registry.register("stt.batch", make_stt_handler(stt))  # T1.2, doc 03 §6
     registry.register("speakers.suggest", make_suggest_handler(llm))  # T1.3, doc 03 §5
     registry.register("claims.extract", make_extract_handler(llm))  # T1.6, doc 04 §5
-    registry.register("doc.ingest", make_doc_ingest_handler(store))  # T2.1 (sanitise), doc 05 §6
+    registry.register("doc.ingest", make_doc_ingest_handler(store, llm=llm))  # T2.1–T2.3, doc 05 §6

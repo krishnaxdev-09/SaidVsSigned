@@ -9,7 +9,8 @@
   (doc 05 §6.5; no Tesseract). Text-layer items get 1.0 and `text_layer`. Each item gets `ocr_conf` (mean of the
   overlapping OCR lines) and `ocr_min_numeric_conf` (min over overlapping lines containing digits, % or ₹).
 - Every bbox is normalised server-side to 0–1 with a top-left origin.
-Items (text blocks and table cells, with table row/column) are the hand-off to clause segmentation (T2.3).
+Items (text blocks and table cells, with table row/column/header), in Docling reading order, are the hand-off to
+clause segmentation (`segment.py`, T2.3).
 """
 
 from __future__ import annotations
@@ -141,7 +142,7 @@ class Item:
     label: str
     text: str
     bbox: tuple[float, float, float, float] | None
-    table: dict[str, int | str] | None = None  # {"table": ref, "row": i, "col": j}
+    table: dict[str, int | str | bool] | None = None  # {"table": ref, "row": i, "col": j, "header": bool}
     text_source: str = "text_layer"
     ocr_conf: float | None = None
     ocr_min_numeric_conf: float | None = None
@@ -209,25 +210,30 @@ class DoclingParser:
             return normalise_bbox(b.l, b.t, b.r, b.b, *sizes[prov.page_no], b.coord_origin.value)
 
         items: list[Item] = []
-        for t in doc.texts:
-            prov = t.prov[0] if t.prov else None
-            if prov is None or not t.text.strip():
+        for node, _level in doc.iterate_items():  # body in Docling reading order (furniture excluded)
+            prov = node.prov[0] if getattr(node, "prov", None) else None
+            if prov is None or prov.page_no not in sizes:
                 continue
-            items.append(Item(ref=t.self_ref, page=prov.page_no, label=t.label.value, text=t.text, bbox=nb(prov)))
-        for tab in doc.tables:
-            prov = tab.prov[0] if tab.prov else None
-            if prov is None:
+            data = getattr(node, "data", None)
+            if data is not None and hasattr(data, "table_cells"):  # TableItem
+                w, h = sizes[prov.page_no]
+                for c in data.table_cells:
+                    if not c.text.strip():
+                        continue
+                    bb = (normalise_bbox(c.bbox.l, c.bbox.t, c.bbox.r, c.bbox.b, w, h, c.bbox.coord_origin.value)
+                          if c.bbox is not None else nb(prov))
+                    items.append(Item(ref=f"{node.self_ref}/r{c.start_row_offset_idx}c{c.start_col_offset_idx}",
+                                      page=prov.page_no, label="table_cell", text=c.text, bbox=bb,
+                                      table={"table": node.self_ref, "row": c.start_row_offset_idx,
+                                             "col": c.start_col_offset_idx, "header": bool(c.column_header)}))
                 continue
-            w, h = sizes[prov.page_no]
-            for c in tab.data.table_cells:
-                if not c.text.strip():
-                    continue
-                bb = (normalise_bbox(c.bbox.l, c.bbox.t, c.bbox.r, c.bbox.b, w, h, c.bbox.coord_origin.value)
-                      if c.bbox is not None else nb(prov))
-                items.append(Item(ref=f"{tab.self_ref}/r{c.start_row_offset_idx}c{c.start_col_offset_idx}",
-                                  page=prov.page_no, label="table_cell", text=c.text, bbox=bb,
-                                  table={"table": tab.self_ref, "row": c.start_row_offset_idx,
-                                         "col": c.start_col_offset_idx}))
+            txt = getattr(node, "text", "") or ""
+            if not txt.strip():
+                continue
+            marker = (getattr(node, "marker", "") or "").strip()
+            if marker and marker not in ("-", "•", "·") and not txt.lstrip().startswith(marker):
+                txt = f"{marker} {txt}"  # list numbering ("1.") is split off by Docling; keep the printed text
+            items.append(Item(ref=node.self_ref, page=prov.page_no, label=node.label.value, text=txt, bbox=nb(prov)))
         lines: list[OcrLine] = []
         # Result pages are matched to document pages by order (page_no is 0- or 1-based across Docling versions).
         for page_no, p in zip(sorted(sizes), res.pages, strict=False):
