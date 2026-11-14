@@ -9,6 +9,7 @@ import ClaimList from "../claims/ClaimList";
 import TranscriptView from "../transcript/TranscriptView";
 import DocumentUpload from "../documents/DocumentUpload";
 import ResultsDashboard from "../results/ResultsDashboard";
+import AskPanel from "../ask/AskPanel";
 import { api } from "../../lib/api";
 import { connectEvents } from "../../lib/events";
 import { applyEvent } from "../../lib/eventLog";
@@ -32,6 +33,7 @@ export default function SessionPage() {
     if (ev.type.startsWith("claim.") || ev.type === "speaker.updated") qc.invalidateQueries({ queryKey: ["claims", id] });
     if (ev.type === "document.status") qc.invalidateQueries({ queryKey: ["documents", id] });
     if (ev.type === "verification.updated") qc.invalidateQueries({ queryKey: ["results", id] });
+    if (ev.type === "qa.answer") qc.invalidateQueries({ queryKey: ["qa", id] });
   }), [id, qc]);
   if (!q.data) return null;
   const { session, consent } = q.data;
@@ -44,6 +46,7 @@ export default function SessionPage() {
       {consent.active && <SpeakerConfirm sessionId={id} />}
       {consent.active && <ResultsDashboard sessionId={id} />}
       {consent.active && <DocumentUpload sessionId={id} />}
+      {consent.active && <AskPanel sessionId={id} />}
       {consent.active && <ClaimList sessionId={id} />}
       {consent.active && <TranscriptView sessionId={id} />}
       {consent.active && (

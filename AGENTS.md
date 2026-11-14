@@ -44,7 +44,7 @@ cd frontend && npm run dev                     # UI on :5173, proxies /api and /
 ## Layout
 ```
 backend/app/core/        config, db, errors (doc 01 §7), retry (doc 01 §6), idempotency, storage, security
-backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3), claims (normaliser T1.5, extraction T1.6), documents (T2.1–T2.4), rag (retrieval), verify (orchestrator T2.5), contract (T2.6), finance (tolerances)
+backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3), claims (normaliser T1.5, extraction T1.6), documents (T2.1–T2.4), rag (retrieval, Ask), verify (orchestrator T2.5), contract (T2.6), finance (SourcedFactory, formulas, engine), report
 backend/app/llm/         LLM provider interface, Bedrock Mantle provider (Gemma), fakes
 backend/app/schemas/     canonical doc 08 / doc 04 schemas, reason codes, CONFLICT validator, wording (T1.4)
 backend/app/worker/      Postgres job queue, runner, handlers.register_all
@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 30 / 40 tasks done (75%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 in progress.
+**Overall: 31 / 40 tasks done (77.5%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -105,7 +105,7 @@ Gate: HC-4 ✅ approved 2026-11-14.
 | T2.6 | Contract engine (said vs signed; 200 pairs, CONFLICT precision 1.000) | ✅ |
 | T2.7 | Results dashboard + evidence drawer + document upload screen (real-stack E2E demo) | ✅ |
 
-### Stage 3 — Finance, orchestration, reporting · 7 tasks · IN PROGRESS (3/7)
+### Stage 3 — Finance, orchestration, reporting · 7 tasks · IN PROGRESS (4/7)
 Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 package.
 
 | Task | What | Status |
@@ -113,7 +113,7 @@ Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 pa
 | T3.1 | Finance engine: SourcedFactory, MVP formulas, traces (golden 80/80; hidden until HC-5) | ✅ |
 | T3.2 | Merge v2 (C-CALC-DOC, internal_inconsistency; finance hidden until HC-5) | ✅ |
 | T3.3 | Results UI v2 + PDF report (snapshot + wording tests) | ✅ |
-| T3.4 | Ask-lite with routing + citations | ⬜ |
+| T3.4 | Ask-lite with routing + citation validator (routing 50/50, 0 invalid citations) | ✅ |
 | T3.5 | Shadow rules + demo lenders | ⬜ |
 | T3.6 | Gated formulas (off for the whole MVP) | ⬜ |
 | T3.7 | HC-6 rule review package | ⬜ |

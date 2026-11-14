@@ -20,6 +20,7 @@ from app.modules.auth.router import router as auth_router
 from app.modules.claims.router import router as claims_router
 from app.modules.consent.router import router as consent_router
 from app.modules.documents.router import router as documents_router
+from app.modules.rag.qa import router as qa_router
 from app.modules.realtime.bus import hub
 from app.modules.realtime.ws import router as ws_router
 from app.modules.report.service import router as reports_router
@@ -63,6 +64,7 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
     app.include_router(documents_router)
     app.include_router(results_router)
     app.include_router(reports_router)
+    app.include_router(qa_router)
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict[str, str]:

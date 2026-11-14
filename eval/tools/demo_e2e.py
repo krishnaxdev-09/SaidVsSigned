@@ -106,6 +106,19 @@ def main() -> None:
         if d:
             print(f"      page {d['page']} bboxes={len(d['bboxes'])} → "
                   f"{c.get(f'/api/v1/documents/{d['document_id']}/pages/{d['page']}/image').status_code == 200 and 'image ok'}")
+    print("\nASK")
+    for q in ("What is the processing fee?", "Is there a foreclosure charge?", "Is there a gold loan option?",
+              "How much will I get in hand after fees?"):
+        qid = c.post(f"/api/v1/sessions/{sid}/qa", headers=key(), json={"question": q}).json()["qa_id"]
+        a = wait(f"answer: {q}", lambda: next((x for x in c.get(f"/api/v1/sessions/{sid}/qa").json()
+                                                if x["qa_id"] == qid and x["status"] == "done"), None), timeout=180, every=2)
+        print(f"  [{a['route']}] {a['answer']['answer_text']}")
+        for ct in a["answer"]["citations"]:
+            print(f"      “{ct['quote']}”")
+    rid = c.post(f"/api/v1/sessions/{sid}/reports", headers=key()).json()["report_id"]
+    rep = wait("report", lambda: (r := c.get(f"/api/v1/reports/{rid}").json())["status"] == "ready" and r, every=2)
+    pdf = httpx.get(rep["url"].replace("http://localhost:9000", "http://localhost:9000"), timeout=30)
+    print(f"  report PDF: {pdf.status_code}, {len(pdf.content)} bytes, starts {pdf.content[:5]!r}")
     print(f"\nOpen http://localhost:5173/sessions/{sid} (login {email}) to see it in the UI.")
 
 
