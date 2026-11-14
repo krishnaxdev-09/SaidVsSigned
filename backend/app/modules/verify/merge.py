@@ -36,13 +36,14 @@ PRIMARY: dict[str, set[Engine]] = {
     **{t: {"contract"} for t in ("processing_fee", "other_charge", "interest_rate", "tenure", "loan_amount",
                                  "prepayment_charge", "penal_charge", "insurance_bundled", "document_assurance",
                                  "general_assurance")},
-    # emi/total_cost/net_disbursement: the contract engine compares the figure the document prints (like-for-like,
-    # not gated, doc 06 §4a). Finance (C-CALC-DOC, when the document only gives inputs) is a visible sub-check; it
-    # returns calculation_not_enabled before HC-5, which must not block a printed-figure MATCH.
-    **{t: {"contract"} for t in ("emi", "total_cost", "net_disbursement")},
+    # emi/total_cost/net_disbursement (§6, merge v2 T3.2): contract (the printed figure, like-for-like) + finance
+    # (C-CALC-DOC from the document's inputs). A primary that could not compare (NON_BLOCKING) doesn't block the
+    # other's MATCH; an error or a disagreement does.
+    **{t: {"contract", "finance"} for t in ("emi", "total_cost", "net_disbursement")},
     "lender_identity": {"public_data"},
 }
 MEDIUM_UNCLEAR_TYPES = {"processing_fee", "interest_rate", "emi", "net_disbursement"}
+NON_BLOCKING = {ReasonCode.CLAUSE_NOT_FOUND, ReasonCode.CALCULATION_NOT_ENABLED, ReasonCode.MISSING_INPUTS}
 
 
 @dataclass
@@ -110,11 +111,16 @@ def merge(claim: Claim, spoken: SpokenEvidence, outcomes: list[Outcome], *, fina
                       _clause_reason(spoken, docs_of(o.verdict), section_of(o.verdict)) if docs_of(o.verdict)
                       else o.verdict.reason, "high" if high else "medium", o.verdict.engine, ev,
                       o.verdict.suggested_question or CONFLICT_QUESTION, verdicts)
-    # 2. MATCH: every primary verdict is MATCH, nothing visible is CONFLICT/UNCLEAR, and every primary engine ran.
+    # 2. MATCH: every primary engine ran, at least one primary is MATCH, every other primary is MATCH or could not
+    #    compare (NON_BLOCKING), and nothing visible is CONFLICT/UNCLEAR. An errored primary makes MATCH impossible.
     if primary and {o.verdict.engine for o in primary} >= primary_engines \
-            and all(o.verdict.status == Status.MATCH for o in primary) \
+            and any(o.verdict.status == Status.MATCH for o in primary) \
+            and all(o.verdict.status == Status.MATCH or (o.verdict.status == Status.NOT_VERIFIED
+                                                         and o.verdict.reason_code in NON_BLOCKING) for o in primary) \
             and not any(o.verdict.status in (Status.CONFLICT, Status.UNCLEAR) for o in visible):
-        p = primary[0].verdict
+        matched = [o for o in primary if o.verdict.status == Status.MATCH]
+        p = matched[0].verdict
+        primary = matched
         docs = [d for o in primary for d in docs_of(o.verdict)]
         return Merged(Status.MATCH, None, p.finding_kind, headline(Status.MATCH, field_label),
                       _clause_reason(spoken, docs, section_of(p)) if docs else p.reason, "info", p.engine,

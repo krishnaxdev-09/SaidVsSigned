@@ -17,9 +17,9 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
 | 1 — Upload, STT, speakers, claims | 8 | 7 | 1 | 0 | 0 | 87.5% (7/8) |
 | 2 — Documents & contract verification | 7 | 7 | 0 | 0 | 0 | 100% (7/7) |
-| 3 — Finance, orchestration, reporting | 7 | 1 | 0 | 6 | 0 | 14.3% (1/7) |
+| 3 — Finance, orchestration, reporting | 7 | 2 | 0 | 5 | 0 | 28.6% (2/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **28** | **1** | **11** | **0** | **70% (28/40)** |
+| **Total** | **40** | **29** | **1** | **10** | **0** | **72.5% (29/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -120,7 +120,7 @@ Implementation follow-ups from HC-3 (no new task IDs): `POST /claims/{id}/confir
 | Task | Status |
 |---|---|
 | T3.1 SourcedFactory + MVP formulas (synthetic only) | ⬜ (needs HC-3, HC-4) |
-| T3.2 Merge v2 | ⬜ |
+| T3.2 Merge v2 | ✅ 2026-11-14 — real finance engine `app/modules/finance/engine.py` replaces the stub: emi / total_cost / net_disbursement computed from the document's terms (factory inputs, flat small print governs, both bases when unstated → assumption_dependent, deductions from clauses that say "deducted"), compared with doc 06 tolerances → C-CALC-DOC with CalculationEvidence + the input clauses; spoken gates cap at UNCLEAR; no document → agent's own P/R/n (`calculation_internal`: consistent note under no_document, else UNCLEAR(internal_inconsistency)); every run traced (`enabled` = finance visible); **flag off → NOT_VERIFIED(calculation_not_enabled), no finance evidence**. Merge v2: contract + finance joint primaries for these types — a primary that could not compare (clause_not_found / calculation_not_enabled / missing_inputs) doesn't block the other's MATCH, an error or disagreement does; severity from INR impact (EMI × tenure). Integrity validator checks calculation traces (exists, enabled, inputs exist). Tests: `tests/integration/test_finance_merge.py` (flag off/on, C-CALC-DOC MATCH/CONFLICT, net ₹9,57,900 vs "full ₹10 lakh", ADR-019 cap, internal consistency), hypothesis property updated (no MATCH with an errored/disagreeing/absent primary); `make ci` 879/879 |
 | T3.3 Results UI v2 + PDF report | ⬜ |
 | T3.4 Ask-lite + routing | ⬜ |
 | T3.5 Shadow rules + demo lenders | ⬜ |

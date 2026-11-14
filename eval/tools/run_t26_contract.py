@@ -36,7 +36,7 @@ from app.modules.contract.engine import ContractEngine
 from app.modules.documents import ingest, parse, segment, terms
 from app.modules.rag import retrieve
 from app.modules.verify import gates
-from app.modules.verify.engines import FinanceEngine
+from app.modules.finance.engine import FinanceEngine
 from app.modules.verify.merge import merge
 from app.modules.verify.service import EngineContext, load_thresholds, run_engines, spoken_evidence
 from app.schemas.claims import Claim, Condition, ExtractedValue

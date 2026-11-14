@@ -35,7 +35,7 @@ def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | N
     from app.llm.embeddings import from_settings as embedder_from_settings
     from app.llm.nli import LocalNLI
     from app.modules.contract.engine import ContractEngine
-    from app.modules.verify.engines import FinanceEngine
+    from app.modules.finance.engine import FinanceEngine
     from app.modules.verify.job import make_verify_handler
 
     embedder, nli = embedder_from_settings(), LocalNLI()

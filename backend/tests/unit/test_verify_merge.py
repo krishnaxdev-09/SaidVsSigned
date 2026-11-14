@@ -10,7 +10,7 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from app.modules.verify import gates
-from app.modules.verify.merge import Outcome, merge
+from app.modules.verify.merge import NON_BLOCKING, Outcome, merge
 from app.modules.verify.service import is_hindi, spoken_evidence
 from app.schemas.claims import Claim, ExtractedValue
 from app.schemas.verification import (
@@ -177,7 +177,10 @@ def test_properties(vs, role_assignment, role, confirmed, hindi, ctype) -> None:
         assert any(x.status == Status.CONFLICT for x, sh in vs if not sh)
     if m.status == Status.MATCH:
         # 0 MATCH when the primary engine errored or was absent; shadow verdicts never decide
-        primary = [o for o in outs if not o.shadow and o.verdict.engine == ("public_data" if ctype == "lender_identity"
-                                                                            else "contract")]
-        assert primary and all(o.verdict.status == Status.MATCH for o in primary)
+        engines = {"lender_identity": {"public_data"}, "emi": {"contract", "finance"}}.get(ctype, {"contract"})
+        primary = [o for o in outs if not o.shadow and o.verdict.engine in engines]
+        assert {o.verdict.engine for o in primary} >= engines  # every primary engine ran
+        assert any(o.verdict.status == Status.MATCH for o in primary)
+        assert all(o.verdict.status == Status.MATCH or o.verdict.reason_code in NON_BLOCKING for o in primary)
+        assert not any(o.verdict.reason_code == ReasonCode.ENGINE_ERROR for o in primary)
     assert m.status in Status and (m.reason_code is None) == (m.status in (Status.MATCH, Status.CONFLICT))

@@ -61,8 +61,20 @@ async def check(conn: AsyncConnection, evidence: list[Evidence]) -> list[str]:
             stored = {tuple(round(x, 4) for x in b["bbox"]) for b in row.bboxes or []}
             if any((round(b.x0, 4), round(b.y0, 4), round(b.x1, 4), round(b.y1, 4)) not in stored for b in e.bboxes):
                 problems.append("clause_bbox_mismatch")
-        elif isinstance(e, CalculationEvidence):
-            problems.append("calculation_not_available")  # finance persistence arrives in Phase 3 (HC-5)
+        elif isinstance(e, CalculationEvidence):  # 3. trace exists, is user-visible, and its inputs exist
+            row = (await conn.execute(text("SELECT inputs, enabled, formula_id FROM calculations WHERE id = :id"),
+                                      {"id": e.calculation_id})).first()
+            if row is None or not row.enabled or row.formula_id != e.formula_id:
+                problems.append(f"calculation_missing:{e.calculation_id}")
+                continue
+            for name, inp in (row.inputs or {}).items():
+                table = inp.get("ref_table")
+                if table == "doc_terms" and not (await conn.execute(text(
+                        "SELECT 1 FROM doc_terms WHERE id = CAST(:i AS uuid)"), {"i": inp["ref_id"]})).first():
+                    problems.append(f"calculation_input_missing:{name}")
+                if table == "claim_values" and not (await conn.execute(text(
+                        "SELECT 1 FROM claims WHERE id = CAST(:i AS uuid)"), {"i": inp["ref_id"]})).first():
+                    problems.append(f"calculation_input_missing:{name}")
         elif isinstance(e, RuleEvidence):
             problems.append("rule_not_enabled")  # no rule is enabled before HC-6
     if problems:

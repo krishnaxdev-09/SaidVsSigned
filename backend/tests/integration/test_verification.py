@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 from app.llm.fakes import FakeEmbeddingProvider
 from app.modules.documents.ingest import make_doc_ingest_handler
-from app.modules.verify.engines import FinanceEngine
+from app.modules.finance.engine import FinanceEngine
 from app.modules.verify.job import make_verify_handler
 from app.modules.verify.merge import Outcome
 from app.schemas.verification import DocumentEvidence, EngineVerdict, FindingKind, NormBBox, ReasonCode, Status
