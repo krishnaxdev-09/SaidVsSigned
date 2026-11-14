@@ -116,6 +116,8 @@ flowchart TD
 ## 6. Normaliser (deterministic; `claims/normalize.py`, versioned)
 - **Numbers:** digits; Indian grouping (1,50,000); English and Hindi words (roman and Devanagari): ek, do, teen … sau, hazaar, lakh, crore; dedh = 1.5, dhai = 2.5, sava = +0.25, saadhe = +0.5, paune = −0.25; Devanagari digits ०–९.
 - **Zero synonyms** for fee/charge claims: zero, no, nil, free, nothing, "koi nahi", "bilkul nahi" → 0.
+  - **Extension approved by the user on 2026-11-14:** exactly "without charge" and "without any charge" → 0, for fee/charge fields only. Other forms (e.g. "without any charges") are not included and stay unparsed.
+  - A zero expression next to a number (e.g. "free after 2 years", "without any charge after 6 EMIs") is ambiguous and stays unparsed.
 - **Units:** %, percent, pratishat, taka → percent; k, thousand, hazaar multipliers; per month/mahina → monthly; saal/years → years (converted to months).
 - **Basis:** flat → flat; reducing, diminishing, on balance → reducing. **"Fixed" is a rate type, not flat.**
 - If parsing fails, set `value=None` and `normaliser_version=None`. The verification gate then gives `UNCLEAR(value_unparsed)` (doc 08 §5). **The LLM never supplies `value`**; any LLM-provided numeric field is discarded.

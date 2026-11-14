@@ -148,3 +148,9 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - Correction: the HC-2 summary said "25 MVP reason codes"; doc 08 has 24 MVP codes plus 1 deferred.
 - ADR-006 (semantic CONFLICT needs NLI + LLM-judge agreement) remains a working design; not approved.
 - Dev dependency `hypothesis==6.170.15` (doc 12 §A.2 test tooling).
+
+## 2026-11-14 — T1.5 deterministic normaliser
+- **T1.5 done:** `backend/app/modules/claims/normalize.py`, version `norm-1.0`, per doc 04 §6. It alone sets `value` / `value_low` / `value_high` and the comparator, period, rate basis/type and GST labels; anything the LLM supplied is replaced. Ambiguous, incomplete or unsupported text stays unparsed (→ `UNCLEAR(value_unparsed)` at the gate).
+- Decisions inside §6 (no new scope): romanised Hindi number words are read only in non-English segments ("do" is an English word); "flat" sets a basis only for interest rates; zero words apply only to fee/charge fields, including the insurance premium; comparators are read just before the value and GST/period/basis just after it.
+- **Doc 04 §6 extension approved by the user:** exactly "without charge" and "without any charge" → 0 on fee/charge fields; doc 04 updated. Also: a zero expression next to a number is now ambiguous and stays unparsed (previously "without any charge after 6 EMIs" would have read 6 as the charge).
+- Evidence: 444-case table + property tests (452 tests); 101 synthetic-agreement terms → 97 exact, 0 wrong, 4 unparsed.
