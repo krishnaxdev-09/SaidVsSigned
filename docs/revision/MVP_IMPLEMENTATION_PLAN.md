@@ -141,7 +141,7 @@ It then waits. No approval is recorded unless you give it.
 | T0.12 | CI (incl. feature-flag startup checks) | `.github/workflows/ci.yml` | Green | all |
 | T0.13 | Start eval datasets; draft consent/attestation texts (en/hi) for HC-7 | `eval/datasets/*`, `backend/data/consent_texts/*` | 10 agreements drafted; texts drafted (not approved) | — |
 
-#### Phase 0 implementation status (updated 2026-11-14). All 13 tasks are built and verified; Phase 0 exit is reported in `MVP_TASK_STATUS.md`
+#### Phase 0 implementation status (updated 2026-11-14). All 13 tasks are implemented. Verification has specific limitations, including no real-browser testing of the frontend shell and no independently verified GitHub Actions run on `main`; these are listed in `MVP_TASK_STATUS.md`, which holds the Phase 0 exit report
 | Task | Status | Evidence |
 |---|---|---|
 | T0.1 | ✅ | Q-16 resolved (MinIO built from source); `make up`: all services healthy; `/readyz` all `ok`; SSE-S3 put/head/presign/delete smoke test |

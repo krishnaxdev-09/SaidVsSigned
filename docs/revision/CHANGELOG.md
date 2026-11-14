@@ -8,7 +8,7 @@
   3. Document input is PDF + photo upload.
   4. Proceed with the revision, including the master report.
 
-**Nothing has been implemented.** No approvals, credentials, test results or legal reviews are recorded as obtained.
+**Historical, as of this v0.2 revision (2026-11-13): nothing had been implemented.** At that point, no approvals, credentials, test results or legal reviews were recorded as obtained. *(This records the state at that time. Later progress is in the "2026-11-14 — Phase 0 close-out" entry below and in `MVP_TASK_STATUS.md`.)*
 
 ## Global changes (all docs)
 | Change | Why |
