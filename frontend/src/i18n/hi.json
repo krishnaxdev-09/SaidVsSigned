@@ -118,5 +118,9 @@
   "severity_medium": "मध्यम",
   "severity_low": "कम",
   "severity_info": "जानकारी",
-  "choose_doc_files": "दस्तावेज़ चुनें (PDF या पेज की फ़ोटो)"
+  "choose_doc_files": "दस्तावेज़ चुनें (PDF या पेज की फ़ोटो)",
+  "report_download": "रिपोर्ट डाउनलोड करें (PDF)",
+  "report_working": "रिपोर्ट तैयार हो रही है…",
+  "report_failed": "रिपोर्ट तैयार नहीं हो सकी। फिर कोशिश करें।",
+  "calculation": "गणना"
 }

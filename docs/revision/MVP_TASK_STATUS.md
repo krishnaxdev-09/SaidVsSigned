@@ -17,9 +17,9 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
 | 1 — Upload, STT, speakers, claims | 8 | 7 | 1 | 0 | 0 | 87.5% (7/8) |
 | 2 — Documents & contract verification | 7 | 7 | 0 | 0 | 0 | 100% (7/7) |
-| 3 — Finance, orchestration, reporting | 7 | 2 | 0 | 5 | 0 | 28.6% (2/7) |
+| 3 — Finance, orchestration, reporting | 7 | 3 | 0 | 4 | 0 | 42.9% (3/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **29** | **1** | **10** | **0** | **72.5% (29/40)** |
+| **Total** | **40** | **30** | **1** | **9** | **0** | **75% (30/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -121,7 +121,7 @@ Implementation follow-ups from HC-3 (no new task IDs): `POST /claims/{id}/confir
 |---|---|
 | T3.1 SourcedFactory + MVP formulas (synthetic only) | ⬜ (needs HC-3, HC-4) |
 | T3.2 Merge v2 | ✅ 2026-11-14 — real finance engine `app/modules/finance/engine.py` replaces the stub: emi / total_cost / net_disbursement computed from the document's terms (factory inputs, flat small print governs, both bases when unstated → assumption_dependent, deductions from clauses that say "deducted"), compared with doc 06 tolerances → C-CALC-DOC with CalculationEvidence + the input clauses; spoken gates cap at UNCLEAR; no document → agent's own P/R/n (`calculation_internal`: consistent note under no_document, else UNCLEAR(internal_inconsistency)); every run traced (`enabled` = finance visible); **flag off → NOT_VERIFIED(calculation_not_enabled), no finance evidence**. Merge v2: contract + finance joint primaries for these types — a primary that could not compare (clause_not_found / calculation_not_enabled / missing_inputs) doesn't block the other's MATCH, an error or disagreement does; severity from INR impact (EMI × tenure). Integrity validator checks calculation traces (exists, enabled, inputs exist). Tests: `tests/integration/test_finance_merge.py` (flag off/on, C-CALC-DOC MATCH/CONFLICT, net ₹9,57,900 vs "full ₹10 lakh", ADR-019 cap, internal consistency), hypothesis property updated (no MATCH with an errored/disagreeing/absent primary); `make ci` 879/879 |
-| T3.3 Results UI v2 + PDF report | ⬜ |
+| T3.3 Results UI v2 + PDF report | ✅ 2026-11-14 — `app/modules/report/` (`render.build` deterministic content: summary counts, every user-visible result with quote + time and page + clause excerpt, questions to ask, disclaimer "not legal or financial advice", call-language label, attestation as the customer's own statement "The customer states … (not independently verified)", consent text version, generation time; `render.to_pdf` via reportlab; job `report.render:{id}` → `exports/{session}/{report}.pdf`; `POST /sessions/{id}/reports` (idempotent, consent required), `GET /reports/{id}` (presigned 5 min); audit report.generate / report.download; event report.status), migration `0011_reports_qa` (reports + qa_messages). UI: "Download report (PDF)" and calculation evidence in the drawer (server sends it only after HC-5). Dep `reportlab==4.2.5`. Tests: **report snapshot** `tests/snapshots/report_v1.txt`, wording (deny-list, "The customer states", never agent consent, disclaimer) for yes/no/unsure, PDF text round trip, API/job/owner/consent; frontend 16/16; `make ci` 883/883. Limits: Helvetica has no Devanagari glyphs (Hindi report text at T4.4); real-stack report check batched with T3.4 |
 | T3.4 Ask-lite + routing | ⬜ |
 | T3.5 Shadow rules + demo lenders | ⬜ |
 | T3.6 Gated formulas (off for MVP) | ⬜ |

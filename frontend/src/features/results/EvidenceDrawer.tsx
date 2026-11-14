@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../lib/api";
 import { mmss, playSnippet } from "../../lib/snippet";
-import type { BBox, DocumentEvidence, SpokenEvidence, VerificationResult } from "../../lib/types";
+import type { BBox, CalculationEvidence, DocumentEvidence, SpokenEvidence, VerificationResult } from "../../lib/types";
 
 export function bboxStyle(b: BBox): React.CSSProperties {
   return { left: `${b.x0 * 100}%`, top: `${b.y0 * 100}%`, width: `${(b.x1 - b.x0) * 100}%`,
@@ -34,6 +34,8 @@ export default function EvidenceDrawer({ sessionId, result, onClose }:
   const { t } = useTranslation();
   const spoken = result.evidence.find((e): e is SpokenEvidence => e.kind === "spoken");
   const docs = result.evidence.filter((e): e is DocumentEvidence => e.kind === "document");
+  // Only present after HC-5 (the server never sends finance evidence while finance is hidden).
+  const calcs = result.evidence.filter((e): e is CalculationEvidence => e.kind === "calculation");
   const hist = useQuery({ queryKey: ["history", result.id],
     queryFn: () => api<VerificationResult[]>(`/api/v1/results/${result.id}/history`) });
   return (
@@ -61,6 +63,11 @@ export default function EvidenceDrawer({ sessionId, result, onClose }:
             <blockquote className="whitespace-pre-wrap border-l-4 border-amber-400 pl-3 text-sm" data-testid="clause-text">
               {d.clause_text}</blockquote>
             <PageImage ev={d} />
+          </section>))}
+        {calcs.map((c) => (
+          <section key={c.calculation_id} className="space-y-1">
+            <h4 className="text-sm font-semibold">{t("calculation")}</h4>
+            <p className="text-sm" data-testid="calc-summary">{c.summary}</p>
           </section>))}
         {result.suggested_question && (
           <p className="rounded bg-slate-100 p-2 text-sm"><strong>{t("ask_this")}:</strong> {result.suggested_question}</p>)}

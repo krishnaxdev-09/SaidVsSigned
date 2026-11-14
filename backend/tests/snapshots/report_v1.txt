@@ -1,0 +1,23 @@
+[title] SaidSigned — call vs loan documents
+[small] Generated 14 Nov 2026, 12:30 UTC · Session s-1
+[body] Aangan Home Finance (fictional) · home loan
+[small] Call language: Hinglish (beta)
+[small] This report compares what was said on the call with the loan documents you uploaded. It is not legal or financial advice. A "Possible mismatch" is something to clarify with the lender in writing before you sign; it is not a finding about anyone's intent.
+[h2] Summary
+[body] Possible mismatch: 1 · Needs clarification: 0 · Matches the document: 0 · Couldn't check: 1
+[h2] Possible mismatch
+[item] Possible mismatch: processing fee (medium)
+[body] The agent said "the processing fee is one point five percent." (00:25). Page 1 says: "0.5% + GST".
+[quote] Said (agent) at 00:25: “the processing fee is one point five percent.”
+[quote] Document page 1: “Item | Details Processing fee | 0.5% of loan amount + GST”
+[small] Question: Ask the agent to explain the difference in writing before you sign.
+[h2] Couldn't check
+[item] Couldn't check yet: EMI
+[body] No loan document has been uploaded and processed yet.
+[quote] Said (agent, auto-detected) at 00:14: “EMI 22,093”
+[small] Question: Ask for the KFS / agreement and upload it.
+[h2] Questions to ask the lender before signing
+[item] Ask the agent to explain the difference in writing before you sign.
+[h2] About this recording
+[body] The customer states the agent was informed of the recording (not independently verified).
+[small] Processing consent text version draft-0.1 (draft wording; legal review pending).

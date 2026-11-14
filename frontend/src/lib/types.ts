@@ -69,7 +69,8 @@ export interface DocumentEvidence {
   kind: "document"; document_id: string; document_version: number; page: number; clause_id: string; clause_text: string;
   bboxes: BBox[]; ocr_conf: number | null; text_source: "text_layer" | "ocr";
 }
-export type Evidence = SpokenEvidence | DocumentEvidence | { kind: "calculation" | "rule" | "public" };
+export interface CalculationEvidence { kind: "calculation"; calculation_id: string; formula_id: string; summary: string; input_sources: string[] }
+export type Evidence = SpokenEvidence | DocumentEvidence | CalculationEvidence | { kind: "rule" | "public" };
 export interface VerificationResult {
   id: string; claim_id: string; version: number; is_current: boolean; status: Status; reason_code: string | null;
   headline: string; reason: string; severity: "high" | "medium" | "low" | "info"; suggested_question: string | null;

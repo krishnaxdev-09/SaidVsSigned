@@ -24,6 +24,7 @@ dependencies = [
   "pikepdf==10.18.1",
   "pillow==13.0.0",
   "docling==2.150.1",
+  "reportlab==4.2.5",
 ]
 
 [dependency-groups]

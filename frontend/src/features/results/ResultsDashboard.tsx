@@ -4,7 +4,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api } from "../../lib/api";
+import { api, newIdempotencyKey } from "../../lib/api";
 import { playSnippet } from "../../lib/snippet";
 import type { Claim, SpokenEvidence, Status, VerificationResult } from "../../lib/types";
 import EvidenceDrawer from "./EvidenceDrawer";
@@ -17,6 +17,21 @@ export default function ResultsDashboard({ sessionId }: { sessionId: string }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [open, setOpen] = useState<VerificationResult | null>(null);
+  const [report, setReport] = useState<"idle" | "working" | "failed">("idle");
+
+  async function downloadReport() {
+    setReport("working");
+    try {
+      const { report_id } = await api<{ report_id: string }>(`/api/v1/sessions/${sessionId}/reports`,
+        { method: "POST", idempotencyKey: newIdempotencyKey() });
+      for (let i = 0; i < 60; i++) {  // the server renders it in the background (report.render job)
+        const r = await api<{ status: string; url: string | null }>(`/api/v1/reports/${report_id}`);
+        if (r.status === "ready" && r.url) { window.open(r.url, "_blank", "noopener"); setReport("idle"); return; }
+        await new Promise((res) => setTimeout(res, 1000));
+      }
+      setReport("failed");
+    } catch { setReport("failed"); }
+  }
   const q = useQuery({ queryKey: ["results", sessionId],
     queryFn: () => api<VerificationResult[]>(`/api/v1/sessions/${sessionId}/results`) });
   const claims = useQuery({ queryKey: ["claims", sessionId],
@@ -33,10 +48,16 @@ export default function ResultsDashboard({ sessionId }: { sessionId: string }) {
     <section className="space-y-3 rounded border border-slate-200 p-4" aria-labelledby="results-title">
       <div className="flex items-center justify-between">
         <h2 id="results-title" className="font-semibold">{t("results_title")}</h2>
-        <button className="h-11 rounded border px-3 text-sm" onClick={async () => {
-          await api(`/api/v1/sessions/${sessionId}/reverify`, { method: "POST" });
-        }}>{t("reverify")}</button>
+        <div className="flex gap-2">
+          <button className="h-11 rounded border px-3 text-sm" onClick={async () => {
+            await api(`/api/v1/sessions/${sessionId}/reverify`, { method: "POST" });
+          }}>{t("reverify")}</button>
+          <button className="h-11 rounded bg-slate-900 px-3 text-sm text-white disabled:opacity-50"
+            disabled={report === "working"} onClick={downloadReport}>
+            {report === "working" ? t("report_working") : t("report_download")}</button>
+        </div>
       </div>
+      {report === "failed" && <p role="alert" className="text-sm text-red-700">{t("report_failed")}</p>}
       <ul className="flex flex-wrap gap-2 text-sm" aria-label="summary">
         {ORDER.map((s) => (
           <li key={s} data-testid={`count-${s}`} className={`rounded border px-2 py-1 ${TONE[s]}`}>

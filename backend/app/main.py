@@ -22,6 +22,7 @@ from app.modules.consent.router import router as consent_router
 from app.modules.documents.router import router as documents_router
 from app.modules.realtime.bus import hub
 from app.modules.realtime.ws import router as ws_router
+from app.modules.report.service import router as reports_router
 from app.modules.sessions.router import router as sessions_router
 from app.modules.speakers.router import router as speakers_router
 from app.modules.stt.router import router as stt_router
@@ -61,6 +62,7 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
     app.include_router(claims_router)
     app.include_router(documents_router)
     app.include_router(results_router)
+    app.include_router(reports_router)
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict[str, str]:

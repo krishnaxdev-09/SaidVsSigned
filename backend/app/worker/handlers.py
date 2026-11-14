@@ -43,4 +43,7 @@ def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | N
         embedder.embed_sync(["warm-up"], kind="query")
         nli.score_sync("warm-up", "warm-up")
     contract = ContractEngine(embedder=embedder, llm=llm, nli=nli)
-    registry.register("verify", make_verify_handler([contract, FinanceEngine()], llm=llm))  # T2.5/T2.6, doc 08
+    registry.register("verify", make_verify_handler([contract, FinanceEngine()], llm=llm))
+    from app.modules.report.service import make_report_handler
+
+    registry.register("report.render", make_report_handler(store))  # T3.3, doc 10 report  # T2.5/T2.6, doc 08

@@ -118,5 +118,9 @@
   "severity_medium": "Medium",
   "severity_low": "Low",
   "severity_info": "Info",
-  "choose_doc_files": "Choose the document (PDF or page photos)"
+  "choose_doc_files": "Choose the document (PDF or page photos)",
+  "report_download": "Download report (PDF)",
+  "report_working": "Preparing report…",
+  "report_failed": "The report couldn't be prepared. Try again.",
+  "calculation": "Calculation"
 }

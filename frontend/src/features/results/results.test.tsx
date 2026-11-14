@@ -54,6 +54,8 @@ beforeEach(() => {
     if (url.includes("/audio?")) return json({ url: "https://minio.test/snippet.m4a" });
     if (url.includes("/confirm-quote")) return json({});
     if (url.endsWith("/reverify")) return json({ queued: 3 }, 202);
+    if (url.endsWith("/sessions/s/reports") && method === "POST") return json({ report_id: "rep1", status: "queued" }, 202);
+    if (url.endsWith("/reports/rep1")) return json({ report_id: "rep1", status: "ready", url: "https://minio.test/s/rep1.pdf" });
     if (url.endsWith("/documents") && method === "GET") {
       return json([{ document_id: "d9", session_id: "s", kind: "kfs", source: "photos", version: 1, status: "ready", stage: "ready",
         status_code: null, page_count: 2, warnings: ["blurry_page:2"], pages: [] } satisfies LoanDocument]);
@@ -131,4 +133,20 @@ it("document upload sends kind and files in page order and offers a retake for a
   const retake = screen.getByText("Retake page 2").querySelector("input")!;
   fireEvent.change(retake, { target: { files: [new File(["c"], "p2b.jpg", { type: "image/jpeg" })] } });
   await waitFor(() => expect(calls.some((c) => c.method === "PUT" && c.url.endsWith("/documents/d9/pages/2"))).toBe(true));
+});
+
+it("downloads the report: creates it with an idempotency key, then opens the presigned PDF", async () => {
+  const open = vi.spyOn(window, "open").mockReturnValue(null);
+  wrap(<ResultsDashboard sessionId="s" />);
+  fireEvent.click(await screen.findByText("Download report (PDF)"));
+  await waitFor(() => expect(open).toHaveBeenCalledWith("https://minio.test/s/rep1.pdf", "_blank", "noopener"));
+  const post = calls.find((c) => c.method === "POST" && c.url.endsWith("/sessions/s/reports"));
+  expect(post).toBeTruthy();
+});
+
+it("shows calculation evidence when the server sends it", async () => {
+  const calc = { kind: "calculation" as const, calculation_id: "k1", formula_id: "emi_reducing_v1", input_sources: ["document"],
+    summary: "From the document: emi = ₹35902.17; the agent said ₹30000." };
+  wrap(<EvidenceDrawer sessionId="s" result={result({ evidence: [spoken, calc, doc] })} onClose={() => {}} />);
+  expect((await screen.findByTestId("calc-summary")).textContent).toContain("35902.17");
 });
