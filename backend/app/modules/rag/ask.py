@@ -74,6 +74,9 @@ ANSWER_PROMPT = """You answer a customer's question using ONLY the numbered cont
 Rules:
 - Answer in short sentences. Every sentence must cite at least one chunk with the exact words copied from it.
 - Never calculate, convert or add numbers. Only repeat numbers exactly as they appear in the cited quote.
+- Loan terms have synonyms: foreclosure = prepayment = part-payment = closing the loan early; processing fee = login
+  fee = file charge; EMI = kist = instalment; penal charge = late-payment charge. A chunk about a synonym answers the
+  question.
 - If the chunks don't answer the question, set not_in_document to true and give no sentences.
 - No legal or financial advice. Answer in English.
 Reply only with JSON: {"not_in_document": false, "sentences": [{"text": "...", "citations": [{"chunk": "C1",

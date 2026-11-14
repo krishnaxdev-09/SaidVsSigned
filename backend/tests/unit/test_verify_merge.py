@@ -179,7 +179,8 @@ def test_properties(vs, role_assignment, role, confirmed, hindi, ctype) -> None:
     if m.status == Status.MATCH:
         # 0 MATCH when the primary engine errored or was absent; shadow verdicts never decide
         engines = {"lender_identity": {"public_data"}, "emi": {"contract", "finance"}}.get(ctype, {"contract"})
-        primary = [o for o in outs if not o.shadow and o.verdict.engine in engines]
+        primary = [o for o in outs if not o.shadow and o.verdict.engine in engines
+                   and o.verdict.reason_code != ReasonCode.RULE_NOT_ENABLED]
         assert {o.verdict.engine for o in primary} >= engines  # every primary engine ran
         assert any(o.verdict.status == Status.MATCH for o in primary)
         assert all(o.verdict.status == Status.MATCH or o.verdict.reason_code in NON_BLOCKING for o in primary)
