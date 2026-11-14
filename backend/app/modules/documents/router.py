@@ -37,7 +37,7 @@ router = APIRouter(prefix="/api/v1", tags=["documents"])
 
 Kind = Literal["kfs", "loan_agreement", "sanction_letter", "fee_schedule", "other"]  # insurance_policy deferred
 _STAGE = {"queued": "queued", "sanitising": "sanitising", "sanitised": "sanitising", "rendering": "rendering",
-          "ocr": "ocr", "confidence": "confidence", "segmenting": "segmenting", "segmented": "segmenting",
+          "ocr": "ocr", "confidence": "confidence", "segmenting": "segmenting", "indexing": "indexing", "ready": "ready",
           "failed": "failed"}
 
 

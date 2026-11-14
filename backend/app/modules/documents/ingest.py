@@ -1,7 +1,8 @@
 """Worker job `doc.ingest:{document_id}:{version}` (doc 05 §6). T2.1: step 1 sanitising. T2.2: steps 2–5 render,
 photo pre-process, Docling/OCR, confidence pass (`parse.py`); outputs pages/{n}.webp, docling.json and items.json.
 T2.3: steps 6–7 clause segmentation (`segment.py`) and doc_terms (`terms.py`), written atomically per
-(document_id, version) together with the final status `segmented`. Chunks/indexing (→ ready) are T2.4.
+(document_id, version). T2.4: step 8 chunks + embeddings (`rag/retrieve.py`), same transaction, final status
+`ready`.
 Input failures end the document as failed(code)."""
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ import json
 import tempfile
 import uuid
 from pathlib import Path
+from typing import Any
 
 import structlog
 import yaml
@@ -21,8 +23,9 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from app.core.config import get_settings
 from app.core.retry import InputError
 from app.core.storage import ObjectStore
-from app.llm.base import LLMProvider
+from app.llm.base import EmbeddingProvider, LLMProvider
 from app.modules.documents import media, parse, segment, terms
+from app.modules.rag import retrieve
 from app.modules.realtime.bus import publish
 from app.modules.realtime.events import EventType
 from app.worker.runner import Handler, JobContext
@@ -45,14 +48,23 @@ async def _progress(engine: AsyncEngine, sid: uuid.UUID, doc_id: uuid.UUID, vers
 
 
 def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | None = None,
-                            llm: LLMProvider | None = None) -> Handler:
-    state: dict[str, parse.DocumentParser] = {}
+                            llm: LLMProvider | None = None, embedder: EmbeddingProvider | None = None) -> Handler:
+    state: dict[str, Any] = {}
 
     def get_parser() -> parse.DocumentParser:
         if parser is not None:
             return parser
         state.setdefault("p", parse.DoclingParser())  # lazy: loading Docling models is slow
         return state["p"]
+
+    def get_embedder() -> EmbeddingProvider:
+        if embedder is not None:
+            return embedder
+        if "e" not in state:
+            from app.llm.embeddings import from_settings as embedder_from_settings
+
+            state["e"] = embedder_from_settings()  # ADR-005 working choice (HC-4)
+        return state["e"]
 
     async def handle(ctx: JobContext) -> None:
         doc_id = uuid.UUID(ctx.job.payload["document_id"])
@@ -67,7 +79,7 @@ def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | N
             await ctx.conn.execute(text(
                 "UPDATE documents SET status = :st, status_code = :c, warnings = CAST(:w AS jsonb) "
                 "WHERE id = :id AND status <> 'failed'"), {"st": st, "c": code, "w": json.dumps(warnings or []), "id": doc_id})
-            stage = {"failed": "failed", "segmented": "segmenting"}.get(st, "sanitising")
+            stage = {"failed": "failed", "ready": "ready"}.get(st, "sanitising")
             await publish(ctx.conn, sid, EventType.DOCUMENT_STATUS, {
                 "document_id": str(doc_id), "version": version, "stage": stage,
                 "progress": progress, **({"code": code} if code else {}), "warnings": warnings or []})
@@ -122,9 +134,20 @@ def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | N
             doc_terms += llm_out
             log.info("doc_terms.llm", document_id=str(doc_id), version=version, **stats)
         await ctx.checkpoint()
-        await _write_clauses(ctx, doc_id, version, clauses, doc_terms)
-        await status("segmented", 1.0, None, warnings)
-        # Chunks, embeddings and → ready (doc 05 §6 step 8) are T2.4.
+        await _progress(ctx.engine, sid, doc_id, version, "indexing", 0.95)
+        chunks = [(c, piece) for c in clauses for piece in retrieve.chunk_texts(c.text)]
+        emb = get_embedder()
+        vectors = await emb.embed([((c.section_path + "\n") if c.section_path else "") + piece for c, piece in chunks],
+                                  kind="passage") if chunks else []
+        await ctx.checkpoint()
+        ids = await _write_clauses(ctx, doc_id, version, clauses, doc_terms)
+        for (c, piece), vec in zip(chunks, vectors, strict=True):
+            await ctx.conn.execute(text(
+                "INSERT INTO chunks (id, document_id, version, clause_id, page, section_path, text, embedding, "
+                "embedding_model) VALUES (:id, :d, :v, :c, :p, :sp, :t, CAST(:e AS vector), :m)"),
+                {"id": uuid.uuid4(), "d": doc_id, "v": version, "c": ids[c.ord], "p": c.page_start,
+                 "sp": c.section_path, "t": piece, "e": "[" + ",".join(f"{x:.6f}" for x in vec) + "]", "m": emb.name})
+        await status("ready", 1.0, None, warnings)
 
     return handle
 
@@ -193,7 +216,7 @@ async def _render_and_parse(ctx: JobContext, store: ObjectStore, parser: parse.D
 
 
 async def _write_clauses(ctx: JobContext, doc_id: uuid.UUID, version: int, clauses: list[segment.Clause],
-                         doc_terms: list[terms.Term]) -> None:
+                         doc_terms: list[terms.Term]) -> dict[int, uuid.UUID]:
     """doc 05 §6.9: a re-run rewrites this version's rows (same transaction as the final status)."""
     await ctx.conn.execute(text("DELETE FROM clauses WHERE document_id = :d AND version = :v"), {"d": doc_id, "v": version})
     ids: dict[int, uuid.UUID] = {}
@@ -214,3 +237,4 @@ async def _write_clauses(ctx: JobContext, doc_id: uuid.UUID, version: int, claus
             {"id": uuid.uuid4(), "d": doc_id, "v": version, "c": ids[tm.clause_ord], "f": tm.field,
              "raw": tm.value_raw, "val": tm.value, "u": tm.unit, "b": tm.basis, "rt": tm.rate_type,
              "cond": json.dumps(tm.conditions), "g": tm.includes_gst, "nv": tm.normaliser_version, "src": tm.source})
+    return ids

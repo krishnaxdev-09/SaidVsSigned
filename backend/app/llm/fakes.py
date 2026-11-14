@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from typing import Literal
 
 from pydantic import BaseModel
@@ -29,12 +30,16 @@ class FakeLLMProvider:
 class FakeEmbeddingProvider:
     name = "fake-embedding"
 
-    def __init__(self, dim: int = 8) -> None:
+    def __init__(self, dim: int = 384) -> None:
         self.dim = dim
 
     async def embed(self, texts: list[str], *, kind: Literal["query", "passage"]) -> list[list[float]]:
+        """Deterministic hashed bag-of-words, L2-normalised: texts sharing words are similar (no model download)."""
         out = []
         for t in texts:
-            digest = hashlib.sha256(t.encode()).digest()
-            out.append([b / 255 for b in digest[: self.dim]])
+            v = [0.0] * self.dim
+            for w in re.findall(r"\w+", t.lower()):
+                v[int.from_bytes(hashlib.sha256(w.encode()).digest()[:4], "big") % self.dim] += 1.0
+            n = sum(x * x for x in v) ** 0.5 or 1.0
+            out.append([x / n for x in v])
         return out

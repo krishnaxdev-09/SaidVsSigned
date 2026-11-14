@@ -107,7 +107,9 @@ class FakeParser:
 
 async def drain(engine, store, parser=None, llm=None) -> None:  # type: ignore[no-untyped-def]
     reg = Registry()
-    reg.register("doc.ingest", make_doc_ingest_handler(store, parser or FakeParser(), llm))
+    from app.llm.fakes import FakeEmbeddingProvider
+
+    reg.register("doc.ingest", make_doc_ingest_handler(store, parser or FakeParser(), llm, FakeEmbeddingProvider()))
     w = Worker(engine, reg, lease_seconds=60)
     while await w.run_once():
         pass
@@ -128,7 +130,7 @@ async def test_hostile_pdf_is_sanitised(client, engine, fake_store):  # type: ig
     did = r.json()["document_id"]
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["status"], d["source"], d["page_count"]) == ("segmented", "pdf", 2)
+    assert (d["status"], d["source"], d["page_count"]) == ("ready", "pdf", 2)
     assert {"removed_open_action", "removed_javascript", "removed_embedded_files", "removed_xfa",
             "removed_page_actions", "removed_javascript_link", "removed_file_attachment"} <= set(d["warnings"])
     clean = fake_store.objects[("documents", f"{did}/v1/sanitised/document.pdf")]
@@ -217,7 +219,7 @@ async def test_photos_lose_exif_and_gps(client, engine, fake_store):  # type: ig
     did = r.json()["document_id"]
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["status"], d["source"], d["page_count"]) == ("segmented", "photos", 2)
+    assert (d["status"], d["source"], d["page_count"]) == ("ready", "photos", 2)
     assert "removed_exif" in d["warnings"] and d["pages"][0]["width"] == 64
     clean = fake_store.objects[("documents", f"{did}/v1/sanitised/1.jpg")]
     im = Image.open(io.BytesIO(clean))
@@ -278,7 +280,7 @@ async def test_page_replace_creates_a_new_version(client, engine, fake_store):  
     assert await scalar(engine, "SELECT content_sha256 FROM documents WHERE id = :d", d=uuid.UUID(did)) != sha1
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["version"], d["status"], d["page_count"]) == (2, "segmented", 3) and "removed_exif" in d["warnings"]
+    assert (d["version"], d["status"], d["page_count"]) == (2, "ready", 3) and "removed_exif" in d["warnings"]
     assert ("documents", f"{did}/v2/sanitised/2.jpg") in fake_store.objects
     assert await scalar(engine, "SELECT count(*) FROM audit_log WHERE action = 'document.page_replace' AND target_id = :t",
                         t=uuid.UUID(did)) == 1
@@ -335,7 +337,7 @@ async def test_parse_outputs_pages_items_and_page_image(client, engine, fake_sto
     parser = FakeParser()
     await drain(engine, fake_store, parser)
     d = await doc(client, h, did)
-    assert d["status"] == "segmented" and d["stage"] == "segmenting"
+    assert d["status"] == "ready" and d["stage"] == "ready"
     assert parser.calls == [{"ocr": False, "force": False}]  # digital PDF: text layer on every page, OCR off
     assert [p["text_source"] for p in d["pages"]] == ["text_layer", "text_layer"] and d["pages"][0]["width"] == 1654
     for name in ("pages/1.webp", "pages/2.webp", "docling.json", "items.json"):
@@ -373,7 +375,7 @@ async def test_ocr_page_warnings(client, engine, fake_store, parser, warning):  
     did = (await upload(client, h, sid, [("scan.pdf", pdf_bytes(1))])).json()["document_id"]  # blank: no text layer
     await drain(engine, fake_store, parser)
     d = await doc(client, h, did)
-    assert d["status"] == "segmented" and warning in d["warnings"] and d["pages"][0]["text_source"] == "ocr"
+    assert d["status"] == "ready" and warning in d["warnings"] and d["pages"][0]["text_source"] == "ocr"
 
 
 # ---- T2.3 clause segmentation + doc_terms ---------------------------------------------------------------------------
@@ -413,7 +415,7 @@ async def test_clauses_and_doc_terms(client, engine, fake_store):  # type: ignor
         {"clause": "C1", "field": "penal_charge", "value_raw": "5% per month", "quantity": "percent"},  # not in the clause
         {"clause": "C9", "field": "emi", "value_raw": "Rs. 100", "quantity": "amount_inr"}]}])  # unknown ref
     await drain(engine, fake_store, KfsParser(), llm)
-    assert (await doc(client, h, did))["status"] == "segmented"
+    assert (await doc(client, h, did))["status"] == "ready"
     r = await client.get(f"/api/v1/documents/{did}/clauses", headers=h)
     assert r.status_code == 200, r.text
     cl = r.json()
@@ -458,5 +460,5 @@ async def test_llm_schema_failure_keeps_lexicon_terms(client, engine, fake_store
     h, sid = await ready_session(client)
     did = (await upload(client, h, sid, [("kfs.pdf", pdf_bytes(2))])).json()["document_id"]
     await drain(engine, fake_store, KfsParser(), BrokenLLM())
-    assert (await doc(client, h, did))["status"] == "segmented"
+    assert (await doc(client, h, did))["status"] == "ready"
     assert await scalar(engine, "SELECT count(*) FROM doc_terms WHERE document_id = :d", d=uuid.UUID(did)) == 3
