@@ -15,7 +15,7 @@
 | 001 | Modular monolith + one worker | **Accepted (HC-1, 2026-11-13)** | Unchanged |
 | 002 | Postgres as DB, vector store, job queue and event bus | **Accepted (HC-1, 2026-11-13)** | v0.2 adds `dedupe_key` and the idempotency table (doc 11 §2) |
 | 003 | ElevenLabs Scribe behind `STTProvider` | Accepted (provider, from brief); fallback Open (HC-3) | MVP uses **batch** only; realtime deferred to Later-L1 |
-| 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13. **2026-11-14:** the user configured Gemma 4 31B (`google.gemma-4-31b`) on Amazon Bedrock Mantle as the working provider; a live call returned valid JSON with verbatim quotes. Not a final selection | Final selection from the Phase 1 eval (T1.8) |
+| 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13. **Decided 2026-11-14 by the user: Gemma 4 31B on Amazon Bedrock, model ID `google.gemma-4-31b`** (verified listed and callable in us-east-1). The interface stays provider-agnostic | Accepted; T1.8 still reports extraction quality |
 | 005 | Embedding model (reranker deferred) | Open (HC-4) | Dimension is a migration parameter; reranker → Later-L4 |
 | 006 | Semantic CONFLICT needs NLI + LLM-judge agreement | Approved as the working design at HC-1 (2026-11-13); final confirmation at HC-2 | Unchanged |
 | 007 | Status taxonomy CONFLICT/MATCH/UNCLEAR/NOT_VERIFIED | Accepted (brief; reaffirmed 2026-11-13) | v0.2 adds canonical reason codes, `FindingKind`, `REASON_STATUS` mapping (doc 08) |
@@ -40,7 +40,7 @@
   - The batch pipeline is designed so that Later-L1 adds an ingestion front-end (realtime STT, incremental extraction) and reuses claims, engines, the orchestrator and the UI results.
 
 ### HC-1 approval scope and record
-**HC-1: APPROVED** by the user (project owner) on 2026-11-13. HC-2…HC-8: **pending**.
+**HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED** 2026-11-14 (conditions: `revision/MVP_IMPLEMENTATION_PLAN.md` §4). HC-3…HC-8: **pending**.
 
 HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-002, **ADR-015** (upload-first MVP, P0-1 live verification deferred — confirm), ADR-016, ADR-017, **ADR-018** (canonical definition owners) and the Proposed ADRs 006/012/014 as written. The accepted user decisions recorded in ADR-003, 007, 008, 009, 010 and 011 are presented for confirmation only. ADR-004, 005, 013 and 019 remain Open or Proposed for their own checkpoints.
 
@@ -48,7 +48,7 @@ HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-00
 | ID | Question | Status / owner |
 |---|---|---|
 | Q-1 | Do the PPT or UI designs exist? | Open — user |
-| Q-2 | LLM provider (ADR-004) | Working provider: Gemma 4 31B via Bedrock Mantle (user, 2026-11-14). Final choice open until the Phase 1 eval |
+| Q-2 | LLM provider (ADR-004) | **Resolved 2026-11-14:** Gemma 4 31B on Amazon Bedrock (`google.gemma-4-31b`) |
 | Q-3 | Embedding model (ADR-005) | Open — HC-4 |
 | Q-4 | Hosting region and data residency | Open — user/legal |
 | Q-5 | Primary device (Android Chrome?) | Open — user |

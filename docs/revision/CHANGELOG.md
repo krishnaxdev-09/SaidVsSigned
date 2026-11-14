@@ -136,3 +136,8 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 
 ## 2026-11-14 — KI-1 fixed
 - Withdrawing consent now marks the session's unfinished recordings `failed(consent_revoked)` (and emits `recording.status`); running or late workers cannot overwrite it; nothing downstream is saved. Finished recordings are left for session erasure (T4.3). Regression tests added (4 fail on the old code).
+
+## 2026-11-14 — HC-2 approved; ADR-004 decided
+- **HC-2 approved** by the user, items A–I as recommended (record and conditions: `MVP_IMPLEMENTATION_PLAN.md` §4). T1.4–T1.6 unblocked. ADR-006 was not among the items and keeps its HC-1 working-design status.
+- **ADR-004 decided** by the user: Gemma 4 31B on Amazon Bedrock, `google.gemma-4-31b` (Q-2 resolved).
+- HC-3…HC-8 are still pending.

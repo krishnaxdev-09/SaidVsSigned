@@ -78,16 +78,16 @@ Gate: HC-1 ✅ approved 2026-11-13.
 | T0.13 | 10 synthetic agreements + DRAFT consent texts (legal review at HC-7) | ✅ |
 
 ### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (3/8)
-Gates: HC-2 before T1.4 (⛔ pending) · HC-3 at stage exit.
+Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit.
 
 | Task | What | Status | Blocked by |
 |---|---|---|---|
 | T1.1 | Recording upload: magic-byte check, dedupe, normalise, replace, snippets | ✅ | — |
 | T1.2 | ElevenLabs batch STT (diarization, word timestamps) + transcript revisions | ✅ | — |
 | T1.3 | Speaker suggestion (Gemma) + one-tap agent confirmation | ✅ | — |
-| T1.4 | Schema registry (statuses, reason codes) | ⛔ | **HC-2** |
-| T1.5 | Deterministic normaliser (≥ 300 cases, Hinglish) | ⛔ | T1.4 |
-| T1.6 | Claim extraction with verbatim quote anchors | ⛔ | T1.2, T1.5 (→ HC-2). LLM ready: Gemma 4 31B via Bedrock Mantle, smoke-tested |
+| T1.4 | Schema registry (statuses, reason codes) | ⬜ | — |
+| T1.5 | Deterministic normaliser (≥ 300 cases, Hinglish) | ⬜ | T1.4 |
+| T1.6 | Claim extraction with verbatim quote anchors | ⬜ | T1.5; user reviews 12 English + 12 Hinglish few-shots before completion |
 | T1.7 | Claims UI, transcript view, snippet playback | ⬜ | T1.3, T1.6 |
 | T1.8 | Experiments E2/E3/E10 + LLM evaluation | ⬜ | T1.2, T1.6 |
 
@@ -100,7 +100,7 @@ Gate: HC-4 at stage exit.
 | T2.2 | Docling/OCR + confidence pass | ⬜ |
 | T2.3 | Clause segmentation + doc_terms | ⬜ |
 | T2.4 | Chunks, embeddings, hybrid retrieval | ⬜ |
-| T2.5 | Orchestrator v1 (gates, merge, validators) — needs T1.4 (HC-2) | ⬜ |
+| T2.5 | Orchestrator v1 (gates, merge, validators) — needs T1.4 | ⬜ |
 | T2.6 | Contract engine (said vs signed comparison) | ⬜ |
 | T2.7 | Results dashboard + evidence drawer | ⬜ |
 
@@ -138,13 +138,13 @@ L6 expanded regulatory/finance · L7 insurance · L8 second STT provider · L9 l
 | Speech-to-text | ElevenLabs Scribe v2 (`scribe_v2`), batch with diarization | `ELEVENLABS_API_KEY` |
 | LLM | Gemma 4 31B (`google.gemma-4-31b`) on Amazon Bedrock Mantle, OpenAI-compatible Chat Completions at `/openai/v1` | `MANTLE_*` |
 
-Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role suggestion (T1.3, job `speakers.suggest`); claim extraction (T1.6) is next. ADR-004 (final LLM choice) is decided from the Phase 1 eval.
+Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role suggestion (T1.3, job `speakers.suggest`); claim extraction (T1.6) is next. ADR-004 decided 2026-11-14: Gemma 4 31B on Amazon Bedrock (`google.gemma-4-31b`).
 
 ## Human checkpoints
 | ID | Approves | Status |
 |---|---|---|
 | HC-1 | Docs + plan | ✅ Approved 2026-11-13 |
-| HC-2 | Claim schema, reason codes, evidence rules, wording | ⛔ Pending — blocks T1.4 onward |
+| HC-2 | Claim schema, reason codes, evidence rules, wording | ✅ Approved 2026-11-14 (English wording; Hindi later) |
 | HC-3 | STT/diarization results, languages | ⬜ Pending (Stage 1 exit) |
 | HC-4 | OCR, retrieval, embeddings | ⬜ Pending (Stage 2 exit) |
 | HC-5 | Finance formulas and visibility | ⬜ Pending (Stage 3 exit) |

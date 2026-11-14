@@ -300,7 +300,7 @@ If a primary engine errored, MATCH is impossible (rule 2 requires every primary 
 - A suggested question on ≥ 95% of non-MATCH results.
 
 ## 13. Human review
-- **HC-2:** taxonomy, reason codes, the evidence combinations, the primary-comparison table and the wording templates.
+- **HC-2 (approved 2026-11-14):** taxonomy, reason codes, the evidence combinations, the primary-comparison table and the English wording templates. C-CALC-DOC, finance and regulatory findings stay hidden until HC-5 / HC-6; Hindi wording is reviewed later.
 - **HC-3:** the `quote_confirmed_by_user` proposal.
 - **Phase 4:** the calibration report.
 

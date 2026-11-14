@@ -1,6 +1,6 @@
 # SaidSigned — MVP Implementation Plan (v0.2.1, 2026-11-13)
 
-> **HC-1: APPROVED** by the user (project owner) on 2026-11-13. HC-2…HC-8: **pending**. Phase 0 implementation is authorised; nothing beyond Phase 0. Implementation status is reported per task, never assumed.
+> **HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED 2026-11-14** (§4). HC-3…HC-8: **pending**. Phase 0 is complete; Phase 1 is authorised by the user (2026-11-14). Implementation status is reported per task, never assumed.
 >
 > **v0.2.1 corrections** (from your review of v0.2):
 > 1. HC-6 is restored in the graph, the checkpoint sequence and the roadmap.
@@ -99,11 +99,13 @@ flowchart TD
 - HC-6 does not block HC-8. Without it, rules ship in shadow.
 - HC-7 must be approved before HC-8 can permit real users.
 
-## 4. Checkpoint sequence (HC-1 APPROVED 2026-11-13; HC-2…HC-8 PENDING)
+## 4. Checkpoint sequence (HC-1 APPROVED 2026-11-13; HC-2 APPROVED 2026-11-14; HC-3…HC-8 PENDING)
+
+**HC-2: APPROVED** by the user (project owner) on 2026-11-14, items A–I as recommended: the 14 claim types and 7 utterance kinds; the vagueness rules; the 25 reason codes; the four status labels and the primary-comparison table; the C-DOC evidence requirement; **English** wording templates. Conditions: C-CALC-DOC, finance calculations and regulatory findings stay hidden until HC-5 / HC-6; Hindi wording is reviewed later (T4.4); the claim-extractor few-shots (12 English + 12 Hinglish) must be shown to the user for review **before T1.6 is marked complete**. ADR-006 (semantic CONFLICT needs NLI + LLM-judge agreement) was not part of the items presented and stays at its HC-1 working-design status.
 | Order | ID | Trigger | Approves | Blocks |
 |---|---|---|---|---|
 | 1 | **HC-1 ✅ APPROVED 2026-11-13 (user)** | Before Phase 0 | v0.2.1 docs and this plan. Architecture and upload-first scope: ADR-001, ADR-002, **ADR-015** (upload-first MVP, P0-1 deferred), ADR-016, ADR-017, **ADR-018** (canonical owners, present in doc 14), plus Proposed ADR-006/012/014 as written. Accepted user decisions (ADR-003/007/008/009/010/011) are presented for confirmation | Phase 0 |
-| 2 | **HC-2** | Before Phase 1 code | Claim schema, reason codes, CONFLICT evidence combinations, wording templates (docs 04, 08) | T1.4 onward |
+| 2 | **HC-2 ✅ APPROVED 2026-11-14 (user)** | Before Phase 1 code | Claim schema, reason codes, CONFLICT evidence combinations, wording templates (docs 04, 08) | T1.4 onward |
 | 3 | **HC-3** | Phase 1 exit | E2/E3/E10 results, languages, ADR-019 confirm-quote fallback, ElevenLabs config/pricing, fallback STT | T3.1 |
 | 4 | **HC-4** | Phase 2 exit | OCR backend, thresholds, retrieval/NLI, embedding model (ADR-005/013) | T3.1 |
 | 5 | **HC-5** | Phase 3 exit | Finance formulas, tolerances, GST assumption, synthetic results. Enables user visibility of the **MVP formula set only** (§7) | Phase 4; user-facing finance |
@@ -225,9 +227,9 @@ It then waits. No approval is recorded unless you give it.
 | ID | Decision | Recommendation | When |
 |---|---|---|---|
 | D1 | **HC-1:** approve the v0.2.1 docs and this plan, incl. ADR-001, 002, **015**, 016, 017, **018** and Proposed 006/012/014 | — | ✅ **APPROVED 2026-11-13** |
-| D2 | **HC-2:** claim schema, reason codes, CONFLICT evidence combinations, wording | Approve after reviewing docs 04/08 | Before Phase 1 code |
+| D2 | **HC-2:** claim schema, reason codes, CONFLICT evidence combinations, wording | Approve after reviewing docs 04/08 | ✅ **APPROVED 2026-11-14** (conditions in §4) |
 | D3 | ADR-019 confirm-quote fallback | Approve only if E3 shows weak or no confidences | HC-3 |
-| D4 | ADR-004 LLM provider | Decide from the Phase 1 eval | Phase 1 |
+| D4 | ADR-004 LLM provider | Decide from the Phase 1 eval | ✅ **Decided 2026-11-14 (user): Gemma 4 31B on Amazon Bedrock, `google.gemma-4-31b`** |
 | D5 | ADR-005 / ADR-013 embeddings and OCR | Decide from E5/E6 | HC-4 |
 | D6 | **HC-5:** finance formulas, tolerances, GST 18% assumption, MVP-set visibility | Finance-literate reviewer | Phase 3 exit |
 | D7 | **HC-6:** per-rule approval of the curated regulatory rules (T3.7 package), and whether any approved rule becomes visible in the MVP or waits for Later-L6 | Qualified legal/compliance reviewer | Phase 4 |

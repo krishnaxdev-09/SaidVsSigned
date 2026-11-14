@@ -15,7 +15,7 @@ Turn transcript segments into structured, **verbatim-anchored** loan claims, wit
 - **Feeds:** doc 08 (and through it docs 05–07).
 
 ## 2. Prerequisites
-- **HC-2** approval of this schema and the few-shots (pending).
+- **HC-2 approved 2026-11-14** for this schema. The few-shots (12 English + 12 Hinglish) are reviewed by the user before T1.6 is marked complete.
 - An LLM provider chosen for Phase 1 (ADR-004, open). The design works with any provider that has structured output.
 
 ## 3. LLMProvider (provider-agnostic) [Accepted: provider-agnostic]

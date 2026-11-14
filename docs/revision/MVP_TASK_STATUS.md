@@ -15,11 +15,11 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | Phase | Tasks | ✅ | ◐ | ⬜ | ⛔ | Task completion |
 |---|---|---|---|---|---|---|
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
-| 1 — Upload, STT, speakers, claims | 8 | 3 | 0 | 2 | 3 | 37.5% (3/8) |
+| 1 — Upload, STT, speakers, claims | 8 | 3 | 0 | 5 | 0 | 37.5% (3/8) |
 | 2 — Documents & contract verification | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 3 — Finance, orchestration, reporting | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **16** | **0** | **21** | **3** | **40% (16/40)** |
+| **Total** | **40** | **16** | **0** | **24** | **0** | **40% (16/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -30,7 +30,7 @@ Progress is reported as task completion only. Effort is not sized in any project
 | ID | Status | Blocks |
 |---|---|---|
 | HC-1 | ✅ Approved 2026-11-13 | Phase 0 |
-| HC-2 | ⛔ Pending | T1.4 onward (Phase 1 code) |
+| HC-2 | ✅ Approved 2026-11-14 (conditions: plan §4) | — |
 | HC-3 | ⬜ Pending (Phase 1 exit) | T3.1 |
 | HC-4 | ⬜ Pending (Phase 2 exit) | T3.1 |
 | HC-5 | ⬜ Pending (Phase 3 exit) | Phase 4; user-facing finance |
@@ -38,7 +38,7 @@ Progress is reported as task completion only. Effort is not sized in any project
 | HC-7 | ⬜ Pending | Real users; HC-8 |
 | HC-8 | ⬜ Pending | Release |
 
-Checkpoint states are unchanged by implementation progress. HC-1 is the only recorded approval (plan header and §4). Phase 1 go-ahead given by the user on 2026-11-14 (this is not an HC approval; HC-2 still gates T1.4 onward).
+Checkpoint states are unchanged by implementation progress. Recorded approvals: HC-1 (2026-11-13) and HC-2 (2026-11-14), both given explicitly by the user (plan §4). Phase 1 go-ahead given by the user on 2026-11-14 (this is not an HC approval; HC-2 still gates T1.4 onward).
 
 ## Phase 0 — Foundation: exit report (2026-11-14)
 
@@ -84,9 +84,9 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 | T1.1 Recording upload pipeline | ✅ 2026-11-14 | Done. Evidence: `tests/integration/test_recordings.py` + `tests/unit/test_audio_sniff.py` (33 tests: 6 formats normalise within ±50 ms, stereo split, magic-byte rejection, corrupt/silent/too-long fail without retry, sha256 dedupe, idempotency replay/409, replace, consent gate, owner-only, identical re-run, snippet ±0.25 s); `make ci` 88/88 backend. Real-stack run: speech upload → normalised → presigned snippet fetched from host. Limits: `stt.batch` enqueue arrives with T1.2; snippets download the whole FLAC (fine for call-length audio) |
 | T1.2 ElevenLabs batch adapter + revisions | ✅ 2026-11-14 | Done. Evidence: `tests/unit/test_stt_segmentation.py`, `tests/unit/test_elevenlabs_adapter.py` (recorded scribe_v2 response, no network), `tests/integration/test_transcripts.py` (9 tests: transcript from the recorded response, atomic re-run rewrite, replace → revision 2 current / revision 1 kept, FakeSTTProvider same flow, stereo L/R, empty → no_speech_detected without retry, 401 → provider_auth without retry, owner-only, consent revoked mid-call → job cancelled and nothing committed); `make ci` 138/138 backend. Real-stack run with the real ElevenLabs API on a synthetic 2-speaker call: uploaded → transcribing → ready in 4.7 s, 4 segments, speakers correct, turn starts within 36–101 ms of truth (limit ±200 ms), per-word confidences present. Limits: role suggestion is T1.3; `claims.extract` enqueue is T1.6; numeric accuracy/languages are E2/E3 (T1.8) |
 | T1.3 Speaker suggestion + confirmation | ✅ 2026-11-14 | Done. Evidence: `tests/unit/test_speaker_suggestion.py` (21: recorded Gemma reply via the Mantle provider, uncertainty rules, LLM-failure fallback, corrective retry, auth errors, conflict-gate matrix), `tests/integration/test_speakers.py` (9: suggest → one-tap confirm, swap/rejection, missing confirmation, uncertain suggestion, revision change (no carry-over, stale PUT 409), re-run never overwrites a confirmation, segment override, validation/consent/ownership), `frontend/src/features/speakers/roles.test.ts` (3); `make ci` 168/168 backend, 7/7 frontend. Real run (ElevenLabs + Gemma 4 31B on Bedrock): suggestion 6.2 s after upload, agent correct at confidence 1.0; gate false for both speakers before confirmation, true only for the confirmed agent after; stale revision rejected. Limits: segment-fix UI is in the transcript view (T1.7); the gate is applied to verdicts by the orchestrator (T2.5), which also re-verifies on confirmation; auto-role accuracy is E10 (T1.8) |
-| T1.4 Schema registry | ⛔ | HC-2 |
-| T1.5 Normaliser | ⛔ | T1.4 |
-| T1.6 Claim extraction | ⛔ | T1.2, T1.5 (→ HC-2). LLM configured: Gemma 4 31B via Bedrock Mantle, smoke-tested 2026-11-14 (valid JSON, verbatim quotes); ADR-004 final choice after the Phase 1 eval |
+| T1.4 Schema registry | ⬜ | Unblocked by HC-2 (2026-11-14) |
+| T1.5 Normaliser | ⬜ | T1.4 |
+| T1.6 Claim extraction | ⬜ | T1.5. LLM: Gemma 4 31B on Bedrock (ADR-004 decided 2026-11-14). **Before marking complete:** the user reviews 12 English + 12 Hinglish few-shots (HC-2 condition) |
 | T1.7 Claims UI, transcript, snippets | ⬜ | T1.3, T1.6 |
 | T1.8 Experiments E2, E3, E10 + LLM eval | ⬜ | T1.2, T1.6 |
 
@@ -103,7 +103,7 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 | T2.2 Docling/OCR + confidence | ⬜ |
 | T2.3 Clauses + doc_terms | ⬜ |
 | T2.4 Chunks + hybrid retrieval | ⬜ |
-| T2.5 Orchestrator v1 | ⬜ (needs T1.4 → HC-2) |
+| T2.5 Orchestrator v1 | ⬜ (needs T1.4) |
 | T2.6 Contract engine | ⬜ |
 | T2.7 Results dashboard v1 + evidence drawer | ⬜ |
 
@@ -130,5 +130,4 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 | T4.5 Staging deploy + load test | ⬜ |
 
 ## Open inputs needed from the user
-- **HC-2** approval (claim schema, reason codes, CONFLICT evidence, wording; docs 04 and 08), which is the main blocker for Phase 1.
 - D9–D12: hosting region, team size and deadline, UI designs, malware scanning.
