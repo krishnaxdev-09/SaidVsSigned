@@ -17,7 +17,7 @@
 | 003 | ElevenLabs Scribe behind `STTProvider` | Accepted (provider, from brief); fallback Open (HC-3) | MVP uses **batch** only; realtime deferred to Later-L1 |
 | 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13. **Decided 2026-11-14 by the user: Gemma 4 31B on Amazon Bedrock, model ID `google.gemma-4-31b`** (verified listed and callable in us-east-1). The interface stays provider-agnostic | Accepted; T1.8 still reports extraction quality |
 | 005 | Embedding model (reranker deferred) | Open (HC-4) | Dimension is a migration parameter; reranker → Later-L4 |
-| 006 | Semantic CONFLICT needs NLI + LLM-judge agreement | Approved as the working design at HC-1 (2026-11-13); final confirmation at HC-2 | Unchanged |
+| 006 | Semantic CONFLICT needs NLI + LLM-judge agreement | Working design (HC-1, 2026-11-13). **Not approved:** it was not among the HC-2 items approved on 2026-11-14; final confirmation is still open (needed before semantic CONFLICTs, T2.6) | Unchanged |
 | 007 | Status taxonomy CONFLICT/MATCH/UNCLEAR/NOT_VERIFIED | Accepted (brief; reaffirmed 2026-11-13) | v0.2 adds canonical reason codes, `FindingKind`, `REASON_STATUS` mapping (doc 08) |
 | 008 | Audio capture modes: mic, Meet tab, upload; Meet API spike; no headless bots | Accepted 2026-11-13 | **Unchanged decision**; schedule moved by ADR-015 |
 | 009 | Speaker attribution without realtime diarization | v0.1 Proposed → **Accepted 2026-11-13 for MVP**: CONFLICT requires a one-tap `user_confirmed` role | Live `inferred` roles remain Later-L1 |

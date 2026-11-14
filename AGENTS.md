@@ -46,6 +46,7 @@ cd frontend && npm run dev                     # UI on :5173, proxies /api and /
 backend/app/core/        config, db, errors (doc 01 §7), retry (doc 01 §6), idempotency, storage, security
 backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3)
 backend/app/llm/         LLM provider interface, Bedrock Mantle provider (Gemma), fakes
+backend/app/schemas/     canonical doc 08 / doc 04 schemas, reason codes, CONFLICT validator, wording (T1.4)
 backend/app/worker/      Postgres job queue, runner, handlers.register_all
 backend/alembic/         migrations 0001 foundation … 0004 speaker_assignments
 frontend/src/            React PWA: features/{auth,sessions,consent,recordings,speakers}, lib (api, events), i18n en/hi
@@ -56,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 16 / 40 tasks done (40%).** Stage 0 complete; Stage 1 in progress.
+**Overall: 17 / 40 tasks done (42.5%).** Stage 0 complete; Stage 1 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -77,7 +78,7 @@ Gate: HC-1 ✅ approved 2026-11-13.
 | T0.12 | CI (feature-flag startup checks, DB required) | ✅ |
 | T0.13 | 10 synthetic agreements + DRAFT consent texts (legal review at HC-7) | ✅ |
 
-### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (3/8)
+### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (4/8)
 Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit.
 
 | Task | What | Status | Blocked by |
@@ -85,7 +86,7 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.1 | Recording upload: magic-byte check, dedupe, normalise, replace, snippets | ✅ | — |
 | T1.2 | ElevenLabs batch STT (diarization, word timestamps) + transcript revisions | ✅ | — |
 | T1.3 | Speaker suggestion (Gemma) + one-tap agent confirmation | ✅ | — |
-| T1.4 | Schema registry (statuses, reason codes) | ⬜ | — |
+| T1.4 | Schema registry (statuses, reason codes, evidence, claims, wording) | ✅ | — |
 | T1.5 | Deterministic normaliser (≥ 300 cases, Hinglish) | ⬜ | T1.4 |
 | T1.6 | Claim extraction with verbatim quote anchors | ⬜ | T1.5; user reviews 12 English + 12 Hinglish few-shots before completion |
 | T1.7 | Claims UI, transcript view, snippet playback | ⬜ | T1.3, T1.6 |

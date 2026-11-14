@@ -141,3 +141,10 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - **HC-2 approved** by the user, items A–I as recommended (record and conditions: `MVP_IMPLEMENTATION_PLAN.md` §4). T1.4–T1.6 unblocked. ADR-006 was not among the items and keeps its HC-1 working-design status.
 - **ADR-004 decided** by the user: Gemma 4 31B on Amazon Bedrock, `google.gemma-4-31b` (Q-2 resolved).
 - HC-3…HC-8 are still pending.
+
+## 2026-11-14 — T1.4 schema registry; D-14 resolved
+- **T1.4 done:** `backend/app/schemas/` — doc 08 statuses, 25 reason codes (24 MVP + `awaiting_confirmation` deferred) with `REASON_STATUS`, merge priorities, evidence models, `EngineVerdict`, `VerificationResult`, the §4 CONFLICT-evidence validator; doc 04 claim schemas; doc 08 §8 English wording and deny-list. HC-2 conditions enforced in code: C-CALC-DOC rejected unless finance is user-visible (HC-5), C-RULE unless rules are user-visible (HC-6).
+- **D-14 (user, Option A):** doc 08 §3.4 updated — every status except MATCH and CONFLICT requires a reason code; CONFLICT carries none and is justified only by validated §4 evidence with a user-confirmed agent. No reason codes added or changed.
+- Correction: the HC-2 summary said "25 MVP reason codes"; doc 08 has 24 MVP codes plus 1 deferred.
+- ADR-006 (semantic CONFLICT needs NLI + LLM-judge agreement) remains a working design; not approved.
+- Dev dependency `hypothesis==6.170.15` (doc 12 §A.2 test tooling).

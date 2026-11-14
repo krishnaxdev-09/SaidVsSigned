@@ -154,14 +154,16 @@ class VerificationResult(BaseModel):
 
     @model_validator(mode="after")
     def _status_contract(self):
-        if self.status != Status.MATCH and self.reason_code is None:
-            raise ValueError("non-MATCH requires reason_code")
+        if self.status not in (Status.MATCH, Status.CONFLICT) and self.reason_code is None:   # D-14
+            raise ValueError("UNCLEAR / NOT_VERIFIED require reason_code")
         if self.reason_code and REASON_STATUS[self.reason_code] != self.status:
             raise ValueError("reason_code does not belong to status")
         if self.status == Status.CONFLICT:
             validate_conflict_evidence(self)     # §4
         return self
 ```
+
+**D-14 (user decision, 2026-11-14, Option A).** Every status except MATCH and CONFLICT requires a reason code. No reason code belongs to MATCH or CONFLICT (§3.1), so both carry none. A CONFLICT is justified only by validated evidence under §4, including the user-confirmed agent; it keeps the approved "Possible mismatch" headline and wording (§8). This resolves a contradiction between the v0.2.1 validator (non-MATCH requires a code) and §3.1 (no code maps to CONFLICT). No reason codes were added or changed.
 
 ## 4. CONFLICT evidence requirements
 A CONFLICT is valid only with **one** of these combinations. Every gate in §5 must pass for **every** piece of spoken evidence involved, including all spoken inputs to a calculation.
