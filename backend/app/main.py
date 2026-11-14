@@ -15,6 +15,7 @@ from app.core.db import dispose_engine, get_engine, init_engine
 from app.core.errors import install_error_handlers
 from app.core.logging import RequestIdMiddleware, configure_logging
 from app.core.storage import ObjectStore, S3ObjectStore
+from app.modules.audio.router import router as audio_router
 from app.modules.auth.router import router as auth_router
 from app.modules.consent.router import router as consent_router
 from app.modules.realtime.bus import hub
@@ -42,12 +43,14 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
             await dispose_engine()
 
     app = FastAPI(title="SaidSigned API", version="0.0.1", lifespan=lifespan)
+    app.state.store = object_store
     app.add_middleware(RequestIdMiddleware)
     install_error_handlers(app)
     app.include_router(auth_router)
     app.include_router(sessions_router)
     app.include_router(consent_router)
     app.include_router(ws_router)
+    app.include_router(audio_router)
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict[str, str]:

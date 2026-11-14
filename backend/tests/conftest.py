@@ -103,12 +103,41 @@ async def engine(test_database: str):  # type: ignore[no-untyped-def]
 
 
 class FakeStore:
+    """In-memory ObjectStore (app.core.storage.ObjectStore) for integration tests."""
+
     ok = True
+
+    def __init__(self) -> None:
+        self.objects: dict[tuple[str, str], bytes] = {}
 
     async def check(self) -> bool:
         if not self.ok:
             raise ConnectionError("storage down")
         return True
+
+    async def put(self, bucket: str, key: str, data, content_type: str) -> None:  # type: ignore[no-untyped-def]
+        self.objects[(bucket, key)] = data if isinstance(data, bytes) else b"".join([c async for c in data])
+
+    async def put_file(self, bucket: str, key: str, path: str, content_type: str) -> None:
+        self.objects[(bucket, key)] = Path(path).read_bytes()
+
+    async def get_file(self, bucket: str, key: str, path: str) -> None:
+        Path(path).write_bytes(self.objects[(bucket, key)])
+
+    async def exists(self, bucket: str, key: str) -> bool:
+        return (bucket, key) in self.objects
+
+    async def delete(self, bucket: str, key: str) -> None:
+        self.objects.pop((bucket, key), None)
+
+    async def get_url(self, bucket: str, key: str, ttl_s: int = 300) -> str:
+        return f"memory://{bucket}/{key}"
+
+    async def delete_prefix(self, bucket: str, prefix: str) -> int:
+        keys = [k for k in self.objects if k[0] == bucket and k[1].startswith(prefix)]
+        for k in keys:
+            del self.objects[k]
+        return len(keys)
 
 
 @pytest.fixture(scope="session")

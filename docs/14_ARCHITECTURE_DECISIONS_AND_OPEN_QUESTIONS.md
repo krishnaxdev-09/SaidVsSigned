@@ -15,7 +15,7 @@
 | 001 | Modular monolith + one worker | **Accepted (HC-1, 2026-11-13)** | Unchanged |
 | 002 | Postgres as DB, vector store, job queue and event bus | **Accepted (HC-1, 2026-11-13)** | v0.2 adds `dedupe_key` and the idempotency table (doc 11 §2) |
 | 003 | ElevenLabs Scribe behind `STTProvider` | Accepted (provider, from brief); fallback Open (HC-3) | MVP uses **batch** only; realtime deferred to Later-L1 |
-| 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13 | Selection eval early in Phase 1 |
+| 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13. **2026-11-14:** the user configured Gemma 4 31B (`google.gemma-4-31b`) on Amazon Bedrock Mantle as the working provider; a live call returned valid JSON with verbatim quotes. Not a final selection | Final selection from the Phase 1 eval (T1.8) |
 | 005 | Embedding model (reranker deferred) | Open (HC-4) | Dimension is a migration parameter; reranker → Later-L4 |
 | 006 | Semantic CONFLICT needs NLI + LLM-judge agreement | Approved as the working design at HC-1 (2026-11-13); final confirmation at HC-2 | Unchanged |
 | 007 | Status taxonomy CONFLICT/MATCH/UNCLEAR/NOT_VERIFIED | Accepted (brief; reaffirmed 2026-11-13) | v0.2 adds canonical reason codes, `FindingKind`, `REASON_STATUS` mapping (doc 08) |
@@ -48,7 +48,7 @@ HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-00
 | ID | Question | Status / owner |
 |---|---|---|
 | Q-1 | Do the PPT or UI designs exist? | Open — user |
-| Q-2 | LLM provider (ADR-004) | Open — Phase 1 eval |
+| Q-2 | LLM provider (ADR-004) | Working provider: Gemma 4 31B via Bedrock Mantle (user, 2026-11-14). Final choice open until the Phase 1 eval |
 | Q-3 | Embedding model (ADR-005) | Open — HC-4 |
 | Q-4 | Hosting region and data residency | Open — user/legal |
 | Q-5 | Primary device (Android Chrome?) | Open — user |

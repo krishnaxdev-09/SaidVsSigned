@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import ConsentForm from "../consent/ConsentForm";
+import RecordingPanel from "../recordings/RecordingPanel";
 import { api } from "../../lib/api";
 import { connectEvents } from "../../lib/events";
 import { applyEvent } from "../../lib/eventLog";
@@ -20,6 +21,7 @@ export default function SessionPage() {
     log.current = applyEvent(log.current, ev);
     setEvents(log.current.events);
     qc.invalidateQueries({ queryKey: ["state", id] });
+    if (ev.type === "recording.status") qc.invalidateQueries({ queryKey: ["recording", id] });
   }), [id, qc]);
   if (!q.data) return null;
   const { session, consent } = q.data;
@@ -28,9 +30,9 @@ export default function SessionPage() {
       <p>{t("state")}: <strong data-testid="state">{session.state}</strong>{session.state_reason ? ` (${session.state_reason})` : ""}</p>
       {session.state === "consent_pending" && <ConsentForm sessionId={id} />}
       {consent.attestation_note && <p className="text-sm">{consent.attestation_note}</p>}
-      {session.state === "ready" && (
+      {consent.active && <RecordingPanel sessionId={id} />}
+      {consent.active && (
         <>
-          <p className="text-slate-600">{t("upload_next")}</p>
           <button className="rounded border border-red-700 px-3 py-2 text-red-700"
             onClick={() => api(`/api/v1/sessions/${id}/consents/customer`, { method: "DELETE" })}>{t("revoke")}</button>
         </>

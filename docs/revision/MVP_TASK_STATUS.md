@@ -15,11 +15,11 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | Phase | Tasks | ✅ | ◐ | ⬜ | ⛔ | Task completion |
 |---|---|---|---|---|---|---|
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
-| 1 — Upload, STT, speakers, claims | 8 | 0 | 0 | 5 | 3 | 0% (0/8) |
+| 1 — Upload, STT, speakers, claims | 8 | 1 | 0 | 4 | 3 | 12.5% (1/8) |
 | 2 — Documents & contract verification | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 3 — Finance, orchestration, reporting | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **13** | **0** | **24** | **3** | **32.5% (13/40)** |
+| **Total** | **40** | **14** | **0** | **23** | **3** | **35% (14/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -38,7 +38,7 @@ Progress is reported as task completion only. Effort is not sized in any project
 | HC-7 | ⬜ Pending | Real users; HC-8 |
 | HC-8 | ⬜ Pending | Release |
 
-Checkpoint states are unchanged by implementation progress. HC-1 is the only recorded approval (plan header and §4). Phase 1 start also needs the user's go-ahead (requested 2026-11-14; not yet given).
+Checkpoint states are unchanged by implementation progress. HC-1 is the only recorded approval (plan header and §4). Phase 1 go-ahead given by the user on 2026-11-14 (this is not an HC approval; HC-2 still gates T1.4 onward).
 
 ## Phase 0 — Foundation: exit report (2026-11-14)
 
@@ -81,12 +81,12 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 
 | Task | Status | Blocker |
 |---|---|---|
-| T1.1 Recording upload pipeline | ⬜ | Can start (needs only T0.x) |
-| T1.2 ElevenLabs batch adapter + revisions | ⬜ | Needs ElevenLabs API key |
+| T1.1 Recording upload pipeline | ✅ 2026-11-14 | Done. Evidence: `tests/integration/test_recordings.py` + `tests/unit/test_audio_sniff.py` (33 tests: 6 formats normalise within ±50 ms, stereo split, magic-byte rejection, corrupt/silent/too-long fail without retry, sha256 dedupe, idempotency replay/409, replace, consent gate, owner-only, identical re-run, snippet ±0.25 s); `make ci` 88/88 backend. Real-stack run: speech upload → normalised → presigned snippet fetched from host. Limits: `stt.batch` enqueue arrives with T1.2; snippets download the whole FLAC (fine for call-length audio) |
+| T1.2 ElevenLabs batch adapter + revisions | ⬜ | Unblocked: ElevenLabs key provided and smoke-tested 2026-11-14 (`scribe_v2`, HTTP 200, diarization + word timestamps + `logprob`) |
 | T1.3 Speaker suggestion + confirmation | ⬜ | T1.2 |
 | T1.4 Schema registry | ⛔ | HC-2 |
 | T1.5 Normaliser | ⛔ | T1.4 |
-| T1.6 Claim extraction | ⛔ | T1.2, T1.5, ADR-004 (LLM choice) |
+| T1.6 Claim extraction | ⛔ | T1.2, T1.5 (→ HC-2). LLM configured: Gemma 4 31B via Bedrock Mantle, smoke-tested 2026-11-14 (valid JSON, verbatim quotes); ADR-004 final choice after the Phase 1 eval |
 | T1.7 Claims UI, transcript, snippets | ⬜ | T1.3, T1.6 |
 | T1.8 Experiments E2, E3, E10 + LLM eval | ⬜ | T1.2, T1.6 |
 
@@ -126,5 +126,4 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 
 ## Open inputs needed from the user
 - **HC-2** approval (claim schema, reason codes, CONFLICT evidence, wording; docs 04 and 08), which is the main blocker for Phase 1.
-- ElevenLabs API key (T1.2).
 - D9–D12: hosting region, team size and deadline, UI designs, malware scanning.

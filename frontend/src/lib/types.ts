@@ -12,3 +12,10 @@ export interface ConsentStatus {
 }
 export interface ConsentText { id: string; kind: "processing" | "attestation"; version: string; locale: string; body: string; body_sha256: string }
 export interface EventEnvelope { type: string; session_id: string; seq: number; ts: string; payload: Record<string, unknown> }
+
+export type RecordingStage = "uploaded" | "validating" | "normalising" | "transcribing" | "diarizing" | "ready" | "failed";
+export interface Recording {
+  recording_id: string; session_id: string; status: string; stage: RecordingStage; status_code: string | null;
+  duration_ms: number | null; format: string | null; channel_layout: "mono" | "stereo_split" | null;
+  warnings: string[]; replaced_by: string | null; created_at: string;
+}

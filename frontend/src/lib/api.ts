@@ -41,6 +41,19 @@ export async function api<T>(path: string, opts: { method?: string; body?: unkno
   return data as T;
 }
 
+// Multipart upload (doc 02 §4). The browser sets the multipart boundary; the caller keeps the Idempotency-Key
+// across retries of one upload.
+export async function upload<T>(path: string, method: "POST" | "PUT", form: FormData, idempotencyKey: string,
+                                retried = false): Promise<T> {
+  const headers: Record<string, string> = { "idempotency-key": idempotencyKey };
+  if (accessToken) headers.authorization = `Bearer ${accessToken}`;
+  const r = await fetchImpl(path, { method, headers, credentials: "same-origin", body: form });
+  if (r.status === 401 && !retried && await refresh()) return upload<T>(path, method, form, idempotencyKey, true);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new ApiError(r.status, data.code ?? "internal_error", data.detail ?? r.statusText);
+  return data as T;
+}
+
 export async function login(email: string, password: string) {
   const out = await api<{ access_token: string }>("/api/v1/auth/login", { method: "POST", body: { email, password } });
   setAccessToken(out.access_token);

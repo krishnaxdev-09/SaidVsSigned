@@ -50,6 +50,7 @@ def test_migration_upgrade_downgrade_upgrade():
     with psycopg.connect(admin.rsplit("/", 1)[0] + "/" + scratch) as c:
         tables = {r[0] for r in c.execute("SELECT tablename FROM pg_tables WHERE schemaname='public'")}
     assert tables == {"alembic_version", "users", "refresh_tokens", "ws_tickets", "sessions", "consent_texts",
-                      "consents", "idempotency_keys", "jobs", "events", "audit_log", "deletion_receipts"}
+                      "consents", "idempotency_keys", "jobs", "events", "audit_log", "deletion_receipts",
+                      "audio_streams"}
     with psycopg.connect(admin, autocommit=True) as c:
         c.execute(f"DROP DATABASE IF EXISTS {scratch} WITH (FORCE)")

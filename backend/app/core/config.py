@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     S3_ENDPOINT: str = "http://localhost:9000"
     S3_ACCESS_KEY: SecretStr = SecretStr("")
     S3_SECRET_KEY: SecretStr = SecretStr("")
+    S3_PUBLIC_ENDPOINT: str = ""  # browser-reachable endpoint for presigned URLs; empty = S3_ENDPOINT
     S3_REGION: str = "us-east-1"
     S3_BUCKETS: tuple[str, ...] = ("audio", "documents", "exports")
 
@@ -46,6 +47,8 @@ class Settings(BaseSettings):
     RETENTION_DAYS: int = 30  # [Q-11] pending HC-7
     MAX_UPLOAD_MB_AUDIO: int = 200
     MAX_AUDIO_MINUTES: int = 180
+    FFPROBE_TIMEOUT_S: int = 30
+    FFMPEG_TIMEOUT_S: int = 900
     MAX_UPLOAD_MB_DOC: int = 40
     MAX_DOC_PAGES: int = 60
     MAX_PHOTO_PAGES: int = 20

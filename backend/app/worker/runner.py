@@ -4,7 +4,7 @@ Each handler runs inside ONE transaction together with its success marker, so a 
 job commits nothing. Handlers must call `ctx.checkpoint()` at step boundaries (before provider calls, before each
 write batch, before publishing events) to observe cancellation (doc 01 §5.4).
 
-Phase 0 registers no production job kinds; Phase 1+ add handlers via `registry.register`.
+Production job kinds are registered in `app.worker.handlers.register_all`.
 """
 
 from __future__ import annotations
@@ -159,6 +159,10 @@ async def main() -> None:
     configure_logging()
     s = get_settings()
     engine = init_engine(s.DATABASE_URL)
+    from app.core.storage import S3ObjectStore
+    from app.worker.handlers import register_all
+
+    register_all(registry, S3ObjectStore(s))
     log.info("worker_start", kinds=registry.kinds)
     await Worker(engine, registry, lease_seconds=s.JOB_LEASE_SECONDS).run_forever(s.WORKER_POLL_SECONDS)
 

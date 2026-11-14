@@ -24,7 +24,7 @@ Turn a normalised recording into timestamped, speaker-attributed transcript segm
 |---|---|
 | Scribe v2 batch supports speaker diarization (max speakers 32–48; sources differ) | [V] |
 | Batch returns word-level timestamps | [V] |
-| Batch word-level confidence/logprob field | **[A] → E3** |
+| Batch word-level confidence/logprob field | **[A] → E3.** Smoke test 2026-11-14 (`scribe_v2`, one 11 s English synthetic call): every word had `logprob`, `start`, `end`, `speaker_id`. One sample only; E3 must confirm on the dataset, incl. Hinglish |
 | Hindi/Hinglish quality, code-switching | **[A] → E2** |
 | Keyterms supported | [V, secondary] |
 | Pricing: realtime $0.39/h (vendor) vs $0.28/h (third party); batch pricing to confirm | Confirm at HC-3 |

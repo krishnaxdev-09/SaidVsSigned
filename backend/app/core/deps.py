@@ -29,16 +29,24 @@ def client_ip(request: Request) -> str | None:
 
 
 async def idempotent_create(request: Request, user_id: uuid.UUID, status_code: int,
-                            handler: Callable[[], Awaitable[Any]]) -> JSONResponse:
-    """Wrap a resource-creating handler with doc 11 §2 idempotency. Only 2xx responses are stored."""
+                            handler: Callable[[], Awaitable[Any]], *, body: bytes | None = None) -> JSONResponse:
+    """Wrap a resource-creating handler with doc 11 §2 idempotency. Only 2xx responses are stored.
+
+    `body` overrides the bytes hashed into request_hash: multipart uploads pass a canonical JSON of the file sha256
+    and form fields instead of buffering the raw body. A handler may return `(status_code, result)` when the status
+    depends on the outcome (e.g. 202 new vs 200 duplicate, doc 02 §4)."""
     engine = get_engine()
-    body = await request.body()
+    if body is None:
+        body = await request.body()
     outcome = await idempotency.begin(engine, user_id, request.headers.get("idempotency-key"), request.method,
                                       request.url.path, body)
     if isinstance(outcome, idempotency.Replay):
         return JSONResponse(outcome.body, status_code=outcome.status_code, headers={"Idempotent-Replay": "true"})
     try:
-        result = jsonable_encoder(await handler())
+        out = await handler()
+        if isinstance(out, tuple):
+            status_code, out = out
+        result = jsonable_encoder(out)
     except BaseException:
         await idempotency.abandon(engine, outcome)
         raise

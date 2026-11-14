@@ -1,11 +1,31 @@
+# Secrets: any env file except the committed template (e.g. .env.local from SDK snippets)
 .env
+.env.*
+!.env.example
+
+# Python
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Frontend
 node_modules/
 frontend/dist/
-.DS_Store
 *.tsbuildinfo
+
+# Call recordings must never be committed (privacy; HC-7). Synthetic eval data is allowed.
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.webm
+*.ogg
+*.flac
+*.aiff
+!eval/datasets/**
+
+# OS
+.DS_Store

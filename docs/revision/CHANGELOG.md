@@ -108,3 +108,12 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - T0.13: 10 synthetic agreements in `eval/datasets/agreements` (`agreements-v1`).
 - New tracker: `docs/revision/MVP_TASK_STATUS.md`.
 - No approvals recorded. HC-2…HC-8 are still pending.
+
+## 2026-11-14 — Phase 1: T1.1 and provider setup
+- **T1.1 done:** recording upload pipeline (migration `0002_audio_streams`, `app/modules/audio`, upload panel). Evidence in `MVP_TASK_STATUS.md`.
+- **Providers configured and smoke-tested** (not yet called by app code):
+  - ElevenLabs `scribe_v2` batch STT: HTTP 200; diarization, word timestamps and a per-word `logprob` returned (doc 03 §3 updated; E3 still required).
+  - Gemma 4 31B (`google.gemma-4-31b`) on Amazon Bedrock Mantle: HTTP 200, valid JSON, verbatim quotes. Gemma 4 requires the `/openai/v1` base path.
+- **ADR-004 / Q-2:** Gemma 4 31B recorded as the user's working provider; the final choice stays with the Phase 1 eval.
+- New `AGENTS.md` (stage-by-stage status) and `CLAUDE.md`; README rewritten; `.env.example` reduced to the settings in use.
+- No approvals recorded. HC-2…HC-8 are still pending.

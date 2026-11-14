@@ -55,6 +55,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://saidsigned:${POSTGRES_PASSWORD}@db:5432/saidsigned
       S3_ENDPOINT: http://minio:9000
+      S3_PUBLIC_ENDPOINT: http://localhost:9000   # presigned URLs must be reachable from the browser
     command: >
       sh -c "alembic upgrade head && python -m app.cli seed-consent-texts &&
              uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000"
