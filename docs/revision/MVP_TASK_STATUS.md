@@ -90,10 +90,10 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 | T1.7 Claims UI, transcript, snippets | ⬜ | T1.3, T1.6 |
 | T1.8 Experiments E2, E3, E10 + LLM eval | ⬜ | T1.2, T1.6 |
 
-### Known issues (tracked, not yet fixed)
+### Known issues
 | ID | Found | Issue | Impact | Required fix | Planned |
 |---|---|---|---|---|---|
-| KI-1 | T1.2, 2026-11-14 | Withdrawing consent while `audio.ingest` or `stt.batch` is running (or queued) leaves the recording's status at its last intermediate stage (e.g. `transcribing`). The session correctly shows `failed(consent_revoked)`, the job is `cancelled` and nothing is committed (tested). | Display only: a stale "in progress" stage. No data is kept, no transcript or claim is produced, no CONFLICT is possible. | In the revocation transaction, set the session's in-progress recordings to `failed(consent_revoked)`; make the jobs' intermediate status updates conditional (`status NOT IN ('failed','ready')`) so a racing job cannot overwrite it; add a test for queued and running cases. About 15 lines. | Awaiting your go-ahead (small bug fix; recommended before the demo) |
+| KI-1 | T1.2, 2026-11-14 | Withdrawing consent while `audio.ingest` or `stt.batch` is running (or queued) leaves the recording's status at its last intermediate stage (e.g. `transcribing`). The session correctly shows `failed(consent_revoked)`, the job is `cancelled` and nothing is committed (tested). | Display only: a stale "in progress" stage. No data is kept, no transcript or claim is produced, no CONFLICT is possible. | In the revocation transaction, set the session's in-progress recordings to `failed(consent_revoked)`; make the jobs' intermediate status updates conditional (`status NOT IN ('failed','ready')`) so a racing job cannot overwrite it; add a test for queued and running cases. About 15 lines. | ✅ **Fixed 2026-11-14** (user approved): revocation marks unfinished recordings `failed(consent_revoked)` in the same transaction; progress and success writes in `audio.ingest` / `stt.batch` never overwrite `failed`; `stt.batch` re-checks under a row lock before saving. Regression tests `tests/integration/test_ki1_consent_revocation.py` (5: queued, during transcription, during ingest, late progress write, finished recording left for erasure); 4 of them fail on the pre-fix code |
 
 ## Phase 2 — Documents & contract verification (HC-4)
 

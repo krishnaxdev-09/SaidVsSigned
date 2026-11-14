@@ -209,4 +209,5 @@ async def test_revocation_during_transcription_commits_nothing(client, engine, f
     assert await scalar(engine, "SELECT count(*) FROM events WHERE session_id = :s AND type = 'transcript.ready'", s=s) == 0
     assert await scalar(engine, "SELECT count(*) FROM audit_log WHERE action = 'job.cancel_observed' "
                                 "AND meta->>'session_id' = :s", s=sid) == 1
-    assert (await client.get(f"/api/v1/recordings/{rid}", headers=h)).json()["status"] != "ready"
+    rec = (await client.get(f"/api/v1/recordings/{rid}", headers=h)).json()
+    assert (rec["status"], rec["status_code"]) == ("failed", "consent_revoked")  # KI-1

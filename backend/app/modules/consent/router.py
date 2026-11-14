@@ -144,6 +144,14 @@ async def revoke_consent(session_id: uuid.UUID, request: Request,
             raise AppError("invalid_state", "No active customer consent to revoke")
         await set_state(conn, session_id, SessionState.FAILED, "consent_revoked")
         cancelled, requested = await cancel_session_jobs(conn, session_id)
+        # KI-1: unfinished recordings end as failed(consent_revoked); jobs never overwrite 'failed' (see the guards in
+        # audio/ingest.py and stt/job.py). Finished recordings are left for erasure (T4.3).
+        stopped = (await conn.execute(text(
+            "UPDATE audio_streams SET status = 'failed', status_code = 'consent_revoked' WHERE session_id = :s "
+            "AND deleted_at IS NULL AND status NOT IN ('ready', 'failed') RETURNING id"), {"s": session_id})).all()
+        for rec in stopped:
+            await publish(conn, session_id, EventType.RECORDING_STATUS,
+                          {"recording_id": str(rec.id), "stage": "failed", "progress": 1.0, "code": "consent_revoked"})
         ip = client_ip(request)
         await audit.record(conn, "consent.revoke", actor_id=user_id, target_type="session", target_id=session_id,
                            meta={"consent_id": str(revoked.id)}, ip=ip)

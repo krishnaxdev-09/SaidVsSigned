@@ -32,10 +32,12 @@ async def _progress(engine: AsyncEngine, session_id: uuid.UUID, stream_id: uuid.
                     progress: float) -> None:
     """Intermediate stage, committed on its own so the UI sees progress while the job runs."""
     async with engine.begin() as c:
-        await c.execute(text("UPDATE audio_streams SET status = :st WHERE id = :id AND deleted_at IS NULL"),
-                        {"st": status, "id": stream_id})
-        await publish(c, session_id, EventType.RECORDING_STATUS,
-                      {"recording_id": str(stream_id), "stage": status, "progress": progress})
+        moved = (await c.execute(text(  # never overwrites 'failed' (e.g. consent revoked, KI-1)
+            "UPDATE audio_streams SET status = :st WHERE id = :id AND deleted_at IS NULL AND status <> 'failed'"),
+            {"st": status, "id": stream_id})).rowcount
+        if moved:
+            await publish(c, session_id, EventType.RECORDING_STATUS,
+                          {"recording_id": str(stream_id), "stage": status, "progress": progress})
 
 
 async def _fail(ctx: JobContext, row: Any, code: str, warnings: list[str]) -> None:
@@ -93,11 +95,14 @@ def make_ingest_handler(store: ObjectStore) -> Handler:
                 ctype = "audio/flac" if name.endswith(".flac") else "audio/wav"
                 await store.put_file("audio", f"{prefix}/{name}", str(path), ctype)
         await ctx.checkpoint()
-        await ctx.conn.execute(text(
+        done = (await ctx.conn.execute(text(
             "UPDATE audio_streams SET status = 'normalised', status_code = NULL, duration_ms = :d, "
-            "channel_layout = :cl, object_key_normalized = :k, warnings = CAST(:w AS jsonb) WHERE id = :id"),
+            "channel_layout = :cl, object_key_normalized = :k, warnings = CAST(:w AS jsonb) "
+            "WHERE id = :id AND status <> 'failed'"),
             {"d": duration_ms, "cl": layout, "k": f"{prefix}/normalized.wav", "w": json.dumps(warnings),
-             "id": row.id})
+             "id": row.id})).rowcount
+        if not done:
+            return  # failed meanwhile (e.g. consent revoked): do not enqueue transcription
         await publish(ctx.conn, row.session_id, EventType.RECORDING_STATUS,
                       {"recording_id": str(row.id), "stage": "normalising", "progress": 1.0})
         await enqueue_stt(ctx.conn, row.session_id, row.id)  # doc 02 §5 step 6

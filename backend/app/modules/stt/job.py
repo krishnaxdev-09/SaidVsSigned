@@ -59,10 +59,12 @@ async def enqueue_stt(conn: AsyncConnection, session_id: uuid.UUID, stream_id: u
 
 async def _status(ctx: JobContext, session_id: uuid.UUID, stream_id: uuid.UUID, status: str, progress: float) -> None:
     async with ctx.engine.begin() as c:  # committed on its own so the UI sees progress during the provider call
-        await c.execute(text("UPDATE audio_streams SET status = :st WHERE id = :id AND deleted_at IS NULL"),
-                        {"st": status, "id": stream_id})
-        await publish(c, session_id, EventType.RECORDING_STATUS,
-                      {"recording_id": str(stream_id), "stage": status, "progress": progress})
+        moved = (await c.execute(text(  # never overwrites 'failed' (e.g. consent revoked, KI-1)
+            "UPDATE audio_streams SET status = :st WHERE id = :id AND deleted_at IS NULL AND status <> 'failed'"),
+            {"st": status, "id": stream_id})).rowcount
+        if moved:
+            await publish(c, session_id, EventType.RECORDING_STATUS,
+                          {"recording_id": str(stream_id), "stage": status, "progress": progress})
 
 
 async def _fail(ctx: JobContext, session_id: uuid.UUID, stream_id: uuid.UUID, code: str) -> None:
@@ -130,6 +132,12 @@ def make_stt_handler(stt: STTProvider) -> Handler:
                 raise InputError("empty transcript", "no_speech_detected")
         except InputError as exc:
             await _fail(ctx, session_id, stream_id, exc.code)
+            return
+        # KI-1: re-check under a row lock right before persisting; a failed (e.g. consent-revoked) recording keeps
+        # nothing. Revocation that commits after this point is caught by the runner's cancel check (rollback).
+        status = (await ctx.conn.execute(text("SELECT status FROM audio_streams WHERE id = :id FOR UPDATE"),
+                                         {"id": stream_id})).scalar()
+        if status == "failed":
             return
         segments.sort(key=lambda g: (g.start_ms, g.channel))
         config = stt.config(diarize=diarize, num_speakers=s.STT_NUM_SPEAKERS if diarize else None,

@@ -133,3 +133,6 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - Audit uses the doc 12 §B.4 actions `speaker.confirm` and `segment.reassign`.
 - **Known issue KI-1** (from T1.2) assessed and tracked in `MVP_TASK_STATUS.md`; fix proposed, not applied.
 - No approvals recorded. HC-2…HC-8 are still pending.
+
+## 2026-11-14 — KI-1 fixed
+- Withdrawing consent now marks the session's unfinished recordings `failed(consent_revoked)` (and emits `recording.status`); running or late workers cannot overwrite it; nothing downstream is saved. Finished recordings are left for session erasure (T4.3). Regression tests added (4 fail on the old code).
