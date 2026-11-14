@@ -78,7 +78,9 @@ def load_thresholds() -> gates.Thresholds:
     t = yaml.safe_load(get_settings().THRESHOLDS_FILE.read_text())
     return gates.Thresholds(version=str(t["version"]), T_asr_num=float(t["T_asr_num"]), T_asr_avg=float(t["T_asr_avg"]),
                             T_ocr=float(t["T_ocr"]), T_ocr_num=float(t["T_ocr_num"]),
-                            T_ret=None if t.get("T_ret") is None else float(t["T_ret"]))
+                            T_ret=None if t.get("T_ret") is None else float(t["T_ret"]),
+                            T_nli_contra=None if t.get("T_nli_contra") is None else float(t["T_nli_contra"]),
+                            T_nli_entail=None if t.get("T_nli_entail") is None else float(t["T_nli_entail"]))
 
 
 def visibility() -> tuple[bool, bool]:

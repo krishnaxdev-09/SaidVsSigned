@@ -5,5 +5,5 @@ T_asr_avg: 0.70
 T_ocr: 0.70
 T_ocr_num: 0.80
 T_ret: 0.73          # E6 2026-11-14 (E5-small cosine floor; provisional until HC-4)
-T_nli_contra: null   # calibrated in E6
-T_nli_entail: null   # calibrated in E6
+T_nli_contra: 0.5    # T2.6 2026-11-14 (NLI + Gemma judge must agree); provisional until HC-4
+T_nli_entail: 0.5    # T2.6 2026-11-14; provisional until HC-4

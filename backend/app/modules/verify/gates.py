@@ -24,6 +24,8 @@ class Thresholds:
     T_ocr: float
     T_ocr_num: float
     T_ret: float | None
+    T_nli_contra: float | None = None
+    T_nli_entail: float | None = None
 
 
 def lower(v: EngineVerdict, status: Status, code: ReasonCode) -> EngineVerdict:
