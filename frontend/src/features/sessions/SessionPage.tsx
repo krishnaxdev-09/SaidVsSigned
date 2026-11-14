@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import ConsentForm from "../consent/ConsentForm";
 import RecordingPanel from "../recordings/RecordingPanel";
 import SpeakerConfirm from "../speakers/SpeakerConfirm";
+import ClaimList from "../claims/ClaimList";
+import TranscriptView from "../transcript/TranscriptView";
 import { api } from "../../lib/api";
 import { connectEvents } from "../../lib/events";
 import { applyEvent } from "../../lib/eventLog";
@@ -24,6 +26,8 @@ export default function SessionPage() {
     qc.invalidateQueries({ queryKey: ["state", id] });
     if (ev.type === "recording.status") qc.invalidateQueries({ queryKey: ["recording", id] });
     if (ev.type === "transcript.ready" || ev.type === "speaker.updated") qc.invalidateQueries({ queryKey: ["speakers", id] });
+    if (ev.type === "transcript.ready") qc.invalidateQueries({ queryKey: ["transcript", id] });
+    if (ev.type.startsWith("claim.") || ev.type === "speaker.updated") qc.invalidateQueries({ queryKey: ["claims", id] });
   }), [id, qc]);
   if (!q.data) return null;
   const { session, consent } = q.data;
@@ -34,6 +38,8 @@ export default function SessionPage() {
       {consent.attestation_note && <p className="text-sm">{consent.attestation_note}</p>}
       {consent.active && <RecordingPanel sessionId={id} />}
       {consent.active && <SpeakerConfirm sessionId={id} />}
+      {consent.active && <ClaimList sessionId={id} />}
+      {consent.active && <TranscriptView sessionId={id} />}
       {consent.active && (
         <>
           <button className="rounded border border-red-700 px-3 py-2 text-red-700"

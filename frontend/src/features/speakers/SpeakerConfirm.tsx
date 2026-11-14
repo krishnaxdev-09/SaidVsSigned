@@ -4,13 +4,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError, api } from "../../lib/api";
+import { mmss as fmt, playSnippet } from "../../lib/snippet";
 import type { Speaker, Speakers } from "../../lib/types";
 import { confidentSuggestedAgent, confirmedAgent, rolesForAgent } from "./roles";
-
-function fmt(ms: number) {
-  const s = Math.floor(ms / 1000);
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
 
 export default function SpeakerConfirm({ sessionId }: { sessionId: string }) {
   const { t } = useTranslation();
@@ -20,7 +16,6 @@ export default function SpeakerConfirm({ sessionId }: { sessionId: string }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
-  const [audio] = useState(() => new Audio());
 
   if (!q.data) return null; // no transcript yet (404) or still loading
   const data = q.data;
@@ -41,15 +36,12 @@ export default function SpeakerConfirm({ sessionId }: { sessionId: string }) {
       setMessage(e instanceof ApiError && e.code === "invalid_state" ? t("transcript_changed") : t("save_failed"));
     } finally {
       setBusy(false);
-      await qc.invalidateQueries({ queryKey: ["speakers", sessionId] });
+      // Refresh roles everywhere they show, without waiting for the speaker.updated event.
+      await Promise.all(["speakers", "claims", "transcript"].map((k) => qc.invalidateQueries({ queryKey: [k, sessionId] })));
     }
   }
 
-  async function play(fromMs: number, toMs: number) {
-    const r = await api<{ url: string }>(`/api/v1/sessions/${sessionId}/audio?from_ms=${fromMs}&to_ms=${toMs}`);
-    audio.src = r.url;
-    await audio.play();
-  }
+  const play = (fromMs: number, toMs: number) => playSnippet(sessionId, fromMs, toMs);
 
   if (agent && !editing) {
     return (

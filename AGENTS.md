@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 19 / 40 tasks done (47.5%).** Stage 0 complete; Stage 1 in progress.
+**Overall: 20 / 40 tasks done (50%).** Stage 0 complete; Stage 1 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -78,7 +78,7 @@ Gate: HC-1 ✅ approved 2026-11-13.
 | T0.12 | CI (feature-flag startup checks, DB required) | ✅ |
 | T0.13 | 10 synthetic agreements + DRAFT consent texts (legal review at HC-7) | ✅ |
 
-### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (6/8)
+### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (7/8)
 Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit.
 
 | Task | What | Status | Blocked by |
@@ -89,7 +89,7 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.4 | Schema registry (statuses, reason codes, evidence, claims, wording) | ✅ | — |
 | T1.5 | Deterministic normaliser (422-case table, Hinglish, Devanagari) | ✅ | — |
 | T1.6 | Claim extraction (Gemma) with verbatim quote anchors; few-shots approved | ✅ | — |
-| T1.7 | Claims UI, transcript view, snippet playback | ⬜ | T1.3, T1.6 |
+| T1.7 | Claims UI, transcript view, snippet playback | ✅ | — |
 | T1.8 | Experiments E2/E3/E10 + LLM evaluation | ⬜ | T1.2, T1.6 |
 
 ### Stage 2 — Documents and contract verification · 7 tasks · NOT STARTED (0/7)

@@ -166,3 +166,6 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
   5. Utterance-kind variation is acceptable only when eligibility is unchanged (promise / assertion / conditional); ranges and approximation are kept independently of kind. The eval reports strict and eligibility-equivalent matches.
 - Normaliser fix found during T1.6: values are returned in plain notation (1000000, not 1E+6) so no scientific notation reaches the API, UI or report; regression test added.
 - Not in T1.6: enqueueing `verify:{claim_id}` (T2.5); claims UI (T1.7).
+
+## 2026-11-14 — T1.7 claims UI, transcript view, snippet playback
+- `ClaimList` (quote + playback, value as spoken → understood, speaker badge, not-checked/vague/approximate/correction labels, dismiss), `TranscriptView` (timestamps, speaker chips, playback, per-segment speaker fix), shared `lib/snippet.ts`. Speaker confirmation now also refreshes claims and transcript directly. Flow test with fakes; no new dependencies.

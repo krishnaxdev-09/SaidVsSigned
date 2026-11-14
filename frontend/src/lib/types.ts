@@ -32,3 +32,22 @@ export interface Speakers {
   transcript_revision: number; confirmed: boolean; speakers: Speaker[];
   overrides: { segment_id: string; speaker_role: SpeakerRole }[];
 }
+
+export interface Word { text: string; start_ms: number; end_ms: number; confidence: number | null; speaker_label: string | null; is_numeric: boolean }
+export interface Segment {
+  id: string; channel: "mono" | "L" | "R"; speaker_label: string | null; text: string; start_ms: number; end_ms: number;
+  words: Word[]; language: string | null; asr_avg_conf: number | null; asr_min_numeric_conf: number | null;
+}
+export interface Transcript { transcript_revision: number; is_current: boolean; audio_stream_id: string | null; provider: string | null; segments: Segment[] }
+export interface ClaimValue {
+  field: string; raw_text: string; quantity: string; value: string | null; value_low: string | null; value_high: string | null;
+  comparator: string; period: string; rate_basis: string | null; rate_type: string | null; includes_gst: boolean | null;
+  normaliser_version: string | null;
+}
+export interface Claim {
+  id: string; transcript_revision: number; claim_type: string; utterance_kind: string; speaker_label: string | null;
+  speaker_role: SpeakerRole; role_assignment: "auto" | "user_confirmed"; normalized_statement: string; quote: string;
+  start_ms: number; end_ms: number; values: ClaimValue[]; vagueness: "specific" | "approximate" | "vague";
+  readiness: string; verifiable: boolean; state: "active" | "dismissed" | "superseded"; supersedes_claim_id: string | null;
+  conditions: { text: string; kind: string }[];
+}
