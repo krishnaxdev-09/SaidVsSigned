@@ -16,7 +16,7 @@
 | 002 | Postgres as DB, vector store, job queue and event bus | **Accepted (HC-1, 2026-11-13)** | v0.2 adds `dedupe_key` and the idempotency table (doc 11 §2) |
 | 003 | ElevenLabs Scribe behind `STTProvider` | **Approved at HC-3 (2026-11-14):** Accepted — ElevenLabs Scribe v2 batch only for the MVP; no second STT provider | Realtime deferred to Later-L1 |
 | 004 | LLM provider | Open: provider-agnostic, accepted 2026-11-13. **Decided 2026-11-14 by the user: Gemma 4 31B on Amazon Bedrock, model ID `google.gemma-4-31b`** (verified listed and callable in us-east-1). The interface stays provider-agnostic | Accepted; T1.8 still reports extraction quality |
-| 005 | Embedding model (reranker deferred) | Open (HC-4) | Dimension is a migration parameter; reranker → Later-L4 |
+| 005 | Embedding model (reranker deferred) | **Approved at HC-4 (2026-11-14)**: `intfloat/multilingual-e5-small`, 384-dim, local CPU; hybrid FTS + vector with RRF | E6 hybrid R@5 0.993 (synthetic); reranker stays Later-L4 |
 | 006 | Semantic CONFLICT needs NLI + LLM-judge agreement | Working design (HC-1, 2026-11-13). **Not approved:** it was not among the HC-2 items approved on 2026-11-14; final confirmation is still open (needed before semantic CONFLICTs, T2.6) | Unchanged |
 | 007 | Status taxonomy CONFLICT/MATCH/UNCLEAR/NOT_VERIFIED | Accepted (brief; reaffirmed 2026-11-13) | v0.2 adds canonical reason codes, `FindingKind`, `REASON_STATUS` mapping (doc 08) |
 | 008 | Audio capture modes: mic, Meet tab, upload; Meet API spike; no headless bots | Accepted 2026-11-13 | **Unchanged decision**; schedule moved by ADR-015 |
@@ -24,7 +24,7 @@
 | 010 | Deterministic finance; LLM only extracts | Accepted (brief) | v0.2: `SourcedFactory` enforcement; APR, prepayment and penal gated by HC-5 |
 | 011 | Scope: loans MVP, insurance-ready | Accepted 2026-11-13 | Insurance → Later-L7 |
 | 012 | Noise handling | Approved as the working design at HC-1 (2026-11-13); final confirmation at E9 evidence | MVP: loudness normalisation only; denoise only if E9 shows gains (Later-L8) |
-| 013 | Docling + OCR backend | Open (HC-4) | Tesseract confidence pass if Docling has none |
+| 013 | Docling + OCR backend | **Approved at HC-4 (2026-11-14)**: Docling (TableFormer ACCURATE) + RapidOCR, no Tesseract (Docling gives OCR confidences) | E5 190/190 key fields on simulated scans/photos |
 | 014 | Rules as curated cited YAML with shadow mode | Approved as the working design at HC-1 (2026-11-13); final confirmation at HC-6 | v0.2: violation → `CONFLICT` + `finding_kind=regulatory`, visible only when enabled, reviewed and HC-6 approved; all MVP rules shadow |
 | **015** | **Upload-first MVP; P0-1 Live Promise Verification deferred** | **Accepted 2026-11-13 (user instruction); confirmed at HC-1 2026-11-13** | See below |
 | **016** | **MATCH requires the claim's primary comparison** | **Accepted 2026-11-13**; confirmed at HC-1 | Spoken-only consistency → sub-check note; inconsistency → `UNCLEAR(internal_inconsistency)` |
@@ -40,7 +40,7 @@
   - The batch pipeline is designed so that Later-L1 adds an ingestion front-end (realtime STT, incremental extraction) and reuses claims, engines, the orchestrator and the UI results.
 
 ### HC-1 approval scope and record
-**HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED** 2026-11-14 (conditions: `revision/MVP_IMPLEMENTATION_PLAN.md` §4). **HC-3: APPROVED** 2026-11-14 (ADR-003, ADR-019, language policy in doc 03 §8; gaps KG-1, KG-2 accepted as open). HC-4…HC-8: **pending**.
+**HC-1: APPROVED** by the user (project owner) on 2026-11-13. **HC-2: APPROVED** 2026-11-14 (conditions: `revision/MVP_IMPLEMENTATION_PLAN.md` §4). **HC-3: APPROVED** 2026-11-14 (ADR-003, ADR-019, language policy in doc 03 §8; gaps KG-1, KG-2 accepted as open). **HC-4: APPROVED** 2026-11-14 as recommended (ADR-005, ADR-013, hybrid retrieval, NLI + Gemma judge must agree, thresholds T_ocr 0.70 / T_ocr_num 0.80 / T_ret 0.73 / T_nli 0.5 provisional until T4.1 calibration, photo guidance text; evidence is synthetic — real scans/photos remain a known gap). HC-5…HC-8: **pending**.
 
 HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-002, **ADR-015** (upload-first MVP, P0-1 live verification deferred — confirm), ADR-016, ADR-017, **ADR-018** (canonical definition owners) and the Proposed ADRs 006/012/014 as written. The accepted user decisions recorded in ADR-003, 007, 008, 009, 010 and 011 are presented for confirmation only. ADR-004, 005, 013 and 019 remain Open or Proposed for their own checkpoints.
 
@@ -49,7 +49,7 @@ HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-00
 |---|---|---|
 | Q-1 | Do the PPT or UI designs exist? | Open — user |
 | Q-2 | LLM provider (ADR-004) | **Resolved 2026-11-14:** Gemma 4 31B on Amazon Bedrock (`google.gemma-4-31b`) |
-| Q-3 | Embedding model (ADR-005) | Open — HC-4 |
+| Q-3 | Embedding model (ADR-005) | **Resolved at HC-4 (2026-11-14):** multilingual-e5-small |
 | Q-4 | Hosting region and data residency | Open — user/legal |
 | Q-5 | Primary device (Android Chrome?) | Open — user |
 | Q-6 | Agent notification method | **Deferred** (live modes, Later-L1); for uploads see Q-13 |

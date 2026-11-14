@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     MANTLE_API_KEY: SecretStr = SecretStr("")
     MANTLE_MODEL: str = "google.gemma-4-31b"
     MANTLE_MAX_TOKENS: int = 4096
-    # ADR-005 working choice (provisional until HC-4): local multilingual E5 small, 384-dim, CPU (no data leaves infra).
+    # ADR-005, approved at HC-4 (2026-11-14): local multilingual E5 small, 384-dim, CPU (no data leaves infra).
     EMBEDDING_PROVIDER: str = "local_e5"
     EMBEDDING_MODEL: str = "intfloat/multilingual-e5-small"
     EMBEDDING_DIM: int = 384

@@ -32,7 +32,7 @@ Progress is reported as task completion only. Effort is not sized in any project
 | HC-1 | ✅ Approved 2026-11-13 | Phase 0 |
 | HC-2 | ✅ Approved 2026-11-14 (conditions: plan §4) | — |
 | HC-3 | ✅ Approved 2026-11-14 with conditions: ADR-019 (numeric CONFLICT only after quote confirmation, all languages; never for Hindi, no confirmation offered there), languages EN Supported / Hinglish Beta / Hindi Not yet supported, ADR-003 ElevenLabs only; KG-1 and KG-2 accepted as **open** gaps | — |
-| HC-4 | ⬜ Pending (Phase 2 exit) | T3.1 |
+| HC-4 | ✅ Approved 2026-11-14 as recommended: Docling + RapidOCR (ADR-013), multilingual-e5-small (ADR-005), hybrid retrieval, NLI + Gemma judge agreement, thresholds provisional until T4.1, photo guidance text. Known gap: evidence is synthetic (no real scans/photos yet) | T3.1 |
 | HC-5 | ⬜ Pending (Phase 3 exit) | Phase 4; user-facing finance |
 | HC-6 | ⬜ Pending (Phase 4) | User-facing regulatory findings only |
 | HC-7 | ⬜ Pending | Real users; HC-8 |

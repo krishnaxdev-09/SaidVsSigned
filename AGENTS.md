@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 27 / 40 tasks done (67.5%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 pending.
+**Overall: 27 / 40 tasks done (67.5%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -92,8 +92,8 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.7 | Claims UI, transcript view, snippet playback | ✅ | — |
 | T1.8 | Experiments E2/E3/E10 + LLM evaluation | ◐ | Reports done (synthetic TTS); E10 5-user usability test needs people |
 
-### Stage 2 — Documents and contract verification · 7 tasks · ✅ COMPLETE (7/7) — HC-4 pending
-Gate: HC-4 at stage exit.
+### Stage 2 — Documents and contract verification · 7 tasks · ✅ COMPLETE (7/7)
+Gate: HC-4 ✅ approved 2026-11-14.
 
 | Task | What | Status |
 |---|---|---|
@@ -147,7 +147,7 @@ Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role
 | HC-1 | Docs + plan | ✅ Approved 2026-11-13 |
 | HC-2 | Claim schema, reason codes, evidence rules, wording | ✅ Approved 2026-11-14 (English wording; Hindi later) |
 | HC-3 | STT/diarization results, languages | ✅ Approved 2026-11-14 (quote confirmation for numeric CONFLICTs; EN Supported, Hinglish Beta, Hindi Not yet supported; ElevenLabs only) |
-| HC-4 | OCR, retrieval, embeddings | ⬜ Pending (Stage 2 exit) |
+| HC-4 | OCR, retrieval, embeddings | ✅ Approved 2026-11-14 (Docling + RapidOCR, e5-small, hybrid retrieval, thresholds provisional) |
 | HC-5 | Finance formulas and visibility | ⬜ Pending (Stage 3 exit) |
 | HC-6 | Each regulatory rule | ⬜ Pending (Stage 4) |
 | HC-7 | Legal: consent texts, privacy, retention | ⬜ Pending (before real users) |
