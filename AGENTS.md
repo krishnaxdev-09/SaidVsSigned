@@ -22,7 +22,7 @@ Upload-first MVP: the customer uploads a call recording and a PDF or photos of t
 2. **Do not start a new stage** until the current stage is complete and its exit checkpoint is approved.
 3. **Mark a task done only with evidence** (tests, a real run). Update `MVP_TASK_STATUS.md` when you do.
 4. **Keep MVP scope.** Deferred features (Later-L1…L9) stay deferred. No features just to score marks.
-5. **Finance figures stay hidden until HC-5**; regulatory rules stay in shadow mode until HC-6 approves each rule.
+5. **Finance figures stay hidden until HC-5 approval**; regulatory rules stay in shadow mode until HC-6 approves each rule.
 6. **No real customer data until HC-7 and HC-8.** Use the synthetic agreements in `eval/datasets/` and team-recorded calls.
 7. **Wording:** never say an agent is lying, fraudulent or acting illegally. The customer's attestation is the
    customer's own statement, never "agent consent". Lint tests enforce this.
@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 34 / 40 tasks done (85%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 complete (7/7), HC-5 pending.
+**Overall: 34 / 40 tasks done (85%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 complete (7/7), HC-5 approved 2026-11-14.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -105,13 +105,13 @@ Gate: HC-4 ✅ approved 2026-11-14.
 | T2.6 | Contract engine (said vs signed; 200 pairs, CONFLICT precision 1.000) | ✅ |
 | T2.7 | Results dashboard + evidence drawer + document upload screen (real-stack E2E demo) | ✅ |
 
-### Stage 3 — Finance, orchestration, reporting · 7 tasks · ✅ COMPLETE (7/7) — HC-5 pending
-Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 package.
+### Stage 3 — Finance, orchestration, reporting · 7 tasks · ✅ COMPLETE (7/7) — HC-5 approved
+Gate: HC-5 approved 2026-11-14; only the approved MVP finance set is visible. Produces the HC-6 package.
 
 | Task | What | Status |
 |---|---|---|
-| T3.1 | Finance engine: SourcedFactory, MVP formulas, traces (golden 80/80; hidden until HC-5) | ✅ |
-| T3.2 | Merge v2 (C-CALC-DOC, internal_inconsistency; finance hidden until HC-5) | ✅ |
+| T3.1 | Finance engine: SourcedFactory, MVP formulas, traces (golden 80/80; MVP set visible after HC-5) | ✅ |
+| T3.2 | Merge v2 (C-CALC-DOC, internal_inconsistency; MVP finance set visible after HC-5) | ✅ |
 | T3.3 | Results UI v2 + PDF report (snapshot + wording tests) | ✅ |
 | T3.4 | Ask-lite with routing + citation validator (routing 50/50, 0 invalid citations) | ✅ |
 | T3.5 | Shadow rules + demo lenders (shadow never visible; fictional demo lenders) | ✅ |
@@ -148,7 +148,7 @@ Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role
 | HC-2 | Claim schema, reason codes, evidence rules, wording | ✅ Approved 2026-11-14 (English wording; Hindi later) |
 | HC-3 | STT/diarization results, languages | ✅ Approved 2026-11-14 (quote confirmation for numeric CONFLICTs; EN Supported, Hinglish Beta, Hindi Not yet supported; ElevenLabs only) |
 | HC-4 | OCR, retrieval, embeddings | ✅ Approved 2026-11-14 (Docling + RapidOCR, e5-small, hybrid retrieval, thresholds provisional) |
-| HC-5 | Finance formulas and visibility | ⬜ Pending (Stage 3 exit) |
+| HC-5 | Finance formulas and visibility | ✅ Approved 2026-11-14 by krishna2027 |
 | HC-6 | Each regulatory rule | ⬜ Pending (Stage 4) |
 | HC-7 | Legal: consent texts, privacy, retention | ⬜ Pending (before real users) |
 | HC-8 | Release readiness | ⬜ Pending (Stage 4 exit) |

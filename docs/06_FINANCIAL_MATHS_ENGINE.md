@@ -75,7 +75,8 @@ A gated formula returns `NOT_VERIFIED(calculation_not_enabled)`. Its results are
 IRR (gated): Newton with bisection fallback; |NPV| < ₹0.01; 200 iterations. Non-convergence → `NOT_VERIFIED(calc_not_converged)` (canonical in doc 08).
 
 ## 4a. HC-5 finance gate (canonical; added v0.2.1)
-HC-5 is the finance sign-off checkpoint. It is **pending**, and nothing below approves it.
+HC-5 was approved 2026-11-14 by `krishna2027` for the MVP formula set, tolerance table, GST 18% assumption, and
+user visibility. APR annualisation and the other gated formulas remain disabled for the whole MVP.
 
 **Allowed before HC-5 (Phase 3 work on synthetic data):**
 - Implement **all** formulas in §4, including the gated ones (APR, flat-to-effective, prepayment, penal), plus `SourcedFactory`, traces and the tolerance table.
@@ -163,7 +164,8 @@ Template example: "For ₹5,00,000 at 10.5% (reducing) for 60 months from the KF
 - No user-visible finance output before HC-5 approval is recorded; no APR, flat-to-effective, prepayment or penal output anywhere in the MVP (flag + startup-check tests).
 
 ## 10. Human review
-**HC-5:** golden table, tolerances, the GST assumption, the APR method (only for enabling later), and a finance-literate reviewer recorded by name. Not yet done.
+**HC-5 approval record (2026-11-14):** `krishna2027` approved the golden table, MVP tolerances, GST 18% assumption,
+and MVP-set user visibility. APR annualisation and the other gated formulas were not enabled.
 
 ## 11. Common failures
 - Floats instead of Decimal.

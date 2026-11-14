@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { api, ApiError, login } from "../../lib/api";
@@ -6,6 +6,7 @@ import { api, ApiError, login } from "../../lib/api";
 export default function LoginPage({ onAuthed }: { onAuthed: () => void }) {
   const { t } = useTranslation();
   const nav = useNavigate();
+  const formRef = useRef<HTMLFormElement>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -19,13 +20,14 @@ export default function LoginPage({ onAuthed }: { onAuthed: () => void }) {
     } catch (e) { setError(e instanceof ApiError ? e.message : String(e)); }
   }
   return (
-    <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); submit(false); }}>
+    <form ref={formRef} className="space-y-3" onSubmit={(e) => { e.preventDefault(); submit(false); }}>
       <label className="block">{t("email")}<input className="mt-1 w-full rounded border p-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
       <label className="block">{t("password")}<input className="mt-1 w-full rounded border p-2" type="password" minLength={10} value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
       {error && <p role="alert" className="text-red-700">{error}</p>}
       <div className="flex gap-3">
         <button className="rounded bg-slate-800 px-4 py-2 text-white" type="submit">{t("login")}</button>
-        <button className="rounded border px-4 py-2" type="button" onClick={() => submit(true)}>{t("register")}</button>
+        <button className="rounded border px-4 py-2" type="button"
+                onClick={() => { if (formRef.current?.reportValidity()) submit(true); }}>{t("register")}</button>
       </div>
     </form>
   );

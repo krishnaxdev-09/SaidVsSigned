@@ -4,16 +4,16 @@ SaidSigned checks a recorded loan-sales call against the loan agreement the cust
 agent promised that the signed terms contradict, citing the exact quote, timestamp and clause.
 
 ## Status (2026-11-14)
-**14 of 40 MVP tasks done (35%).** Stage 0 (foundation) is complete. Stage 1 is in progress: recording upload works;
-speech-to-text, speaker confirmation and claim extraction are next.
+**34 of 40 MVP tasks done (85%).** Stages 0–3 implementation is complete. Phase 3 finance visibility is enabled
+after HC-5 approval; Phase 4 evaluation, security and release work remains.
 Stage-by-stage status: `AGENTS.md` · evidence per task: `docs/revision/MVP_TASK_STATUS.md` ·
 plan: `docs/revision/MVP_IMPLEMENTATION_PLAN.md`.
 
 | Works now | Not built yet |
 |---|---|
-| Register/login, sessions, consent + recording attestation, revocation | Speech-to-text (ElevenLabs, T1.2) |
-| Recording upload (WAV/MP3/M4A/AAC/WebM/OGG), validation, normalisation, playback snippets | Claim extraction (LLM, T1.6) |
-| Job queue, live status events, audit log | Agreement upload/OCR and the said-vs-signed comparison (Stage 2) |
+| Register/login, sessions, consent + recording attestation, revocation | Phase 4 evaluation, security and release |
+| Recording upload, STT, speaker confirmation, claim extraction | — |
+| Agreement upload/OCR, said-vs-signed verification, finance and PDF reporting | — |
 
 ## Requirements
 Docker, Python 3.12 with [uv](https://docs.astral.sh/uv/), Node 20, and `ffmpeg`.

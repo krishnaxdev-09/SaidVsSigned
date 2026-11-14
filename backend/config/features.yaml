@@ -1,8 +1,11 @@
 # Feature flags (doc 06 §4a, doc 07). Checked at startup by app.core.config.check_features.
 finance:
   preview_internal: false              # dev/staging synthetic only; refused where REAL_USERS=true
-  mvp_formulas_user_visible: false     # true only with hc5_approval filled (HC-5 is PENDING)
+  mvp_formulas_user_visible: true      # HC-5 approved 2026-11-14; MVP set only
   gated_formulas_enabled: false        # APR, flat-to-effective, prepayment, penal: off for the whole MVP
-  hc5_approval: { approved_by: null, approved_at: null, record: null }
+  hc5_approval:
+    approved_by: krishna2027
+    approved_at: "2026-11-14"
+    record: "User explicitly approved HC-5: MVP formulas, tolerance table, GST 18% assumption, and user visibility. Gated formulas remain disabled."
 rules:
   user_visible: false                  # per-rule HC-6 approval required (HC-6 is PENDING)

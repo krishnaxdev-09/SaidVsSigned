@@ -108,7 +108,7 @@ flowchart TD
 | 2 | **HC-2 ✅ APPROVED 2026-11-14 (user)** | Before Phase 1 code | Claim schema, reason codes, CONFLICT evidence combinations, wording templates (docs 04, 08) | T1.4 onward |
 | 3 | **HC-3 ✅ APPROVED 2026-11-14 (user)** | Phase 1 exit | E2/E3/E10 results, languages, ADR-019 confirm-quote fallback, ElevenLabs config/pricing, fallback STT | T3.1 |
 | 4 | **HC-4** | Phase 2 exit | OCR backend, thresholds, retrieval/NLI, embedding model (ADR-005/013) | T3.1 |
-| 5 | **HC-5** | Phase 3 exit | Finance formulas, tolerances, GST assumption, synthetic results. Enables user visibility of the **MVP formula set only** (§7) | Phase 4; user-facing finance |
+| 5 | **HC-5 ✅ APPROVED 2026-11-14** | Phase 3 exit | Finance formulas, tolerances, GST 18% assumption, synthetic results. Enables user visibility of the **MVP formula set only** (§7) | Phase 4; gated formulas and regulatory findings remain disabled |
 | 6 | **HC-6** | Phase 4, on T3.7 | Each curated regulatory rule and any user-facing regulatory finding. Until approved, **all rules stay in shadow** | User-facing regulatory findings only (not HC-8) |
 | 7 | **HC-7** | Before any real user | Consent and attestation texts, privacy notice, retention, Q-13 policy, legal memo | Real-user use; HC-8 |
 | 8 | **HC-8** | Phase 4 exit | MVP release readiness from the eval, security and UX reports | Release |
