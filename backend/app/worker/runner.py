@@ -162,7 +162,7 @@ async def main() -> None:
     from app.core.storage import S3ObjectStore
     from app.worker.handlers import register_all
 
-    register_all(registry, S3ObjectStore(s))
+    await asyncio.to_thread(register_all, registry, S3ObjectStore(s), warm=True)
     log.info("worker_start", kinds=registry.kinds)
     await Worker(engine, registry, lease_seconds=s.JOB_LEASE_SECONDS).run_forever(s.WORKER_POLL_SECONDS)
 

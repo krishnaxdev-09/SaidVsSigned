@@ -81,7 +81,7 @@ REASON_TEXT: dict[ReasonCode, str] = {
 }
 
 QUESTION_TEMPLATES.update({
-    ReasonCode.LOW_ASR_CONFIDENCE: "Play the clip and confirm what the agent said.",
+    ReasonCode.LOW_ASR_CONFIDENCE: "Ask the agent to confirm this figure in writing.",
     ReasonCode.LOW_OCR_CONFIDENCE: "Upload a clearer photo of page {page}.",
     ReasonCode.SPEAKER_UNCONFIRMED: "Confirm which speaker is the agent.",
     ReasonCode.VAGUE_CLAIM: "Ask the agent for the exact figure in writing.",

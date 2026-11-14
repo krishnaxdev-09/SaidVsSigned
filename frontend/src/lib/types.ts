@@ -49,5 +49,30 @@ export interface Claim {
   speaker_role: SpeakerRole; role_assignment: "auto" | "user_confirmed"; normalized_statement: string; quote: string;
   start_ms: number; end_ms: number; values: ClaimValue[]; vagueness: "specific" | "approximate" | "vague";
   readiness: string; verifiable: boolean; state: "active" | "dismissed" | "superseded"; supersedes_claim_id: string | null;
-  conditions: { text: string; kind: string }[];
+  conditions: { text: string; kind: string }[]; quote_confirmed_by_user?: boolean;
+}
+
+// T2.7 documents and verification results (doc 05 §5, doc 08 §3.4)
+export type DocumentKind = "kfs" | "loan_agreement" | "sanction_letter" | "fee_schedule" | "other";
+export interface DocPage { page: number; width: number | null; height: number | null; text_source: string | null; ocr_conf: number | null }
+export interface LoanDocument {
+  document_id: string; session_id: string; kind: DocumentKind; source: "pdf" | "photos"; version: number; status: string;
+  stage: string; status_code: string | null; page_count: number | null; warnings: string[]; pages: DocPage[];
+}
+export type Status = "CONFLICT" | "MATCH" | "UNCLEAR" | "NOT_VERIFIED";
+export interface BBox { x0: number; y0: number; x1: number; y1: number }
+export interface SpokenEvidence {
+  kind: "spoken"; claim_id: string; quote: string; start_ms: number; end_ms: number; speaker_role: string;
+  role_assignment: "auto" | "user_confirmed"; quote_confirmed_by_user: boolean;
+}
+export interface DocumentEvidence {
+  kind: "document"; document_id: string; document_version: number; page: number; clause_id: string; clause_text: string;
+  bboxes: BBox[]; ocr_conf: number | null; text_source: "text_layer" | "ocr";
+}
+export type Evidence = SpokenEvidence | DocumentEvidence | { kind: "calculation" | "rule" | "public" };
+export interface VerificationResult {
+  id: string; claim_id: string; version: number; is_current: boolean; status: Status; reason_code: string | null;
+  headline: string; reason: string; severity: "high" | "medium" | "low" | "info"; suggested_question: string | null;
+  evidence: Evidence[]; engine_verdicts?: { engine: string; missing: string[] }[]; changed_because: { trigger: string; previous_status: Status | null; previous_version: number | null };
+  created_at: string;
 }

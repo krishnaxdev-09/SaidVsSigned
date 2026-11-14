@@ -59,8 +59,12 @@ def apply_gates(v: EngineVerdict, claim: Claim, th: Thresholds, *, hindi: bool) 
             return lower(v, Status.UNCLEAR, ReasonCode.LOW_ASR_CONFIDENCE)
         # HC-3 / ADR-019: a numeric CONFLICT also needs the customer's quote confirmation, in every language; Hindi
         # (not yet supported) never shows a numeric CONFLICT.
-        if v.status == Status.CONFLICT and (hindi or not claim.quote_confirmed_by_user):
+        if v.status == Status.CONFLICT and hindi:
             return lower(v, Status.UNCLEAR, ReasonCode.LOW_ASR_CONFIDENCE)
+        if v.status == Status.CONFLICT and not claim.quote_confirmed_by_user:
+            # Only the customer's confirmation is missing: the UI offers play-and-confirm for exactly this case.
+            return lower(v, Status.UNCLEAR, ReasonCode.LOW_ASR_CONFIDENCE).model_copy(update={
+                "missing": ["quote_confirmation"], "suggested_question": "Play the clip and confirm what the agent said."})
     elif claim.asr_avg_conf is None or claim.asr_avg_conf < th.T_asr_avg:
         return lower(v, Status.UNCLEAR, ReasonCode.LOW_ASR_CONFIDENCE)
     # 8. Public-data cap.

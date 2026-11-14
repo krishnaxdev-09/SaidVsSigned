@@ -9,7 +9,9 @@ from app.worker.runner import Registry
 
 
 def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | None = None,
-                 llm: LLMProvider | None = None) -> None:
+                 llm: LLMProvider | None = None, warm: bool = False) -> None:
+    """warm=True (worker process only): load the local embedding and NLI models now, so the first verification
+    doesn't spend the contract engine's 30 s timeout on model loading (found in the T2.7 real-stack run)."""
     from app.core.config import get_settings
     from app.llm.bedrock_mantle import from_settings as mantle_from_settings
     from app.modules.audio.ingest import make_ingest_handler
@@ -36,5 +38,9 @@ def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | N
     from app.modules.verify.engines import FinanceEngine
     from app.modules.verify.job import make_verify_handler
 
-    contract = ContractEngine(embedder=embedder_from_settings(), llm=llm, nli=LocalNLI())  # models load lazily
+    embedder, nli = embedder_from_settings(), LocalNLI()
+    if warm:
+        embedder.embed_sync(["warm-up"], kind="query")
+        nli.score_sync("warm-up", "warm-up")
+    contract = ContractEngine(embedder=embedder, llm=llm, nli=nli)
     registry.register("verify", make_verify_handler([contract, FinanceEngine()], llm=llm))  # T2.5/T2.6, doc 08

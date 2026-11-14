@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import re
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass
@@ -95,7 +96,13 @@ def heuristic_only(ex: dict[str, str]) -> list[Suggestion]:
 
 
 def combine(ex: dict[str, str], llm: LLMRoleSuggestion) -> list[Suggestion]:
-    by_label = {s.speaker_label: s for s in llm.speakers if s.speaker_label in ex}
+    def norm(label: str) -> str:
+        # Stereo labels are "L"/"R" and the prompt shows "Speaker L:"; the model may echo "Speaker L" (found in the
+        # T2.7 real-stack run, every stereo suggestion came back unknown).
+        label = label.strip()
+        return label if label in ex else re.sub(r"(?i)^speaker[\s_:-]*", "", label).strip()
+
+    by_label = {norm(s.speaker_label): s for s in llm.speakers if norm(s.speaker_label) in ex}
     out = []
     for label in ex:
         got = by_label.get(label)

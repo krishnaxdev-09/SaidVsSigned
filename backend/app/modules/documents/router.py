@@ -222,7 +222,7 @@ async def get_document(document_id: uuid.UUID, user_id: uuid.UUID = Depends(curr
 async def replace_page(document_id: uuid.UUID, page: int, request: Request, file: UploadFile = File(...),
                        user_id: uuid.UUID = Depends(current_user)) -> JSONResponse:
     """Replace one photo page (doc 05 §5): a new version with the other pages carried over; re-ingested.
-    Re-verification with changed_because=document_replaced arrives with T2.5."""
+    Re-verification (changed_because=document_replaced) is enqueued when the new version is ready."""
     async with get_engine().connect() as conn:
         doc = await load_document(conn, document_id, user_id)
         if not await has_active_consent(conn, doc.session_id):

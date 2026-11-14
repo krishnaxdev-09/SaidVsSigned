@@ -7,6 +7,8 @@ import RecordingPanel from "../recordings/RecordingPanel";
 import SpeakerConfirm from "../speakers/SpeakerConfirm";
 import ClaimList from "../claims/ClaimList";
 import TranscriptView from "../transcript/TranscriptView";
+import DocumentUpload from "../documents/DocumentUpload";
+import ResultsDashboard from "../results/ResultsDashboard";
 import { api } from "../../lib/api";
 import { connectEvents } from "../../lib/events";
 import { applyEvent } from "../../lib/eventLog";
@@ -28,6 +30,8 @@ export default function SessionPage() {
     if (ev.type === "transcript.ready" || ev.type === "speaker.updated") qc.invalidateQueries({ queryKey: ["speakers", id] });
     if (ev.type === "transcript.ready") qc.invalidateQueries({ queryKey: ["transcript", id] });
     if (ev.type.startsWith("claim.") || ev.type === "speaker.updated") qc.invalidateQueries({ queryKey: ["claims", id] });
+    if (ev.type === "document.status") qc.invalidateQueries({ queryKey: ["documents", id] });
+    if (ev.type === "verification.updated") qc.invalidateQueries({ queryKey: ["results", id] });
   }), [id, qc]);
   if (!q.data) return null;
   const { session, consent } = q.data;
@@ -38,6 +42,8 @@ export default function SessionPage() {
       {consent.attestation_note && <p className="text-sm">{consent.attestation_note}</p>}
       {consent.active && <RecordingPanel sessionId={id} />}
       {consent.active && <SpeakerConfirm sessionId={id} />}
+      {consent.active && <ResultsDashboard sessionId={id} />}
+      {consent.active && <DocumentUpload sessionId={id} />}
       {consent.active && <ClaimList sessionId={id} />}
       {consent.active && <TranscriptView sessionId={id} />}
       {consent.active && (

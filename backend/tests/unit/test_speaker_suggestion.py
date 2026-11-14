@@ -169,3 +169,13 @@ def test_short_customer_question_does_not_outscore_the_agent() -> None:
     assert scores["a"] > scores["c"]
     sugg, _ = asyncio.run(service.suggest(_llm_says(("a", "agent", 0.95), ("c", "customer", 0.95)), segs))
     assert all(s.role_confidence >= service.CONFIDENT for s in sugg)  # agreement: not uncertain
+
+
+def test_stereo_labels_echoed_with_speaker_prefix_still_map() -> None:
+    from app.modules.speakers.service import LLMRoleSuggestion, combine
+
+    ex = {"L": "Your loan of 5 lakh is approved, the processing fee is 2 percent", "R": "What is the processing fee?"}
+    out = combine(ex, LLMRoleSuggestion.model_validate({"speakers": [
+        {"speaker_label": "Speaker L", "role": "agent", "role_confidence": 0.95},
+        {"speaker_label": "speaker R", "role": "customer", "role_confidence": 0.9}]}))
+    assert [(s.speaker_label, s.role) for s in out] == [("L", "agent"), ("R", "customer")]

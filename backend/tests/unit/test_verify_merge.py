@@ -89,7 +89,12 @@ def test_gates_in_order() -> None:
 
 def test_hc3_numeric_conflict_needs_quote_confirmation_and_never_in_hindi() -> None:
     conflict = v("contract", Status.CONFLICT)
-    assert run(claim(quote_confirmed_by_user=False), conflict).reason_code == ReasonCode.LOW_ASR_CONFIDENCE
+    m = run(claim(quote_confirmed_by_user=False), conflict)
+    assert m.reason_code == ReasonCode.LOW_ASR_CONFIDENCE and m.verdicts[0].missing == ["quote_confirmation"]
+    gated = gates.apply_gates(conflict, claim(quote_confirmed_by_user=False), TH, hindi=False)
+    assert gated.missing == ["quote_confirmation"] and gated.suggested_question.startswith("Play the clip")
+    low = gates.apply_gates(conflict, claim(asr_min_numeric_conf=0.5), TH, hindi=False)
+    assert low.missing == [] and gates.apply_gates(conflict, claim(), TH, hindi=True).missing == []
     assert run(claim(quote_confirmed_by_user=True), conflict, hindi=True).reason_code == ReasonCode.LOW_ASR_CONFIDENCE
     assert run(claim(quote_confirmed_by_user=False), v("contract", Status.MATCH)).status == Status.MATCH
     assert run(claim(values=[], quote_confirmed_by_user=False), conflict).status == Status.CONFLICT  # semantic claim
