@@ -35,10 +35,19 @@ class Settings(BaseSettings):
     WS_TICKET_TTL: int = 30
     COOKIE_SECURE: bool = True  # false only for local http dev
 
-    # Providers (unused in Phase 0)
+    # Providers
     ELEVENLABS_API_KEY: SecretStr = SecretStr("")
-    LLM_PROVIDER: str = ""
+    ELEVENLABS_STT_MODEL: str = "scribe_v2"
+    ELEVENLABS_BASE_URL: str = "https://api.elevenlabs.io"
+    STT_NUM_SPEAKERS: int = 2  # doc 03 §5: num_speakers=2 by default (configurable 2–4)
+    STT_TIMEOUT_S: float = 600.0
+    LLM_PROVIDER: str = ""  # "bedrock_mantle" (ADR-004 working provider)
     LLM_MODEL: str = ""
+    LLM_TIMEOUT_MS: int = 120_000
+    MANTLE_BASE_URL: str = "https://bedrock-mantle.us-east-1.api.aws/openai/v1"
+    MANTLE_API_KEY: SecretStr = SecretStr("")
+    MANTLE_MODEL: str = "google.gemma-4-31b"
+    MANTLE_MAX_TOKENS: int = 4096
     EMBEDDING_PROVIDER: str = ""
     EMBEDDING_MODEL: str = ""
     EMBEDDING_DIM: int = 0

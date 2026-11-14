@@ -3,7 +3,7 @@
 Validate (ffprobe, limits) -> normalise (ffmpeg) -> silence check -> store outputs at deterministic keys.
 Input errors (corrupt, too long, silent) end the recording as failed(code) without retries: the job itself succeeds,
 because there is nothing to retry. Timeouts are transient and retried by the job policy (doc 01 §6).
-Step 6 (enqueue `stt.batch`) is added with T1.2, which introduces transcript revisions.
+Step 6: allocate the recording's transcript revision and enqueue `stt.batch` (T1.2).
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ from app.modules.audio import media
 from app.modules.audio.service import object_prefix
 from app.modules.realtime.bus import publish
 from app.modules.realtime.events import EventType
+from app.modules.stt.job import enqueue_stt
 from app.worker.runner import Handler, JobContext
 
 
@@ -99,5 +100,6 @@ def make_ingest_handler(store: ObjectStore) -> Handler:
              "id": row.id})
         await publish(ctx.conn, row.session_id, EventType.RECORDING_STATUS,
                       {"recording_id": str(row.id), "stage": "normalising", "progress": 1.0})
+        await enqueue_stt(ctx.conn, row.session_id, row.id)  # doc 02 §5 step 6
 
     return handle

@@ -117,3 +117,19 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - **ADR-004 / Q-2:** Gemma 4 31B recorded as the user's working provider; the final choice stays with the Phase 1 eval.
 - New `AGENTS.md` (stage-by-stage status) and `CLAUDE.md`; README rewritten; `.env.example` reduced to the settings in use.
 - No approvals recorded. HC-2…HC-8 are still pending.
+
+## 2026-11-14 — Phase 1: T1.2 batch speech-to-text
+- **T1.2 done:** ElevenLabs `scribe_v2` adapter (`app/modules/stt/elevenlabs.py`), segmentation and numeric tokens (`segmentation.py`), `stt.batch` job with transcript revisions (`job.py`), `GET /sessions/{id}/transcript`, migration `0003_transcripts` (doc 11 DDL). Evidence in `MVP_TASK_STATUS.md`.
+- **Interface note (doc 03 §4):** `STTProvider.transcribe_file` gained keyword arguments `session_id`, `transcript_revision` and `channel`, because each returned `TranscriptSegment` carries them. The models are unchanged.
+- **Revisions:** one revision per recording, allocated when ingest finishes (a `transcript_revisions` row with `provider` NULL until transcribed). A replaced recording gets the next revision; old revisions are kept.
+- **Verified:** Bedrock region `us-east-1`; `google.gemma-4-31b` is listed for this key and callable (`google.gemma-4-31b-it` does not exist). The ElevenLabs key can transcribe but cannot list models (scoped key).
+- **Observed:** ElevenLabs returns numbers as digits ("10 lakh", "1%", "36,000"); relevant to the T1.5 normaliser. It also offers `detect_speaker_roles` (agent/customer), not used; noted for T1.3.
+- No approvals recorded. HC-2…HC-8 are still pending.
+
+## 2026-11-14 — Phase 1: T1.3 speaker suggestion + confirmation
+- **T1.3 done** per the user's decision: Gemma (`google.gemma-4-31b`, Bedrock Mantle) suggests roles; ElevenLabs `detect_speaker_roles` is **not** used. Evidence in `MVP_TASK_STATUS.md`.
+- New: `app/llm/bedrock_mantle.py` (structured JSON with one corrective retry), `app/modules/speakers/` (job `speakers.suggest`, `GET/PUT /sessions/{id}/speakers`, `PATCH /segments/{id}/speaker`), migration `0004_speaker_assignments` (doc 11 DDL), the "Who is the agent?" screen.
+- Rules: confirmation names the current transcript revision (stale → 409) and never carries over to a new revision; a re-run suggestion never overwrites a confirmation; uncertain suggestions (confidence < 0.7, two/no agents, LLM vs keyword heuristic disagreement, LLM unavailable) are flagged and cannot be accepted in one tap; only a user-confirmed agent passes `conflict_allowed()` (doc 08 §5 gate 1).
+- Audit uses the doc 12 §B.4 actions `speaker.confirm` and `segment.reassign`.
+- **Known issue KI-1** (from T1.2) assessed and tracked in `MVP_TASK_STATUS.md`; fix proposed, not applied.
+- No approvals recorded. HC-2…HC-8 are still pending.

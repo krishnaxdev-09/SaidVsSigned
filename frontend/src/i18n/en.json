@@ -34,5 +34,21 @@
   "warnings": "Notes",
   "upload_failed": "Upload failed",
   "recording_failed": "The recording could not be processed",
-  "awaiting_transcription": "Ready for transcription"
+  "awaiting_transcription": "Ready for transcription",
+  "speakers_title": "Who is the agent?",
+  "speakers_help": "Listen to a few lines from each speaker, then tap the one who is the loan agent.",
+  "speaker_n": "Speaker {{n}}",
+  "speaker_side": "{{side}} side of the recording",
+  "suggested_agent": "Suggested: agent",
+  "suggested_customer": "Suggested: you (customer)",
+  "suggestion_unsure": "Not sure: please check",
+  "confirm_suggestion": "Yes, Speaker {{n}} is the agent",
+  "this_is_agent": "This is the agent",
+  "agent_confirmed": "Agent confirmed: Speaker {{n}}",
+  "change": "Change",
+  "confirm_banner": "Confirm the agent to enable mismatch checks.",
+  "transcript_changed": "The recording changed. Please confirm the agent again.",
+  "play": "Play",
+  "single_speaker": "Only one speaker was found. Is this the agent?",
+  "save_failed": "Could not save"
 }

@@ -1,5 +1,7 @@
-"""STTProvider protocol + transcript models exactly as doc 03 §4 (canonical there). Interface only in Phase 0;
-the ElevenLabs adapter is Phase 1 (T1.2). `stream()` is deferred to Later-L1 and intentionally omitted."""
+"""STTProvider protocol + transcript models as doc 03 §4 (canonical there). `stream()` is deferred to Later-L1.
+
+T1.2 note: `transcribe_file` also takes `session_id`, `transcript_revision` and `channel`, because every returned
+TranscriptSegment carries them and the doc 03 §4 signature has no other way to supply them. The models are unchanged."""
 
 from __future__ import annotations
 
@@ -37,4 +39,5 @@ class STTProvider(Protocol):
     name: str
 
     async def transcribe_file(self, object_key: str, *, diarize: bool, num_speakers: int | None,
-                              language_hint: str | None, keyterms: list[str]) -> list[TranscriptSegment]: ...
+                              language_hint: str | None, keyterms: list[str], session_id: uuid.UUID,
+                              transcript_revision: int, channel: Literal["mono", "L", "R"]) -> list[TranscriptSegment]: ...

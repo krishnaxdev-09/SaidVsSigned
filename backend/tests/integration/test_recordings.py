@@ -14,7 +14,7 @@ import pytest
 from sqlalchemy import text
 
 from app.core.config import get_settings
-from app.worker.handlers import register_all
+from app.modules.audio.ingest import make_ingest_handler
 from app.worker.runner import Registry, Worker
 from tests.conftest import create_session, give_consent, register_and_login, scalar
 
@@ -62,8 +62,9 @@ def store(fake_store):  # type: ignore[no-untyped-def]
 
 
 async def _drain(engine, store) -> int:  # type: ignore[no-untyped-def]
+    """Runs the T1.1 ingest job only; transcription (stt.batch) is covered by test_transcripts.py."""
     reg = Registry()
-    register_all(reg, store)
+    reg.register("audio.ingest", make_ingest_handler(store))
     worker = Worker(engine, reg, lease_seconds=60)
     n = 0
     while await worker.run_once():

@@ -15,11 +15,11 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | Phase | Tasks | ✅ | ◐ | ⬜ | ⛔ | Task completion |
 |---|---|---|---|---|---|---|
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
-| 1 — Upload, STT, speakers, claims | 8 | 1 | 0 | 4 | 3 | 12.5% (1/8) |
+| 1 — Upload, STT, speakers, claims | 8 | 3 | 0 | 2 | 3 | 37.5% (3/8) |
 | 2 — Documents & contract verification | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 3 — Finance, orchestration, reporting | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **14** | **0** | **23** | **3** | **35% (14/40)** |
+| **Total** | **40** | **16** | **0** | **21** | **3** | **40% (16/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -82,13 +82,18 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 | Task | Status | Blocker |
 |---|---|---|
 | T1.1 Recording upload pipeline | ✅ 2026-11-14 | Done. Evidence: `tests/integration/test_recordings.py` + `tests/unit/test_audio_sniff.py` (33 tests: 6 formats normalise within ±50 ms, stereo split, magic-byte rejection, corrupt/silent/too-long fail without retry, sha256 dedupe, idempotency replay/409, replace, consent gate, owner-only, identical re-run, snippet ±0.25 s); `make ci` 88/88 backend. Real-stack run: speech upload → normalised → presigned snippet fetched from host. Limits: `stt.batch` enqueue arrives with T1.2; snippets download the whole FLAC (fine for call-length audio) |
-| T1.2 ElevenLabs batch adapter + revisions | ⬜ | Unblocked: ElevenLabs key provided and smoke-tested 2026-11-14 (`scribe_v2`, HTTP 200, diarization + word timestamps + `logprob`) |
-| T1.3 Speaker suggestion + confirmation | ⬜ | T1.2 |
+| T1.2 ElevenLabs batch adapter + revisions | ✅ 2026-11-14 | Done. Evidence: `tests/unit/test_stt_segmentation.py`, `tests/unit/test_elevenlabs_adapter.py` (recorded scribe_v2 response, no network), `tests/integration/test_transcripts.py` (9 tests: transcript from the recorded response, atomic re-run rewrite, replace → revision 2 current / revision 1 kept, FakeSTTProvider same flow, stereo L/R, empty → no_speech_detected without retry, 401 → provider_auth without retry, owner-only, consent revoked mid-call → job cancelled and nothing committed); `make ci` 138/138 backend. Real-stack run with the real ElevenLabs API on a synthetic 2-speaker call: uploaded → transcribing → ready in 4.7 s, 4 segments, speakers correct, turn starts within 36–101 ms of truth (limit ±200 ms), per-word confidences present. Limits: role suggestion is T1.3; `claims.extract` enqueue is T1.6; numeric accuracy/languages are E2/E3 (T1.8) |
+| T1.3 Speaker suggestion + confirmation | ✅ 2026-11-14 | Done. Evidence: `tests/unit/test_speaker_suggestion.py` (21: recorded Gemma reply via the Mantle provider, uncertainty rules, LLM-failure fallback, corrective retry, auth errors, conflict-gate matrix), `tests/integration/test_speakers.py` (9: suggest → one-tap confirm, swap/rejection, missing confirmation, uncertain suggestion, revision change (no carry-over, stale PUT 409), re-run never overwrites a confirmation, segment override, validation/consent/ownership), `frontend/src/features/speakers/roles.test.ts` (3); `make ci` 168/168 backend, 7/7 frontend. Real run (ElevenLabs + Gemma 4 31B on Bedrock): suggestion 6.2 s after upload, agent correct at confidence 1.0; gate false for both speakers before confirmation, true only for the confirmed agent after; stale revision rejected. Limits: segment-fix UI is in the transcript view (T1.7); the gate is applied to verdicts by the orchestrator (T2.5), which also re-verifies on confirmation; auto-role accuracy is E10 (T1.8) |
 | T1.4 Schema registry | ⛔ | HC-2 |
 | T1.5 Normaliser | ⛔ | T1.4 |
 | T1.6 Claim extraction | ⛔ | T1.2, T1.5 (→ HC-2). LLM configured: Gemma 4 31B via Bedrock Mantle, smoke-tested 2026-11-14 (valid JSON, verbatim quotes); ADR-004 final choice after the Phase 1 eval |
 | T1.7 Claims UI, transcript, snippets | ⬜ | T1.3, T1.6 |
 | T1.8 Experiments E2, E3, E10 + LLM eval | ⬜ | T1.2, T1.6 |
+
+### Known issues (tracked, not yet fixed)
+| ID | Found | Issue | Impact | Required fix | Planned |
+|---|---|---|---|---|---|
+| KI-1 | T1.2, 2026-11-14 | Withdrawing consent while `audio.ingest` or `stt.batch` is running (or queued) leaves the recording's status at its last intermediate stage (e.g. `transcribing`). The session correctly shows `failed(consent_revoked)`, the job is `cancelled` and nothing is committed (tested). | Display only: a stale "in progress" stage. No data is kept, no transcript or claim is produced, no CONFLICT is possible. | In the revocation transaction, set the session's in-progress recordings to `failed(consent_revoked)`; make the jobs' intermediate status updates conditional (`status NOT IN ('failed','ready')`) so a racing job cannot overwrite it; add a test for queued and running cases. About 15 lines. | Awaiting your go-ahead (small bug fix; recommended before the demo) |
 
 ## Phase 2 — Documents & contract verification (HC-4)
 

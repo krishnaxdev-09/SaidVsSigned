@@ -44,11 +44,11 @@ cd frontend && npm run dev                     # UI on :5173, proxies /api and /
 ## Layout
 ```
 backend/app/core/        config, db, errors (doc 01 §7), retry (doc 01 §6), idempotency, storage, security
-backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (interface only)
-backend/app/llm/         LLM provider interface + fakes (provider-agnostic)
+backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3)
+backend/app/llm/         LLM provider interface, Bedrock Mantle provider (Gemma), fakes
 backend/app/worker/      Postgres job queue, runner, handlers.register_all
-backend/alembic/         migrations (0001 foundation, 0002 audio_streams)
-frontend/src/            React PWA: features/{auth,sessions,consent,recordings}, lib (api, events), i18n en/hi
+backend/alembic/         migrations 0001 foundation … 0004 speaker_assignments
+frontend/src/            React PWA: features/{auth,sessions,consent,recordings,speakers}, lib (api, events), i18n en/hi
 eval/                    synthetic datasets (agreements AG01–AG10), tools, reports
 infra/                   docker-compose, MinIO Dockerfile
 ```
@@ -56,7 +56,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 14 / 40 tasks done (35%).** Stage 0 complete; Stage 1 in progress.
+**Overall: 16 / 40 tasks done (40%).** Stage 0 complete; Stage 1 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -77,14 +77,14 @@ Gate: HC-1 ✅ approved 2026-11-13.
 | T0.12 | CI (feature-flag startup checks, DB required) | ✅ |
 | T0.13 | 10 synthetic agreements + DRAFT consent texts (legal review at HC-7) | ✅ |
 
-### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (1/8)
+### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (3/8)
 Gates: HC-2 before T1.4 (⛔ pending) · HC-3 at stage exit.
 
 | Task | What | Status | Blocked by |
 |---|---|---|---|
 | T1.1 | Recording upload: magic-byte check, dedupe, normalise, replace, snippets | ✅ | — |
-| T1.2 | ElevenLabs batch STT (diarization, word timestamps) + transcript revisions | ⬜ | — (key set and smoke-tested 2026-11-14) |
-| T1.3 | Speaker suggestion + one-tap agent confirmation | ⬜ | T1.2 |
+| T1.2 | ElevenLabs batch STT (diarization, word timestamps) + transcript revisions | ✅ | — |
+| T1.3 | Speaker suggestion (Gemma) + one-tap agent confirmation | ✅ | — |
 | T1.4 | Schema registry (statuses, reason codes) | ⛔ | **HC-2** |
 | T1.5 | Deterministic normaliser (≥ 300 cases, Hinglish) | ⛔ | T1.4 |
 | T1.6 | Claim extraction with verbatim quote anchors | ⛔ | T1.2, T1.5 (→ HC-2). LLM ready: Gemma 4 31B via Bedrock Mantle, smoke-tested |
@@ -138,7 +138,7 @@ L6 expanded regulatory/finance · L7 insurance · L8 second STT provider · L9 l
 | Speech-to-text | ElevenLabs Scribe v2 (`scribe_v2`), batch with diarization | `ELEVENLABS_API_KEY` |
 | LLM | Gemma 4 31B (`google.gemma-4-31b`) on Amazon Bedrock Mantle, OpenAI-compatible Chat Completions at `/openai/v1` | `MANTLE_*` |
 
-The app code does not call either provider yet: STT arrives with T1.2, the LLM with T1.6. ADR-004 (final LLM choice) is decided from the Phase 1 eval.
+Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role suggestion (T1.3, job `speakers.suggest`); claim extraction (T1.6) is next. ADR-004 (final LLM choice) is decided from the Phase 1 eval.
 
 ## Human checkpoints
 | ID | Approves | Status |

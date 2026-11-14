@@ -19,3 +19,16 @@ export interface Recording {
   duration_ms: number | null; format: string | null; channel_layout: "mono" | "stereo_split" | null;
   warnings: string[]; replaced_by: string | null; created_at: string;
 }
+
+export type SpeakerRole = "agent" | "customer" | "unknown";
+export interface SpeakerQuote { segment_id: string; text: string; start_ms: number; end_ms: number }
+export interface Speaker {
+  speaker_label: string; speaker_source: "diarized" | "channel"; segment_count: number;
+  suggested_role: SpeakerRole | null; role_confidence: number | null; suggestion_uncertain: boolean;
+  speaker_role: SpeakerRole; role_assignment: "auto" | "user_confirmed"; confirmed_at: string | null;
+  quotes: SpeakerQuote[];
+}
+export interface Speakers {
+  transcript_revision: number; confirmed: boolean; speakers: Speaker[];
+  overrides: { segment_id: string; speaker_role: SpeakerRole }[];
+}
