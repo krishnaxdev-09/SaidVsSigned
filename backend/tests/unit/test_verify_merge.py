@@ -170,6 +170,7 @@ def test_properties(vs, role_assignment, role, confirmed, hindi, ctype) -> None:
               verifiable=role != "customer")
     outs = [Outcome(gates.apply_gates(x, c, TH, hindi=hindi), shadow=sh) for x, sh in vs]
     m = merge(c, spoken_evidence(c), outs)
+    assert len(m.verdicts) == sum(1 for o in outs if not o.shadow and o.verdict.reason_code != ReasonCode.RULE_NOT_ENABLED)
     if m.status == Status.CONFLICT:
         # 0 CONFLICTs without a §4 combination, without a confirmed agent, without a quote confirmation, or in Hindi
         assert role == "agent" and role_assignment == "user_confirmed" and confirmed and not hindi

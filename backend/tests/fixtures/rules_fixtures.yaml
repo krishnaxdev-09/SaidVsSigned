@@ -1,0 +1,330 @@
+version: rules-fixtures-v1
+note: Hand-written fixtures per rule (violates / complies / not applicable / unknown)
+  for shadow precision/recall (doc 07 §6, T3.7). Synthetic.
+cases:
+- rule: RBI-KFS-2024-PROVIDED
+  name: kfs uploaded
+  expected: complies
+  facts: &id001
+    loan_kind: retail_or_msme_term
+    sanction_date: '2026-02-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-PROVIDED
+  name: only agreement uploaded
+  expected: violates
+  facts: *id001
+  doc_kinds:
+  - loan_agreement
+  doc_text: ''
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-PROVIDED
+  name: sanctioned before KFS rules
+  expected: not_applicable
+  facts:
+    loan_kind: retail_or_msme_term
+    sanction_date: '2024-05-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-PROVIDED
+  name: sanction date unknown
+  expected: unknown
+  facts:
+    loan_kind: retail_or_msme_term
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-PROVIDED
+  name: no document yet
+  expected: unknown
+  facts: *id001
+  doc_kinds: []
+  doc_text: ''
+  doc_terms: []
+  claim: null
+  has_document: false
+- rule: RBI-KFS-2024-APR-DISCLOSED
+  name: APR stated
+  expected: complies
+  facts: *id001
+  doc_kinds:
+  - kfs
+  doc_text: 'Annual Percentage Rate (APR): 19.2%'
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-APR-DISCLOSED
+  name: no APR anywhere
+  expected: violates
+  facts: *id001
+  doc_kinds:
+  - kfs
+  doc_text: Rate of interest | 17.50% p.a.
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-APR-DISCLOSED
+  name: old sanction
+  expected: not_applicable
+  facts:
+    loan_kind: retail_or_msme_term
+    sanction_date: '2023-01-01'
+  doc_kinds:
+  - kfs
+  doc_text: Rate of interest 12%
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-APR-DISCLOSED
+  name: loan kind unknown
+  expected: unknown
+  facts:
+    sanction_date: '2026-02-01'
+  doc_kinds:
+  - kfs
+  doc_text: Rate 12%
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-CHARGES-IN-KFS
+  name: all charges in KFS
+  expected: complies
+  facts: *id001
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: processing_fee
+    value: '2'
+    in_kfs: true
+  - field: other_charge
+    value: '500'
+    in_kfs: true
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-CHARGES-IN-KFS
+  name: documentation charge only in footnote
+  expected: violates
+  facts: *id001
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: processing_fee
+    value: '4999'
+    in_kfs: true
+  - field: other_charge
+    value: '1500'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-CHARGES-IN-KFS
+  name: fee repeated in clause and KFS
+  expected: complies
+  facts: *id001
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: processing_fee
+    value: '2'
+    in_kfs: true
+  - field: processing_fee
+    value: '2'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-CHARGES-IN-KFS
+  name: old sanction
+  expected: not_applicable
+  facts:
+    loan_kind: retail_or_msme_term
+    sanction_date: '2023-03-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: other_charge
+    value: '1500'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-KFS-2024-CHARGES-IN-KFS
+  name: sanction date unknown
+  expected: unknown
+  facts:
+    loan_kind: retail_or_msme_term
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: other_charge
+    value: '1500'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: floating home loan with 2% charge
+  expected: violates
+  facts: &id002
+    borrower_type: individual
+    purpose: non_business
+    rate_type: floating
+    sanction_date: '2026-03-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: prepayment_charge
+    value: '2'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: floating, no charge
+  expected: complies
+  facts: *id002
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: prepayment_charge
+    value: '0'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: fixed-rate loan
+  expected: not_applicable
+  facts:
+    borrower_type: individual
+    purpose: non_business
+    rate_type: fixed
+    sanction_date: '2026-03-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: prepayment_charge
+    value: '4'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: business purpose
+  expected: not_applicable
+  facts:
+    borrower_type: individual
+    purpose: business
+    rate_type: floating
+    sanction_date: '2026-03-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: prepayment_charge
+    value: '4'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: sanctioned 2025
+  expected: not_applicable
+  facts:
+    borrower_type: individual
+    purpose: non_business
+    rate_type: floating
+    sanction_date: '2025-06-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: prepayment_charge
+    value: '2'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: borrower type unknown
+  expected: unknown
+  facts:
+    purpose: non_business
+    rate_type: floating
+    sanction_date: '2026-03-01'
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms:
+  - field: prepayment_charge
+    value: '2'
+    in_kfs: false
+  claim: null
+  has_document: true
+- rule: RBI-PREPAY-2025-FLOATING-PERSONAL
+  name: agent says 1% foreclosure on floating
+  expected: violates
+  facts: *id002
+  doc_kinds:
+  - kfs
+  doc_text: ''
+  doc_terms: []
+  claim:
+    type: prepayment_charge
+    value: '1'
+  has_document: true
+- rule: RBI-PENAL-2023-NOT-INTEREST
+  name: penal interest clause
+  expected: violates
+  facts:
+    sanction_date: '2026-01-01'
+  doc_kinds:
+  - kfs
+  doc_text: penal interest at 3% per month shall be levied
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-PENAL-2023-NOT-INTEREST
+  name: late-payment charge per schedule
+  expected: complies
+  facts:
+    sanction_date: '2026-01-01'
+  doc_kinds:
+  - kfs
+  doc_text: a late-payment charge as per the schedule of charges
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-PENAL-2023-NOT-INTEREST
+  name: old sanction
+  expected: not_applicable
+  facts:
+    sanction_date: '2023-06-01'
+  doc_kinds:
+  - kfs
+  doc_text: penal interest at 2% per month
+  doc_terms: []
+  claim: null
+  has_document: true
+- rule: RBI-PENAL-2023-NOT-INTEREST
+  name: sanction date unknown
+  expected: unknown
+  facts: {}
+  doc_kinds:
+  - kfs
+  doc_text: penal interest at 2% per month
+  doc_terms: []
+  claim: null
+  has_document: true

@@ -1,0 +1,25 @@
+id: RBI-KFS-2024-CHARGES-IN-KFS
+version: 1
+retrieved_on: '2026-11-13'
+quote: null
+explain_en: null
+explain_hi: null
+reviewed_by: null
+enabled: false
+title: Charges not mentioned in the KFS are not levied
+instrument: RBI/2024-25/18 — Key Facts Statement for Loans & Advances (15 Apr 2024)
+source_url: https://www.rbi.org.in/
+source_url_verified: false
+effective_from: '2024-10-01'
+applies_when:
+  loan_kind: retail_or_msme_term
+  sanction_date_gte: '2024-10-01'
+checks:
+- target: doc_term
+  fields:
+  - other_charge
+  - insurance_bundled
+  - processing_fee
+  expect:
+    in_kfs_table: true
+  on_violation: CONFLICT

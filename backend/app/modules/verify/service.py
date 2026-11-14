@@ -163,7 +163,7 @@ async def verify_claim(conn: AsyncConnection, claim_id: uuid.UUID, trigger: Trig
     for o in outcomes:
         o.verdict = gates.apply_gates(o.verdict, claim, th, hindi=ctx.hindi)
     for o in outcomes:
-        if o.shadow:
+        if o.shadow and o.verdict.engine != "rules":  # the rules engine stores one shadow row per rule itself
             await conn.execute(text("INSERT INTO shadow_verdicts (id, claim_id, engine, rule_id, verdict) "
                                     "VALUES (:id, :c, :e, NULL, CAST(:v AS jsonb))"),
                                {"id": uuid.uuid4(), "c": claim.id, "e": o.verdict.engine,

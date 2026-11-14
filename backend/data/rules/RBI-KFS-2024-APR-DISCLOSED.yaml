@@ -1,0 +1,23 @@
+id: RBI-KFS-2024-APR-DISCLOSED
+version: 1
+retrieved_on: '2026-11-13'
+quote: null
+explain_en: null
+explain_hi: null
+reviewed_by: null
+enabled: false
+title: The KFS discloses the Annual Percentage Rate (APR)
+instrument: RBI/2024-25/18 — Key Facts Statement for Loans & Advances (15 Apr 2024)
+source_url: https://www.rbi.org.in/
+source_url_verified: false
+effective_from: '2024-10-01'
+applies_when:
+  loan_kind: retail_or_msme_term
+  sanction_date_gte: '2024-10-01'
+checks:
+- target: doc_text
+  expect:
+    contains_any:
+    - annual percentage rate
+    - apr
+  on_violation: CONFLICT

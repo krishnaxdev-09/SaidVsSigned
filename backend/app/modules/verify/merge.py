@@ -83,8 +83,8 @@ def _clause_reason(spoken: SpokenEvidence, docs: list[DocumentEvidence], section
 def merge(claim: Claim, spoken: SpokenEvidence, outcomes: list[Outcome], *, finance_user_visible: bool = False,
           rules_user_visible: bool = False, sections: dict[str, str | None] | None = None) -> Merged:
     sections = sections or {}
-    verdicts = [o.verdict for o in outcomes]
     visible = [o for o in outcomes if not o.shadow and o.verdict.reason_code != ReasonCode.RULE_NOT_ENABLED]
+    verdicts = [o.verdict for o in visible]  # shadow verdicts never reach results, the API or events (doc 08 §7)
     primary_engines = PRIMARY.get(claim.claim_type.value, set())
     primary = [o for o in visible if o.verdict.engine in primary_engines]
     field_label = FIELD_LABELS.get(claim.claim_type.value, claim.claim_type.value.replace("_", " "))

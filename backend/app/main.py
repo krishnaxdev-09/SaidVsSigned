@@ -24,6 +24,7 @@ from app.modules.rag.qa import router as qa_router
 from app.modules.realtime.bus import hub
 from app.modules.realtime.ws import router as ws_router
 from app.modules.report.service import router as reports_router
+from app.modules.rules.router import router as lenders_router
 from app.modules.sessions.router import router as sessions_router
 from app.modules.speakers.router import router as speakers_router
 from app.modules.stt.router import router as stt_router
@@ -65,6 +66,7 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
     app.include_router(results_router)
     app.include_router(reports_router)
     app.include_router(qa_router)
+    app.include_router(lenders_router)
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict[str, str]:

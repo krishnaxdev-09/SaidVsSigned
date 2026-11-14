@@ -1,0 +1,22 @@
+id: RBI-PENAL-2023-NOT-INTEREST
+version: 1
+retrieved_on: '2026-11-13'
+quote: null
+explain_en: null
+explain_hi: null
+reviewed_by: null
+enabled: false
+title: Penal charges are not levied as penal interest added to the rate
+instrument: RBI circular on Penal Charges in Loan Accounts (Aug 2023) — [A] not retrieved;
+  verify at HC-6
+source_url: https://www.rbi.org.in/
+source_url_verified: false
+effective_from: '2024-01-01'
+applies_when:
+  sanction_date_gte: '2024-01-01'
+checks:
+- target: doc_text
+  expect:
+    not_contains_any:
+    - penal interest
+  on_violation: CONFLICT

@@ -1,0 +1,31 @@
+id: RBI-PREPAY-2025-FLOATING-PERSONAL
+version: 1
+retrieved_on: '2026-11-13'
+quote: null
+explain_en: null
+explain_hi: null
+reviewed_by: null
+enabled: false
+title: No pre-payment charges on floating-rate loans to individuals (non-business)
+instrument: RBI (Pre-payment Charges on Loans) Directions, 2025
+source_url: https://www.rbi.org.in/scripts/FS_Notification.aspx?Id=12878
+source_url_verified: false
+effective_from: '2026-01-01'
+applies_when:
+  borrower_type: individual
+  purpose: non_business
+  rate_type: floating
+  sanction_date_gte: '2026-01-01'
+checks:
+- target: doc_term
+  fields:
+  - prepayment_charge
+  expect:
+    value_eq: 0
+  on_violation: CONFLICT
+- target: claim
+  claim_types:
+  - prepayment_charge
+  expect:
+    value_eq: 0
+  on_violation: CONFLICT

@@ -1,0 +1,21 @@
+id: RBI-KFS-2024-PROVIDED
+version: 1
+retrieved_on: '2026-11-13'
+quote: null
+explain_en: null
+explain_hi: null
+reviewed_by: null
+enabled: false
+title: A Key Fact Statement is provided for retail and MSME term loans
+instrument: RBI/2024-25/18 — Key Facts Statement for Loans & Advances (15 Apr 2024)
+source_url: https://www.rbi.org.in/
+source_url_verified: false
+effective_from: '2024-10-01'
+applies_when:
+  loan_kind: retail_or_msme_term
+  sanction_date_gte: '2024-10-01'
+checks:
+- target: session
+  expect:
+    document_kind_present: kfs
+  on_violation: CONFLICT
