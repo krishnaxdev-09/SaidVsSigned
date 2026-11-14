@@ -35,7 +35,8 @@ from app.worker import queue
 router = APIRouter(prefix="/api/v1", tags=["documents"])
 
 Kind = Literal["kfs", "loan_agreement", "sanction_letter", "fee_schedule", "other"]  # insurance_policy deferred
-_STAGE = {"queued": "queued", "sanitising": "sanitising", "sanitised": "sanitising", "failed": "failed"}
+_STAGE = {"queued": "queued", "sanitising": "sanitising", "sanitised": "sanitising", "rendering": "rendering",
+          "ocr": "ocr", "confidence": "confidence", "parsed": "confidence", "failed": "failed"}
 
 
 class UploadOut(BaseModel):
@@ -49,6 +50,8 @@ class PageOut(BaseModel):
     page: int
     width: float | None
     height: float | None
+    text_source: str | None = None
+    ocr_conf: float | None = None
 
 
 class DocumentOut(BaseModel):
@@ -139,12 +142,14 @@ async def load_document(conn: AsyncConnection, doc_id: uuid.UUID, user_id: uuid.
     if d is None:
         raise AppError("not_found", "Document not found")
     pages = (await conn.execute(text(
-        "SELECT page, width, height FROM document_pages WHERE document_id = :id AND version = :v ORDER BY page"),
+        "SELECT page, width, height, text_source, ocr_conf FROM document_pages WHERE document_id = :id AND version = :v "
+        "ORDER BY page"),
         {"id": doc_id, "v": d["version"]})).all()
     return DocumentOut(document_id=d["id"], session_id=d["session_id"], kind=d["kind"], source=d["source"],
                        version=d["version"], status=d["status"], stage=_STAGE.get(d["status"], d["status"]),
                        status_code=d["status_code"], page_count=d["page_count"], warnings=list(d["warnings"] or []),
-                       pages=[PageOut(page=p.page, width=p.width, height=p.height) for p in pages],
+                       pages=[PageOut(page=p.page, width=p.width, height=p.height, text_source=p.text_source,
+                                      ocr_conf=p.ocr_conf) for p in pages],
                        created_at=d["created_at"])
 
 
@@ -260,3 +265,22 @@ async def replace_page(document_id: uuid.UUID, page: int, request: Request, file
 
         canonical = json.dumps({"page": page, "sha256": new.sha}).encode()
         return await idempotent_create(request, user_id, 202, handler, body=canonical)
+
+
+class PageImageOut(BaseModel):
+    url: str
+    expires_in: int
+
+
+@router.get("/documents/{document_id}/pages/{page}/image", response_model=PageImageOut)
+async def page_image(document_id: uuid.UUID, page: int, request: Request,
+                     user_id: uuid.UUID = Depends(current_user)) -> PageImageOut:
+    """Presigned URL (5 min) for the rendered page image (doc 05 §5)."""
+    async with get_engine().connect() as conn:
+        doc = await load_document(conn, document_id, user_id)
+        key = (await conn.execute(text(
+            "SELECT image_key FROM document_pages WHERE document_id = :d AND version = :v AND page = :n"),
+            {"d": document_id, "v": doc.version, "n": page})).scalar()
+    if key is None:
+        raise AppError("not_found", "Page image not available yet")
+    return PageImageOut(url=await _store(request).get_url("documents", key, 300), expires_in=300)

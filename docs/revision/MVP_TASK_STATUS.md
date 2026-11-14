@@ -16,10 +16,10 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 |---|---|---|---|---|---|---|
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
 | 1 — Upload, STT, speakers, claims | 8 | 7 | 1 | 0 | 0 | 87.5% (7/8) |
-| 2 — Documents & contract verification | 7 | 1 | 0 | 6 | 0 | 14.3% (1/7) |
+| 2 — Documents & contract verification | 7 | 2 | 0 | 5 | 0 | 28.6% (2/7) |
 | 3 — Finance, orchestration, reporting | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **21** | **1** | **18** | **0** | **52.5% (21/40)** |
+| **Total** | **40** | **22** | **1** | **17** | **0** | **55% (22/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -108,7 +108,7 @@ Implementation follow-ups from HC-3 (no new task IDs): `POST /claims/{id}/confir
 | Task | Status |
 |---|---|
 | T2.1 Document upload, sanitise, versioning | ✅ 2026-11-14 — `app/modules/documents/{media,router,ingest}.py`, migration `0006_documents` (doc 11 DDL + `document_pages.original_key/original_sha256`), deps `pikepdf==10.18.1`, `pillow==13.0.0`. Security fixtures `tests/integration/test_documents.py` 16 pass (JavaScript/embedded files/XFA/launch & JS links/file attachments stripped; every encrypted PDF → 400 encrypted_pdf, including owner-password-only (strict doc 05, user decision 2026-11-14); corrupt/renamed/empty → 415; 61 pages / 21 photos / oversize → 413; decompression bomb and corrupt image → failed without retry; EXIF/GPS stripped; dedupe and idempotency; page replace → version 2 with other pages carried; PDF page replace refused; consent, ownership, revocation). `make ci` 795/795. Real stack: AG07 PDF → sanitised in MinIO. Limits: rendering/OCR are T2.2; re-verify on replace is T2.5. Upload UI moved to T2.7 (user decision 2026-11-14) |
-| T2.2 Docling/OCR + confidence | ⬜ |
+| T2.2 Docling/OCR + confidence | ✅ 2026-11-14 — `app/modules/documents/parse.py` (pypdfium2 render 200 DPI → WebP; photo pre-processing: perspective, deskew, CLAHE, blur score; Docling layout + TableFormer ACCURATE with RapidOCR (torch) on photo/scan pages; bboxes normalised to 0–1 top-left; confidence pass from Docling OCR text-line confidences → `ocr_conf` and `ocr_min_numeric_conf` per item), wired into `ingest.py` (status `parsed`; warnings `blurry_page`, `page_unreadable`, `low_ocr_page`; `docling.json` + `items.json` stored), page-image endpoint. Deps `docling==2.150.1` (pulls torch), `pydantic-settings` 2.7.0 → 2.16.3. **E5** (`eval/tools/run_e5.py`, report `eval/reports/2026-11-14_E5_ocr.md`): 5 agreements × digital/scan/photo good/dim/shadow → 190/190 key numeric fields, 100% of OCR items carry a confidence (median min-numeric 0.995), 0 confident misreads, 0.6–5.5 s/page. Docling exposes OCR confidences, so **Tesseract not needed** (doc 05 §6.5). Bbox test + 11 unit / 21 integration tests pass; `make ci` 811/811. Limits: scans and photos are **simulated** (real print-and-scan / phone photos pending, needed for HC-4); worker Docker image not yet rebuilt with Docling (~1.3 GB venv, model download on first run) |
 | T2.3 Clauses + doc_terms | ⬜ |
 | T2.4 Chunks + hybrid retrieval | ⬜ |
 | T2.5 Orchestrator v1 | ⬜ (needs T1.4) |

@@ -17,6 +17,7 @@ from PIL import Image
 
 from app.core.config import get_settings
 from app.modules.documents.ingest import make_doc_ingest_handler
+from app.modules.documents.parse import Item, OcrLine, ParsedDoc
 from app.worker.runner import Registry, Worker
 from tests.conftest import register_and_login, scalar
 from tests.integration.test_transcripts import ready_session
@@ -85,9 +86,28 @@ async def upload(client, h, sid, files: list[tuple[str, bytes]], kind: str = "kf
                              data={"kind": kind}, files=[("files", (n, b, "application/octet-stream")) for n, b in files])
 
 
-async def drain(engine, store) -> None:  # type: ignore[no-untyped-def]
+class FakeParser:
+    """Stands in for Docling in CI (no model downloads): one numeric item per page, with OCR lines on OCR pages."""
+
+    name = "fake-parser"
+
+    def __init__(
+        self, ocr_conf: float = 0.95, ocr_text: str = "Processing fee 2% of the loan amount plus GST, deducted at disbursement"
+    ) -> None:
+        self.ocr_conf, self.ocr_text = ocr_conf, ocr_text
+        self.calls: list[dict] = []
+
+    def parse(self, pdf_path, *, ocr, force_full_page_ocr):  # type: ignore[no-untyped-def]
+        self.calls.append({"ocr": ocr, "force": force_full_page_ocr})
+        n = len(pikepdf.open(pdf_path).pages)
+        items = [Item(f"#/texts/{i}", i, "text", f"Page {i}: fee 2%", (0.1, 0.1, 0.6, 0.15)) for i in range(1, n + 1)]
+        lines = [OcrLine(i, self.ocr_text, (0.1, 0.1, 0.6, 0.15), self.ocr_conf) for i in range(1, n + 1)] if ocr and self.ocr_text else []
+        return ParsedDoc(items=items, ocr_lines=lines, docling_json={"name": "fake"}, scores={"ocr_score": self.ocr_conf})
+
+
+async def drain(engine, store, parser=None) -> None:  # type: ignore[no-untyped-def]
     reg = Registry()
-    reg.register("doc.ingest", make_doc_ingest_handler(store))
+    reg.register("doc.ingest", make_doc_ingest_handler(store, parser or FakeParser()))
     w = Worker(engine, reg, lease_seconds=60)
     while await w.run_once():
         pass
@@ -108,7 +128,7 @@ async def test_hostile_pdf_is_sanitised(client, engine, fake_store):  # type: ig
     did = r.json()["document_id"]
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["status"], d["source"], d["page_count"]) == ("sanitised", "pdf", 2)
+    assert (d["status"], d["source"], d["page_count"]) == ("parsed", "pdf", 2)
     assert {"removed_open_action", "removed_javascript", "removed_embedded_files", "removed_xfa",
             "removed_page_actions", "removed_javascript_link", "removed_file_attachment"} <= set(d["warnings"])
     clean = fake_store.objects[("documents", f"{did}/v1/sanitised/document.pdf")]
@@ -197,7 +217,7 @@ async def test_photos_lose_exif_and_gps(client, engine, fake_store):  # type: ig
     did = r.json()["document_id"]
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["status"], d["source"], d["page_count"]) == ("sanitised", "photos", 2)
+    assert (d["status"], d["source"], d["page_count"]) == ("parsed", "photos", 2)
     assert "removed_exif" in d["warnings"] and d["pages"][0]["width"] == 64
     clean = fake_store.objects[("documents", f"{did}/v1/sanitised/1.jpg")]
     im = Image.open(io.BytesIO(clean))
@@ -258,7 +278,7 @@ async def test_page_replace_creates_a_new_version(client, engine, fake_store):  
     assert await scalar(engine, "SELECT content_sha256 FROM documents WHERE id = :d", d=uuid.UUID(did)) != sha1
     await drain(engine, fake_store)
     d = await doc(client, h, did)
-    assert (d["version"], d["status"], d["page_count"]) == (2, "sanitised", 3) and "removed_exif" in d["warnings"]
+    assert (d["version"], d["status"], d["page_count"]) == (2, "parsed", 3) and "removed_exif" in d["warnings"]
     assert ("documents", f"{did}/v2/sanitised/2.jpg") in fake_store.objects
     assert await scalar(engine, "SELECT count(*) FROM audit_log WHERE action = 'document.page_replace' AND target_id = :t",
                         t=uuid.UUID(did)) == 1
@@ -303,3 +323,54 @@ def test_fixture_files_are_what_they_claim(tmp_path: Path) -> None:
     assert sniff(png_bomb()) == PNG
     with pytest.raises(Image.DecompressionBombError):  # 900 MP claimed by a tiny file: refused before decoding
         Image.open(io.BytesIO(png_bomb()))
+
+
+
+# ---- T2.2: render, OCR, confidence, page images ------------------------------------------------------------------
+
+async def test_parse_outputs_pages_items_and_page_image(client, engine, fake_store):  # type: ignore[no-untyped-def]
+    h, sid = await ready_session(client)
+    ag07 = (Path(__file__).resolve().parents[3] / "eval" / "datasets" / "agreements" / "AG07" / "agreement.pdf").read_bytes()
+    did = (await upload(client, h, sid, [("ag07.pdf", ag07)])).json()["document_id"]
+    parser = FakeParser()
+    await drain(engine, fake_store, parser)
+    d = await doc(client, h, did)
+    assert d["status"] == "parsed" and d["stage"] == "confidence"
+    assert parser.calls == [{"ocr": False, "force": False}]  # digital PDF: text layer on every page, OCR off
+    assert [p["text_source"] for p in d["pages"]] == ["text_layer", "text_layer"] and d["pages"][0]["width"] == 1654
+    for name in ("pages/1.webp", "pages/2.webp", "docling.json", "items.json"):
+        assert ("documents", f"{did}/v1/{name}") in fake_store.objects
+    import json
+
+    items = json.loads(fake_store.objects[("documents", f"{did}/v1/items.json")])
+    assert items["parser"] == "fake-parser" and items["items"][0]["text_source"] == "text_layer"
+    r = await client.get(f"/api/v1/documents/{did}/pages/1/image", headers=h)
+    assert r.status_code == 200 and r.json()["url"].endswith(f"{did}/v1/pages/1.webp")
+    assert (await client.get(f"/api/v1/documents/{did}/pages/9/image", headers=h)).status_code == 404
+
+
+async def test_photos_are_ocred_with_confidences(client, engine, fake_store):  # type: ignore[no-untyped-def]
+    h, sid = await ready_session(client)
+    did = (await upload(client, h, sid, [("1.png", png("white")), ("2.png", png("gray"))])).json()["document_id"]
+    parser = FakeParser(ocr_conf=0.93)
+    await drain(engine, fake_store, parser)
+    d = await doc(client, h, did)
+    assert parser.calls == [{"ocr": True, "force": True}]
+    assert [p["text_source"] for p in d["pages"]] == ["ocr", "ocr"] and d["pages"][0]["ocr_conf"] == pytest.approx(0.93)
+    import json
+
+    items = json.loads(fake_store.objects[("documents", f"{did}/v1/items.json")])["items"]
+    assert all(i["text_source"] == "ocr" and i["ocr_conf"] == pytest.approx(0.93) for i in items)
+    assert "blurry_page:1" in d["warnings"]  # a flat colour image has no detail: flagged for a retake
+
+
+@pytest.mark.parametrize(("parser", "warning"), [
+    (FakeParser(ocr_text=""), "page_unreadable:1"),  # no OCR text on the page
+    (FakeParser(ocr_conf=0.4), "low_ocr_page:1"),  # page OCR confidence below T_ocr 0.70
+])
+async def test_ocr_page_warnings(client, engine, fake_store, parser, warning):  # type: ignore[no-untyped-def]
+    h, sid = await ready_session(client)
+    did = (await upload(client, h, sid, [("scan.pdf", pdf_bytes(1))])).json()["document_id"]  # blank: no text layer
+    await drain(engine, fake_store, parser)
+    d = await doc(client, h, did)
+    assert d["status"] == "parsed" and warning in d["warnings"] and d["pages"][0]["text_source"] == "ocr"

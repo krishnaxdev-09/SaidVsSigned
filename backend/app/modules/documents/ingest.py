@@ -1,24 +1,52 @@
-"""Worker job `doc.ingest:{document_id}:{version}` (doc 05 §6). T2.1 implements step 1, sanitising; rendering,
-OCR and later steps are added by T2.2+. Input failures end the document as failed(code) without retries."""
+"""Worker job `doc.ingest:{document_id}:{version}` (doc 05 §6). T2.1: step 1 sanitising. T2.2: steps 2–5 render,
+photo pre-process, Docling/OCR, confidence pass (`parse.py`); outputs pages/{n}.webp, docling.json and items.json,
+ending at status `parsed`. Clause segmentation onwards is T2.3+. Input failures end the document as failed(code)."""
 
 from __future__ import annotations
 
+import io
 import json
 import tempfile
 import uuid
 from pathlib import Path
 
+import yaml
+from PIL import Image
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app.core.config import get_settings
 from app.core.retry import InputError
 from app.core.storage import ObjectStore
-from app.modules.documents import media
+from app.modules.documents import media, parse
 from app.modules.realtime.bus import publish
 from app.modules.realtime.events import EventType
 from app.worker.runner import Handler, JobContext
 
 
-def make_doc_ingest_handler(store: ObjectStore) -> Handler:
+def _t_ocr() -> float:
+    return float(yaml.safe_load(get_settings().THRESHOLDS_FILE.read_text())["T_ocr"])  # doc 08 §5
+
+
+async def _progress(engine: AsyncEngine, sid: uuid.UUID, doc_id: uuid.UUID, version: int, stage: str, p: float) -> None:
+    """Committed on its own so the UI sees progress during slow OCR; never overwrites 'failed'."""
+    async with engine.begin() as c:
+        moved = (await c.execute(text("UPDATE documents SET status = :st WHERE id = :id AND version = :v AND status <> 'failed'"),
+                                 {"st": stage, "id": doc_id, "v": version})).rowcount
+        if moved:
+            await publish(c, sid, EventType.DOCUMENT_STATUS, {"document_id": str(doc_id), "version": version,
+                                                              "stage": stage, "progress": p, "warnings": []})
+
+
+def make_doc_ingest_handler(store: ObjectStore, parser: parse.DocumentParser | None = None) -> Handler:
+    state: dict[str, parse.DocumentParser] = {}
+
+    def get_parser() -> parse.DocumentParser:
+        if parser is not None:
+            return parser
+        state.setdefault("p", parse.DoclingParser())  # lazy: loading Docling models is slow
+        return state["p"]
+
     async def handle(ctx: JobContext) -> None:
         doc_id = uuid.UUID(ctx.job.payload["document_id"])
         version = int(ctx.job.payload["version"])
@@ -32,8 +60,9 @@ def make_doc_ingest_handler(store: ObjectStore) -> Handler:
             await ctx.conn.execute(text(
                 "UPDATE documents SET status = :st, status_code = :c, warnings = CAST(:w AS jsonb) "
                 "WHERE id = :id AND status <> 'failed'"), {"st": st, "c": code, "w": json.dumps(warnings or []), "id": doc_id})
+            stage = {"failed": "failed", "parsed": "confidence"}.get(st, "sanitising")
             await publish(ctx.conn, sid, EventType.DOCUMENT_STATUS, {
-                "document_id": str(doc_id), "version": version, "stage": "failed" if st == "failed" else "sanitising",
+                "document_id": str(doc_id), "version": version, "stage": stage,
                 "progress": progress, **({"code": code} if code else {}), "warnings": warnings or []})
 
         pages = (await ctx.conn.execute(text(
@@ -70,11 +99,75 @@ def make_doc_ingest_handler(store: ObjectStore) -> Handler:
                         if rep.had_exif:
                             warnings.append("removed_exif")
                     warnings = sorted(set(warnings))
+                await ctx.checkpoint()
+                warnings += await _render_and_parse(ctx, store, get_parser(), sid, doc_id, version, d.source,
+                                                    [p.page for p in pages], t)
         except InputError as exc:
             await status("failed", 1.0, exc.code)
             return
         await ctx.checkpoint()
-        await status("sanitised", 1.0, None, warnings)
-        # Rendering, photo pre-processing and OCR (doc 05 §6 steps 2–5) are T2.2.
+        await status("parsed", 1.0, None, warnings)
+        # Clause segmentation, doc_terms and chunks (doc 05 §6 steps 6–8) are T2.3/T2.4.
 
     return handle
+
+
+async def _render_and_parse(ctx: JobContext, store: ObjectStore, parser: parse.DocumentParser, sid: uuid.UUID,
+                            doc_id: uuid.UUID, version: int, source: str, page_nos: list[int], t: Path) -> list[str]:
+    """doc 05 §6 steps 2–5. Returns page warnings (`blurry_page:N`, `page_unreadable:N`, `low_ocr_page:N`)."""
+    prefix = f"{doc_id}/v{version}"
+    await _progress(ctx.engine, sid, doc_id, version, "rendering", 0.2)
+    quality: dict[int, dict[str, object]] = {}
+    warnings: list[str] = []
+    if source == "pdf":
+        pdf_path = t / "sanitised.pdf"
+        rendered = parse.render_pdf(pdf_path)
+        images = [im for im, _ in rendered]
+        ocr_pages = {n for n, (_, chars) in enumerate(rendered, start=1) if chars < parse.TEXT_LAYER_MIN_CHARS}
+        for n, (_, chars) in enumerate(rendered, start=1):
+            quality[n] = {"text_layer_chars": chars}
+        force = False
+    else:
+        images = []
+        for n in page_nos:
+            src = next(p for p in t.iterdir() if p.name.startswith(f"s{n}."))
+            pre = parse.preprocess_photo(Image.open(src))
+            images.append(pre.image)
+            quality[n] = {"blur": round(pre.blur, 1), "perspective_fixed": pre.perspective_fixed,
+                          "deskew_deg": round(pre.deskew_deg, 2)}
+            if pre.blur < parse.BLUR_MIN_VARIANCE:
+                warnings.append(f"blurry_page:{n}")
+        pdf_path = t / "photos.pdf"
+        parse.images_to_pdf(images, pdf_path)
+        ocr_pages, force = set(page_nos), True
+    for n, im in enumerate(images, start=1):
+        buf = io.BytesIO()
+        im.save(buf, format="WEBP", quality=85)
+        (t / f"page{n}.webp").write_bytes(buf.getvalue())
+        await store.put_file("documents", f"{prefix}/pages/{n}.webp", str(t / f"page{n}.webp"), "image/webp")
+    await ctx.checkpoint()
+    await _progress(ctx.engine, sid, doc_id, version, "ocr", 0.5)
+    parsed = parser.parse(pdf_path, ocr=bool(ocr_pages), force_full_page_ocr=force)
+    await ctx.checkpoint()
+    await _progress(ctx.engine, sid, doc_id, version, "confidence", 0.8)
+    parse.confidence_pass(parsed, ocr_pages)
+    t_ocr = _t_ocr()
+    for n, im in enumerate(images, start=1):
+        lines = [ln for ln in parsed.ocr_lines if ln.page == n]
+        page_conf = (sum(ln.confidence for ln in lines) / len(lines)) if lines else (None if n in ocr_pages else 1.0)
+        if n in ocr_pages:
+            if sum(len(ln.text) for ln in lines) < parse.UNREADABLE_MIN_CHARS:
+                warnings.append(f"page_unreadable:{n}")
+            elif page_conf is not None and page_conf < t_ocr:
+                warnings.append(f"low_ocr_page:{n}")
+        await ctx.conn.execute(text(
+            "UPDATE document_pages SET image_key = :k, width = :w, height = :h, text_source = :ts, ocr_conf = :c, "
+            "quality = CAST(:q AS jsonb) WHERE document_id = :d AND version = :v AND page = :n"),
+            {"k": f"{prefix}/pages/{n}.webp", "w": im.width, "h": im.height,
+             "ts": "ocr" if n in ocr_pages else "text_layer", "c": page_conf, "q": json.dumps(quality.get(n, {})),
+             "d": doc_id, "v": version, "n": n})
+    for name, payload in (("docling.json", parsed.docling_json),
+                          ("items.json", {"parser": parser.name, "scores": parsed.scores, "items": parse.items_json(parsed)})):
+        (t / name).write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
+        await store.put_file("documents", f"{prefix}/{name}", str(t / name), "application/json")
+    return warnings
