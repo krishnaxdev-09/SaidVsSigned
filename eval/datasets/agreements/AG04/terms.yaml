@@ -1,0 +1,92 @@
+dataset_version: agreements-v1
+id: AG04
+synthetic: true
+lender: Gharsaaz Consumer Finance (fictional)
+borrower: Imran Khan (fictional)
+product: Consumer Durable Loan
+pages: 2
+language: en
+traps:
+- id: flat_rate_small_print
+  description: flat rate disclosed only in small print
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '847'
+  gst_on_fee: '152'
+  gst_rate_assumed: '0.18'
+  total_deductions: '999'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '60000'
+  raw_text: Rs. 60,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '11.00'
+  raw_text: 11.00% p.a.
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: small_print
+  rate_basis: flat
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '12'
+  raw_text: 12 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '5550'
+  raw_text: Rs. 5,550 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: amount_inr
+  value: '999'
+  raw_text: Rs. 999 (inclusive of GST)
+  page: 1
+  location: kfs_table
+  includes_gst: true
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '59001'
+  raw_text: Rs. 59,001
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '66600'
+  raw_text: Rs. 66,600 over the tenure
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '11.00'
+  raw_text: '* Interest is computed on a flat basis on the original loan amount for
+    the full tenure; the rate of 11.00% p.a. stated above is a flat rate.'
+  page: 1
+  location: small_print
+  rate_basis: flat
+  rate_type: fixed
+  period: annual
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+files:
+  agreement.pdf:
+    sha256: e8f36bfeb06b87670f6c3ae4dc0b474a8e023ebb7e1014f2a689b59e8392176c
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

@@ -100,3 +100,11 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - Doc 11 DDL: added the `consents_one_active_customer` partial unique index (enforces "one active customer consent", which the 409 rule in §4a assumes) and the TRUNCATE trigger on `audit_log`.
 - Doc 14: new **Q-16**, a Phase 0 blocker: MinIO images can't be pulled. The decision is unchanged; your input is needed.
 - Plan: added a Phase 0 per-task implementation status. Phase 0 is **not** marked complete.
+
+## 2026-11-14 — Phase 0 close-out
+- **Q-16 resolved, option (b)** (doc 14): MinIO and mc are built from their pinned upstream release tags in `infra/minio/Dockerfile`. The compose stack is healthy, and the storage decision is unchanged.
+- Compose: the MinIO healthcheck now uses `/minio/health/live`, because `mc ready` needs an alias that the server container doesn't have.
+- CI: `REQUIRE_DB=1` turns a missing Postgres into a failure instead of 34 silent skips; a new `eval-datasets` job checks the ground truth.
+- T0.13: 10 synthetic agreements in `eval/datasets/agreements` (`agreements-v1`).
+- New tracker: `docs/revision/MVP_TASK_STATUS.md`.
+- No approvals recorded. HC-2…HC-8 are still pending.

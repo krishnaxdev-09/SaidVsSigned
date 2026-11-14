@@ -1,0 +1,80 @@
+dataset_version: agreements-v1
+id: AG10
+synthetic: true
+lender: Sahaj Finance Ltd. (fictional)
+borrower: Farah Siddiqui (fictional)
+product: Personal Loan
+pages: 2
+language: en
+traps: []
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '2000'
+  gst_on_fee: '360'
+  gst_rate_assumed: '0.18'
+  total_deductions: '2360'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '200000'
+  raw_text: Rs. 2,00,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '12.75'
+  raw_text: 12.75% p.a. (reducing, fixed)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '24'
+  raw_text: 24 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '9485'
+  raw_text: Rs. 9,485 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: amount_inr
+  value: '2360'
+  raw_text: Rs. 2,360 (inclusive of GST)
+  page: 1
+  location: kfs_table
+  includes_gst: true
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '197640'
+  raw_text: Rs. 1,97,640
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '227640'
+  raw_text: Rs. 2,27,640 over the tenure
+  page: 1
+  location: kfs_table
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+files:
+  agreement.pdf:
+    sha256: 0ea1960b01bfbb38ebe17d7dc48bfd7e8261637dbd8316963204a5a21ff48c6a
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

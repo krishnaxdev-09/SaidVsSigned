@@ -13,6 +13,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+asyncpg://saidsigned:ci-only-password@localhost:5432/saidsigned
       JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else-0123456789
+      REQUIRE_DB: "1"
     defaults: { run: { working-directory: backend } }
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +23,13 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy app
       - run: uv run pytest -q -p no:warnings
+  eval-datasets:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with: { version: "0.11.26" }
+      - run: uv run --no-project --python 3.12 --with pypdf==5.1.0 --with pyyaml==6.0.2 python eval/tools/check_agreements.py
   frontend:
     runs-on: ubuntu-24.04
     defaults: { run: { working-directory: frontend } }

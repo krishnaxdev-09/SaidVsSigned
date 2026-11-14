@@ -1,0 +1,117 @@
+dataset_version: agreements-v1
+id: AG08
+synthetic: true
+lender: Swarnim Gold & Personal Loans (fictional)
+borrower: Deepak Joshi (fictional)
+product: Personal Loan
+pages: 2
+language: en
+traps:
+- id: flat_rate_small_print
+  description: flat rate disclosed only in small print
+- id: fee_in_footnote
+  description: a fee that appears only in a footnote
+- id: fee_pct_plus_gst
+  description: '"2% + GST" processing fee'
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '3750'
+  gst_on_fee: '675'
+  gst_rate_assumed: '0.18'
+  total_deductions: '5175'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '150000'
+  raw_text: Rs. 1,50,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '12.00'
+  raw_text: 12.00% p.a.
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: small_print
+  rate_basis: flat
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '24'
+  raw_text: 24 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '7750'
+  raw_text: Rs. 7,750 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: percent
+  value: '2.5'
+  raw_text: 2.5% of loan amount + GST
+  page: 1
+  location: kfs_table
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '144825'
+  raw_text: Rs. 1,44,825
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '186000'
+  raw_text: Rs. 1,86,000 over the tenure
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '12.00'
+  raw_text: '* Interest is computed on a flat basis on the original loan amount for
+    the full tenure; the rate of 12.00% p.a. stated above is a flat rate.'
+  page: 1
+  location: small_print
+  rate_basis: flat
+  rate_type: fixed
+  period: annual
+- field: other_charge
+  quantity: amount_inr
+  value: '750'
+  raw_text: ¹ A documentation and stamping charge of Rs. 750 is also payable and will
+    be deducted from the disbursement.
+  page: 1
+  location: footnote
+  of_what: documentation_charge
+  deducted_from_disbursement: true
+  period: one_time
+- field: processing_fee
+  quantity: percent
+  value: '2.5'
+  raw_text: A non-refundable processing fee of 2.5% of the loan amount plus applicable
+    GST will be deducted from the disbursement.
+  page: 2
+  location: clause
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+files:
+  agreement.pdf:
+    sha256: 5661aa5bde81ad0faf08053c6cb428fd7cb183583bf117d6ae4e75e1530790e0
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

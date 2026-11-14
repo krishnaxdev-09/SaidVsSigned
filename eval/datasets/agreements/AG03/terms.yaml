@@ -1,0 +1,112 @@
+dataset_version: agreements-v1
+id: AG03
+synthetic: true
+lender: Prakash Lending Co. (fictional)
+borrower: Meena Iyer (fictional)
+product: Personal Loan
+pages: 2
+language: en
+traps:
+- id: fee_pct_plus_gst
+  description: '"2% + GST" processing fee'
+- id: insurance_deducted
+  description: insurance premium deducted from the disbursement
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '6000'
+  gst_on_fee: '1080'
+  gst_rate_assumed: '0.18'
+  total_deductions: '15480'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '400000'
+  raw_text: Rs. 4,00,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '15.00'
+  raw_text: 15.00% p.a. (reducing, fixed)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '36'
+  raw_text: 36 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '13866'
+  raw_text: Rs. 13,866 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: percent
+  value: '1.5'
+  raw_text: 1.5% of loan amount + GST
+  page: 1
+  location: kfs_table
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: insurance_bundled
+  quantity: amount_inr
+  value: '8400'
+  raw_text: Rs. 8,400 (credit-shield premium, deducted from disbursement)
+  page: 1
+  location: kfs_table
+  deducted_from_disbursement: true
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '384520'
+  raw_text: Rs. 3,84,520
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '499176'
+  raw_text: Rs. 4,99,176 over the tenure
+  page: 1
+  location: kfs_table
+- field: processing_fee
+  quantity: percent
+  value: '1.5'
+  raw_text: A non-refundable processing fee of 1.5% of the loan amount plus applicable
+    GST will be deducted from the disbursement.
+  page: 2
+  location: clause
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: insurance_bundled
+  quantity: amount_inr
+  value: '8400'
+  raw_text: The Borrower is enrolled in a group credit-shield cover; the single premium
+    of Rs. 8,400 is deducted from the loan amount at disbursement.
+  page: 2
+  location: clause
+  deducted_from_disbursement: true
+  period: one_time
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+files:
+  agreement.pdf:
+    sha256: 311be115102c5fcbdf09e7be9bc666c6b89f96d9de284d3c043f554f3d9de31e
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)
