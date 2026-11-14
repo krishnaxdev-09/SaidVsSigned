@@ -300,3 +300,16 @@ def test_synthetic_agreement_terms_are_never_wrong() -> None:
                 assert r.value == Decimal(str(term["value"])), (f.parent.name, term["raw_text"], r.value)
                 exact += 1
     assert total == 101 and exact >= 97
+
+
+@pytest.mark.parametrize(("raw", "q", "lang", "plain"), [
+    ("10 lakh", A, EN, "1000000"), ("7,750 rupees", A, EN, "7750"), ("दस लाख", A, HI, "1000000"),
+    ("5 saal", Y, HI, "60"), ("36 hazaar", A, HI, "36000"), ("8,400", A, EN, "8400"), ("1.50%", P, EN, "1.5"),
+    ("dedh lakh", A, HI, "150000"), ("10 to 12 lakh", A, EN, "1000000"),
+])
+def test_values_are_plain_decimals(raw: str, q: str, lang: str, plain: str) -> None:
+    """No scientific notation reaches the API, UI or report (1E+6 must be 1000000)."""
+    r = normalise(ExtractedValue(field=AMT if q == A else FEE, raw_text=raw, quantity=q), language=lang)  # type: ignore[arg-type]
+    shown = r.value if r.value is not None else r.value_low
+    assert str(shown) == plain and "E" not in str(shown)
+    assert "E" not in r.model_dump_json()

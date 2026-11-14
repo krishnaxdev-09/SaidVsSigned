@@ -44,7 +44,7 @@ cd frontend && npm run dev                     # UI on :5173, proxies /api and /
 ## Layout
 ```
 backend/app/core/        config, db, errors (doc 01 §7), retry (doc 01 §6), idempotency, storage, security
-backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3), claims/normalize.py (T1.5)
+backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), audio (T1.1), stt (ElevenLabs, T1.2), speakers (T1.3), claims (normaliser T1.5, extraction T1.6)
 backend/app/llm/         LLM provider interface, Bedrock Mantle provider (Gemma), fakes
 backend/app/schemas/     canonical doc 08 / doc 04 schemas, reason codes, CONFLICT validator, wording (T1.4)
 backend/app/worker/      Postgres job queue, runner, handlers.register_all
@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 18 / 40 tasks done (45%).** Stage 0 complete; Stage 1 in progress.
+**Overall: 19 / 40 tasks done (47.5%).** Stage 0 complete; Stage 1 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -78,7 +78,7 @@ Gate: HC-1 ✅ approved 2026-11-13.
 | T0.12 | CI (feature-flag startup checks, DB required) | ✅ |
 | T0.13 | 10 synthetic agreements + DRAFT consent texts (legal review at HC-7) | ✅ |
 
-### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (5/8)
+### Stage 1 — Upload, speech-to-text, speakers, claims · 8 tasks · IN PROGRESS (6/8)
 Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit.
 
 | Task | What | Status | Blocked by |
@@ -88,7 +88,7 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.3 | Speaker suggestion (Gemma) + one-tap agent confirmation | ✅ | — |
 | T1.4 | Schema registry (statuses, reason codes, evidence, claims, wording) | ✅ | — |
 | T1.5 | Deterministic normaliser (422-case table, Hinglish, Devanagari) | ✅ | — |
-| T1.6 | Claim extraction with verbatim quote anchors | ⬜ | T1.5; user reviews 12 English + 12 Hinglish few-shots before completion |
+| T1.6 | Claim extraction (Gemma) with verbatim quote anchors; few-shots approved | ✅ | — |
 | T1.7 | Claims UI, transcript view, snippet playback | ⬜ | T1.3, T1.6 |
 | T1.8 | Experiments E2/E3/E10 + LLM evaluation | ⬜ | T1.2, T1.6 |
 
@@ -139,7 +139,7 @@ L6 expanded regulatory/finance · L7 insurance · L8 second STT provider · L9 l
 | Speech-to-text | ElevenLabs Scribe v2 (`scribe_v2`), batch with diarization | `ELEVENLABS_API_KEY` |
 | LLM | Gemma 4 31B (`google.gemma-4-31b`) on Amazon Bedrock Mantle, OpenAI-compatible Chat Completions at `/openai/v1` | `MANTLE_*` |
 
-Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role suggestion (T1.3, job `speakers.suggest`); claim extraction (T1.6) is next. ADR-004 decided 2026-11-14: Gemma 4 31B on Amazon Bedrock (`google.gemma-4-31b`).
+Speech-to-text is live (T1.2, job `stt.batch`). The LLM is live for speaker-role suggestion (T1.3, `speakers.suggest`) and claim extraction (T1.6, `claims.extract`), with PII redacted first. ADR-004 decided 2026-11-14: Gemma 4 31B on Amazon Bedrock (`google.gemma-4-31b`).
 
 ## Human checkpoints
 | ID | Approves | Status |

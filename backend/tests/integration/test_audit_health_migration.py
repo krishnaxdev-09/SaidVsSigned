@@ -52,6 +52,6 @@ def test_migration_upgrade_downgrade_upgrade():
     assert tables == {"alembic_version", "users", "refresh_tokens", "ws_tickets", "sessions", "consent_texts",
                       "consents", "idempotency_keys", "jobs", "events", "audit_log", "deletion_receipts",
                       "audio_streams", "transcript_revisions", "transcript_segments", "transcript_words",
-                      "speaker_assignments"}
+                      "speaker_assignments", "claims", "claim_values"}
     with psycopg.connect(admin, autocommit=True) as c:
         c.execute(f"DROP DATABASE IF EXISTS {scratch} WITH (FORCE)")

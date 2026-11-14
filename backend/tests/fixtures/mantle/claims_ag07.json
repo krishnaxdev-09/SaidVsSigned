@@ -1,0 +1,35 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "annotations": [],
+    "content": "{\"claims\": [{\"anchors\": [{\"segment\": \"S1\", \"text\": \"this is Rahul from Udyam Capital\"}], \"claim_type\": \"lender_identity\", \"utterance_kind\": \"assertion\", \"vagueness\": \"specific\", \"normalized_statement\": \"Lender is Udyam Capital.\", \"values\": [], \"conditions\": [], \"extraction_confidence\": 0.95}, {\"anchors\": [{\"segment\": \"S1\", \"text\": \"Your business loan of 10 lakh rupees is approved.\"}], \"claim_type\": \"loan_amount\", \"utterance_kind\": \"assertion\", \"vagueness\": \"specific\", \"normalized_statement\": \"Business loan of 10 lakh rupees is approved.\", \"values\": [{\"field\": \"loan_amount\", \"raw_text\": \"10 lakh rupees\", \"quantity\": \"amount_inr\"}], \"conditions\": [], \"extraction_confidence\": 0.95}, {\"anchors\": [{\"segment\": \"S2\", \"text\": \"What is the processing fee?\"}], \"claim_type\": \"processing_fee\", \"utterance_kind\": \"question\", \"vagueness\": \"vague\", \"normalized_statement\": \"Customer asks about the processing fee.\", \"values\": [], \"conditions\": [], \"extraction_confidence\": 0.9}, {\"anchors\": [{\"segment\": \"S3\", \"text\": \"The processing fee is only 1%\"}], \"claim_type\": \"processing_fee\", \"utterance_kind\": \"assertion\", \"vagueness\": \"specific\", \"normalized_statement\": \"Processing fee is 1%.\", \"values\": [{\"field\": \"processing_fee\", \"raw_text\": \"1%\", \"quantity\": \"percent\"}], \"conditions\": [], \"extraction_confidence\": 0.95}, {\"anchors\": [{\"segment\": \"S3\", \"text\": \"there is no insurance deduction\"}], \"claim_type\": \"insurance_bundled\", \"utterance_kind\": \"assertion\", \"vagueness\": \"specific\", \"normalized_statement\": \"There is no insurance deduction.\", \"values\": [{\"field\": \"insurance_bundled\", \"raw_text\": \"no insurance deduction\", \"quantity\": \"boolean\"}], \"conditions\": [], \"extraction_confidence\": 0.9}, {\"anchors\": [{\"segment\": \"S3\", \"text\": \"Your EMI will be 36,000 rupees.\"}], \"claim_type\": \"emi\", \"utterance_kind\": \"promise\", \"vagueness\": \"specific\", \"normalized_statement\": \"EMI will be 36,000 rupees.\", \"values\": [{\"field\": \"emi\", \"raw_text\": \"36,000 rupees\", \"quantity\": \"amount_inr\"}], \"conditions\": [], \"extraction_confidence\": 0.95}]}",
+    "refusal": null,
+    "role": "assistant"
+   }
+  }
+ ],
+ "created": 1794649271,
+ "model": "google.gemma-4-31b",
+ "object": "chat.completion",
+ "service_tier": "default",
+ "usage": {
+  "completion_tokens": 613,
+  "completion_tokens_details": {
+   "accepted_prediction_tokens": 0,
+   "audio_tokens": 0,
+   "reasoning_tokens": 0,
+   "rejected_prediction_tokens": 0
+  },
+  "prompt_tokens": 6626,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cache_write_tokens": 0,
+   "cached_tokens": 0
+  },
+  "total_tokens": 7239
+ },
+ "system_fingerprint": null
+}

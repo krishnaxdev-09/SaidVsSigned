@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from app.core.ids import uuid7
 from app.core.retry import InputError, SchemaError
 from app.llm.base import LLMProvider
+from app.llm.redact import redact
 from app.modules.stt.segmentation import is_numeric_token
 
 Role = Literal["agent", "customer", "unknown"]
@@ -118,7 +119,8 @@ async def suggest(llm: LLMProvider | None, segments: list[Any]) -> tuple[list[Su
     if not ex:
         return [], "none"
     if llm is not None:
-        user = "\n\n".join(f"Speaker {label}:\n{txt}" for label, txt in ex.items())
+        # PII is redacted before any LLM call (doc 12 §B.2).
+        user = "\n\n".join(f"Speaker {label}:\n{redact(txt)}" for label, txt in ex.items())
         try:
             result = await llm.structured(system=SYSTEM_PROMPT, messages=[{"role": "user", "content": user}],
                                           schema=LLMRoleSuggestion, temperature=0.0, max_tokens=400)

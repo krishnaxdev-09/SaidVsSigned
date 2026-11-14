@@ -5,7 +5,7 @@
 3. Persist atomically: the revision's segments/words are deleted and rewritten in the job transaction, the revision
    row is filled in and made current. Re-running the same job therefore replaces rather than duplicates.
 4. Recording -> ready; emit `transcript.ready`.
-Step 5: enqueue the auto role suggestion `speakers.suggest` (T1.3). Enqueueing `claims.extract` is T1.6.
+Step 5: enqueue the auto role suggestion `speakers.suggest` (T1.3) and `claims.extract` (T1.6).
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from app.core.config import get_settings
 from app.core.retry import InputError
 from app.modules.audio.service import object_prefix
+from app.modules.claims.job import enqueue_extract
 from app.modules.realtime.bus import publish
 from app.modules.realtime.events import EventType
 from app.modules.speakers.job import enqueue_suggest
@@ -150,5 +151,6 @@ def make_stt_handler(stt: STTProvider) -> Handler:
         await publish(ctx.conn, session_id, EventType.TRANSCRIPT_READY,
                       {"transcript_revision": rev, "segment_count": len(segments)})
         await enqueue_suggest(ctx.conn, session_id, rev)  # doc 03 §6 step 5
+        await enqueue_extract(ctx.conn, session_id, rev)  # doc 03 §6 step 5 / doc 04 §5
 
     return handle

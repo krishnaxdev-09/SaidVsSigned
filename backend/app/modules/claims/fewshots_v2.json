@@ -1,0 +1,333 @@
+{
+  "prompt_version": "claim_extract_v2",
+  "status": "APPROVED by the user 2026-11-14 (HC-2 condition), with clarifications recorded in docs/revision/CHANGELOG.md",
+  "examples": [
+    {
+      "id": "EN01", "language": "en", "teaches": "basic assertion; value with GST context",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "The processing fee is 2% of the loan amount plus GST."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "The processing fee is 2% of the loan amount plus GST."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Processing fee is 2% of the loan amount plus GST.",
+         "values": [{"field": "processing_fee", "raw_text": "2%", "quantity": "percent", "of_what": "loan_amount"}],
+         "conditions": [], "extraction_confidence": 0.95}
+      ]
+    },
+    {
+      "id": "EN02", "language": "en", "teaches": "one sentence, two claims (EMI and tenure)",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Your EMI will be 7,750 rupees for 24 months."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Your EMI will be 7,750 rupees"}],
+         "claim_type": "emi", "utterance_kind": "promise", "vagueness": "specific",
+         "normalized_statement": "EMI will be Rs 7,750.",
+         "values": [{"field": "emi", "raw_text": "7,750 rupees", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.95},
+        {"anchors": [{"segment": "S1", "text": "for 24 months"}],
+         "claim_type": "tenure", "utterance_kind": "promise", "vagueness": "specific",
+         "normalized_statement": "Tenure is 24 months.",
+         "values": [{"field": "tenure", "raw_text": "24 months", "quantity": "months"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "EN03", "language": "en", "teaches": "customer question vs agent answer",
+      "segments": [{"ref": "S1", "speaker": "spk_B", "text": "So the processing fee is zero, right?"},
+                   {"ref": "S2", "speaker": "spk_A", "text": "Yes, zero processing fee for you."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "So the processing fee is zero, right?"}],
+         "claim_type": "processing_fee", "utterance_kind": "question", "vagueness": "specific",
+         "normalized_statement": "Asks whether the processing fee is zero.",
+         "values": [{"field": "processing_fee", "raw_text": "zero", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.9},
+        {"anchors": [{"segment": "S2", "text": "Yes, zero processing fee for you."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Processing fee is zero.",
+         "values": [{"field": "processing_fee", "raw_text": "zero processing fee", "quantity": "amount_inr"}],
+         "conditions": [], "extraction_confidence": 0.95}
+      ]
+    },
+    {
+      "id": "EN04", "language": "en", "teaches": "hypothetical (not a promise) vs the actual offer; reducing basis",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "If you had a salary account with us, the rate would have been 11%."},
+                   {"ref": "S2", "speaker": "spk_A", "text": "For you it is 13.5% reducing."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "If you had a salary account with us, the rate would have been 11%."}],
+         "claim_type": "interest_rate", "utterance_kind": "hypothetical", "vagueness": "specific",
+         "normalized_statement": "Rate would have been 11% with a salary account (hypothetical).",
+         "values": [{"field": "interest_rate", "raw_text": "11%", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.9},
+        {"anchors": [{"segment": "S2", "text": "For you it is 13.5% reducing."}],
+         "claim_type": "interest_rate", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Interest rate is 13.5% on a reducing basis.",
+         "values": [{"field": "interest_rate", "raw_text": "13.5% reducing", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.95}
+      ]
+    },
+    {
+      "id": "EN05", "language": "en", "teaches": "conditional promise with a zero charge",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "If you pay all EMIs on time, there is no penal charge."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "If you pay all EMIs on time, there is no penal charge."}],
+         "claim_type": "penal_charge", "utterance_kind": "conditional", "vagueness": "specific",
+         "normalized_statement": "No penal charge if all EMIs are paid on time.",
+         "values": [{"field": "penal_charge", "raw_text": "no penal charge", "quantity": "amount_inr"}],
+         "conditions": [{"text": "If you pay all EMIs on time", "kind": "if_customer_does"}],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "EN06", "language": "en", "teaches": "vague claims keep no values and are marked vague",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Our rates are the lowest in the market and there are no hidden charges."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Our rates are the lowest in the market"}],
+         "claim_type": "interest_rate", "utterance_kind": "assertion", "vagueness": "vague",
+         "normalized_statement": "Rates are the lowest in the market.", "values": [], "conditions": [],
+         "extraction_confidence": 0.8},
+        {"anchors": [{"segment": "S1", "text": "there are no hidden charges."}],
+         "claim_type": "general_assurance", "utterance_kind": "assertion", "vagueness": "vague",
+         "normalized_statement": "There are no hidden charges.", "values": [], "conditions": [],
+         "extraction_confidence": 0.8}
+      ]
+    },
+    {
+      "id": "EN07", "language": "en", "teaches": "correction: both the first value and the restatement are claims",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Processing fee is 1%."},
+                   {"ref": "S2", "speaker": "spk_A", "text": "Sorry, I mean 1.5% for this scheme."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Processing fee is 1%."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Processing fee is 1%.",
+         "values": [{"field": "processing_fee", "raw_text": "1%", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.9},
+        {"anchors": [{"segment": "S2", "text": "Sorry, I mean 1.5% for this scheme."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Correction: processing fee is 1.5% for this scheme.",
+         "values": [{"field": "processing_fee", "raw_text": "1.5%", "quantity": "percent"}],
+         "conditions": [{"text": "for this scheme", "kind": "product_variant"}], "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "EN08", "language": "en", "teaches": "bundled insurance deducted from the loan",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Insurance is compulsory, the premium of 8,400 will be deducted from the loan amount."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Insurance is compulsory, the premium of 8,400 will be deducted from the loan amount."}],
+         "claim_type": "insurance_bundled", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Compulsory insurance; premium of Rs 8,400 deducted from the loan amount.",
+         "values": [{"field": "insurance_bundled", "raw_text": "8,400", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.95}
+      ]
+    },
+    {
+      "id": "EN09", "language": "en", "teaches": "zero prepayment charge; floating rate stated without a number gives no rate claim",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Since it is a floating rate loan, there is no prepayment charge at all."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "there is no prepayment charge at all."}],
+         "claim_type": "prepayment_charge", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "No prepayment charge (floating rate loan).",
+         "values": [{"field": "prepayment_charge", "raw_text": "no prepayment charge", "quantity": "amount_inr"}],
+         "conditions": [], "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "EN10", "language": "en", "teaches": "approximate range stays a range, marked approximate",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "The interest will be around 12 to 13 percent."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "The interest will be around 12 to 13 percent."}],
+         "claim_type": "interest_rate", "utterance_kind": "promise", "vagueness": "approximate",
+         "normalized_statement": "Interest will be around 12% to 13%.",
+         "values": [{"field": "interest_rate", "raw_text": "12 to 13 percent", "quantity": "percent"}],
+         "conditions": [], "extraction_confidence": 0.85}
+      ]
+    },
+    {
+      "id": "EN11", "language": "en", "teaches": "opinion vs document assurance",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Honestly, I think this is the best loan for you."},
+                   {"ref": "S2", "speaker": "spk_A", "text": "Everything I said is written in the agreement."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "I think this is the best loan for you."}],
+         "claim_type": "general_assurance", "utterance_kind": "opinion", "vagueness": "vague",
+         "normalized_statement": "Agent's opinion: this is the best loan for the customer.", "values": [],
+         "conditions": [], "extraction_confidence": 0.8},
+        {"anchors": [{"segment": "S2", "text": "Everything I said is written in the agreement."}],
+         "claim_type": "document_assurance", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Everything said is written in the agreement.", "values": [], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "EN12", "language": "en", "teaches": "lender identity and net disbursement",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "I'm calling from Navkiran Credit, an RBI-registered NBFC."},
+                   {"ref": "S2", "speaker": "spk_A", "text": "You will receive 4,95,001 in your account."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "I'm calling from Navkiran Credit, an RBI-registered NBFC."}],
+         "claim_type": "lender_identity", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Lender is Navkiran Credit, an RBI-registered NBFC.", "values": [], "conditions": [],
+         "extraction_confidence": 0.9},
+        {"anchors": [{"segment": "S2", "text": "You will receive 4,95,001 in your account."}],
+         "claim_type": "net_disbursement", "utterance_kind": "promise", "vagueness": "specific",
+         "normalized_statement": "Net amount received will be Rs 4,95,001.",
+         "values": [{"field": "net_disbursement", "raw_text": "4,95,001", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI01", "language": "hinglish", "teaches": "Hindi number word with GST note",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Processing fee sirf ek percent hai, GST alag se."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Processing fee sirf ek percent hai, GST alag se."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Processing fee is 1%, GST extra.",
+         "values": [{"field": "processing_fee", "raw_text": "ek percent", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.95}
+      ]
+    },
+    {
+      "id": "HI02", "language": "hinglish", "teaches": "EMI in hazaar, tenure in saal",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Aapka EMI 36 hazaar hoga, teen saal ke liye."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Aapka EMI 36 hazaar hoga"}],
+         "claim_type": "emi", "utterance_kind": "promise", "vagueness": "specific",
+         "normalized_statement": "EMI will be Rs 36,000.",
+         "values": [{"field": "emi", "raw_text": "36 hazaar", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.95},
+        {"anchors": [{"segment": "S1", "text": "teen saal ke liye."}],
+         "claim_type": "tenure", "utterance_kind": "promise", "vagueness": "specific",
+         "normalized_statement": "Tenure is 3 years.",
+         "values": [{"field": "tenure", "raw_text": "teen saal", "quantity": "years"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI03", "language": "hinglish", "teaches": "customer echo 'zero fee na?' is a question, not a promise",
+      "segments": [{"ref": "S1", "speaker": "spk_B", "text": "Zero fee na?"},
+                   {"ref": "S2", "speaker": "spk_A", "text": "Haan ji, bilkul zero."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Zero fee na?"}],
+         "claim_type": "processing_fee", "utterance_kind": "question", "vagueness": "specific",
+         "normalized_statement": "Asks whether the fee is zero.",
+         "values": [{"field": "processing_fee", "raw_text": "Zero", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.85},
+        {"anchors": [{"segment": "S2", "text": "Haan ji, bilkul zero."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Fee is zero.",
+         "values": [{"field": "processing_fee", "raw_text": "zero", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI04", "language": "hinglish", "teaches": "hypothetical with 'agar ... hota toh'; credit score is not a loan term",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Agar aapka CIBIL 800 hota toh rate 10 percent milta."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Agar aapka CIBIL 800 hota toh rate 10 percent milta."}],
+         "claim_type": "interest_rate", "utterance_kind": "hypothetical", "vagueness": "specific",
+         "normalized_statement": "Rate would have been 10% with a CIBIL score of 800 (hypothetical).",
+         "values": [{"field": "interest_rate", "raw_text": "10 percent", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI05", "language": "hinglish", "teaches": "conditional with 'toh'; zero via 'koi nahi'",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Time pe EMI bharoge toh penal charge koi nahi."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Time pe EMI bharoge toh penal charge koi nahi."}],
+         "claim_type": "penal_charge", "utterance_kind": "conditional", "vagueness": "specific",
+         "normalized_statement": "No penal charge if EMIs are paid on time.",
+         "values": [{"field": "penal_charge", "raw_text": "koi nahi", "quantity": "amount_inr"}],
+         "conditions": [{"text": "Time pe EMI bharoge", "kind": "if_customer_does"}], "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI06", "language": "hinglish", "teaches": "vague Hinglish claims keep no values",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Hamare rates market mein sabse kam hain, koi hidden charge nahi."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Hamare rates market mein sabse kam hain"}],
+         "claim_type": "interest_rate", "utterance_kind": "assertion", "vagueness": "vague",
+         "normalized_statement": "Rates are the lowest in the market.", "values": [], "conditions": [],
+         "extraction_confidence": 0.8},
+        {"anchors": [{"segment": "S1", "text": "koi hidden charge nahi."}],
+         "claim_type": "general_assurance", "utterance_kind": "assertion", "vagueness": "vague",
+         "normalized_statement": "No hidden charges.", "values": [], "conditions": [], "extraction_confidence": 0.8}
+      ]
+    },
+    {
+      "id": "HI07", "language": "hinglish", "teaches": "self-correction 'nahi nahi': both values are claims",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Fee dedh percent hai, nahi nahi, do percent."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Fee dedh percent hai"}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Fee is 1.5%.",
+         "values": [{"field": "processing_fee", "raw_text": "dedh percent", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.8},
+        {"anchors": [{"segment": "S1", "text": "nahi nahi, do percent."}],
+         "claim_type": "processing_fee", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Correction: fee is 2%.",
+         "values": [{"field": "processing_fee", "raw_text": "do percent", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.85}
+      ]
+    },
+    {
+      "id": "HI08", "language": "hinglish", "teaches": "insurance deducted from the loan ('kat jayega')",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Insurance lena padega, 18,500 loan se hi kat jayega."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Insurance lena padega, 18,500 loan se hi kat jayega."}],
+         "claim_type": "insurance_bundled", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Insurance is required; Rs 18,500 will be deducted from the loan.",
+         "values": [{"field": "insurance_bundled", "raw_text": "18,500", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI09", "language": "hinglish", "teaches": "zero prepayment charge",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Prepayment charge koi nahi hai, kabhi bhi band kar sakte ho."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Prepayment charge koi nahi hai, kabhi bhi band kar sakte ho."}],
+         "claim_type": "prepayment_charge", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "No prepayment charge; the loan can be closed any time.",
+         "values": [{"field": "prepayment_charge", "raw_text": "koi nahi", "quantity": "amount_inr"}],
+         "conditions": [], "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI10", "language": "hinglish", "teaches": "approximate range with 'lagbhag ... se ... ke beech'",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Interest lagbhag 12 se 13 percent ke beech rahega."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Interest lagbhag 12 se 13 percent ke beech rahega."}],
+         "claim_type": "interest_rate", "utterance_kind": "promise", "vagueness": "approximate",
+         "normalized_statement": "Interest will be about 12% to 13%.",
+         "values": [{"field": "interest_rate", "raw_text": "12 se 13 percent", "quantity": "percent"}], "conditions": [],
+         "extraction_confidence": 0.85}
+      ]
+    },
+    {
+      "id": "HI11", "language": "hinglish", "teaches": "opinion vs document assurance in Hinglish",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "Mere hisaab se ye best loan hai."},
+                   {"ref": "S2", "speaker": "spk_A", "text": "Jo bhi bola hai sab agreement mein likha hai."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "Mere hisaab se ye best loan hai."}],
+         "claim_type": "general_assurance", "utterance_kind": "opinion", "vagueness": "vague",
+         "normalized_statement": "Agent's opinion: this is the best loan.", "values": [], "conditions": [],
+         "extraction_confidence": 0.8},
+        {"anchors": [{"segment": "S2", "text": "Jo bhi bola hai sab agreement mein likha hai."}],
+         "claim_type": "document_assurance", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Everything said is written in the agreement.", "values": [], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    },
+    {
+      "id": "HI12", "language": "hinglish", "teaches": "Devanagari mixed with Latin; loan amount and tenure",
+      "segments": [{"ref": "S1", "speaker": "spk_A", "text": "आपका loan दस लाख का approve हो गया है, tenure 5 saal."}],
+      "claims": [
+        {"anchors": [{"segment": "S1", "text": "आपका loan दस लाख का approve हो गया है"}],
+         "claim_type": "loan_amount", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Loan of Rs 10 lakh is approved.",
+         "values": [{"field": "loan_amount", "raw_text": "दस लाख", "quantity": "amount_inr"}], "conditions": [],
+         "extraction_confidence": 0.9},
+        {"anchors": [{"segment": "S1", "text": "tenure 5 saal."}],
+         "claim_type": "tenure", "utterance_kind": "assertion", "vagueness": "specific",
+         "normalized_statement": "Tenure is 5 years.",
+         "values": [{"field": "tenure", "raw_text": "5 saal", "quantity": "years"}], "conditions": [],
+         "extraction_confidence": 0.9}
+      ]
+    }
+  ]
+}

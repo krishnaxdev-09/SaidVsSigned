@@ -154,3 +154,15 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - Decisions inside §6 (no new scope): romanised Hindi number words are read only in non-English segments ("do" is an English word); "flat" sets a basis only for interest rates; zero words apply only to fee/charge fields, including the insurance premium; comparators are read just before the value and GST/period/basis just after it.
 - **Doc 04 §6 extension approved by the user:** exactly "without charge" and "without any charge" → 0 on fee/charge fields; doc 04 updated. Also: a zero expression next to a number is now ambiguous and stays unparsed (previously "without any charge after 6 EMIs" would have read 6 as the charge).
 - Evidence: 444-case table + property tests (452 tests); 101 synthetic-agreement terms → 97 exact, 0 wrong, 4 unparsed.
+
+## 2026-11-14 — T1.6 claim extraction
+- `app/modules/claims/`: `claims.extract` job (windows 8/stride 6/+2 context), Gemma via the Bedrock Mantle provider, strict output schema (14 MVP types, 7 kinds, no numeric fields), deterministic anchoring (exact or rapidfuzz ≥ 95, else dropped), values via the T1.5 normaliser, consolidation (duplicates → `also_said_at`, restatements → `supersedes_claim_id`), `GET /sessions/{id}/claims`, `PATCH /claims/{id}` (audited `claim.dismiss`, note text not stored). Migration `0005_claims` (doc 11 DDL). Dependency `rapidfuzz==3.14.6` (doc 04 §7).
+- **PII redaction** (`app/llm/redact.py`, doc 12 §B.2: PAN, Verhoeff-checked Aadhaar, account, phone, email) before every LLM call. This also closes a gap in T1.3: speaker suggestion previously sent unredacted text.
+- **Few-shots approved by the user (HC-2 condition)** with these clarifications, each now enforced by tests:
+  1. EN09 expects `assertion` (unchanged; Gemma's `conditional` is an allowed variation, see 5).
+  2. Customer questions (EN03, HI03) are kept for context but are never verifiable and never back a CONFLICT, even if that speaker is later confirmed as the agent (`app/modules/claims/eligibility.py`).
+  3. Vague claims (EN06, HI06) carry no values (enforced in code: values on a vague claim are dropped) and can only lead to Needs clarification.
+  4. Corrections (EN07, HI07) keep both values; the later claim links the earlier as superseded; the earlier quote stays as evidence.
+  5. Utterance-kind variation is acceptable only when eligibility is unchanged (promise / assertion / conditional); ranges and approximation are kept independently of kind. The eval reports strict and eligibility-equivalent matches.
+- Normaliser fix found during T1.6: values are returned in plain notation (1000000, not 1E+6) so no scientific notation reaches the API, UI or report; regression test added.
+- Not in T1.6: enqueueing `verify:{claim_id}` (T2.5); claims UI (T1.7).

@@ -337,6 +337,18 @@ def rate_labels(window: str, field: str) -> tuple[str | None, str | None]:
 
 # ---- public API --------------------------------------------------------------------------------------------------------
 
+def _plain(d: D | None) -> D | None:
+    """Plain notation for display and JSON: 1E+6 -> 1000000, 7.75E+3 -> 7750, 1.500 -> 1.5."""
+    if d is None:
+        return None
+    return D(format(d.normalize(), "f"))
+
+
+def _parsed(ev: ExtractedValue, labels: dict[str, object], **values: D | None) -> ExtractedValue:
+    return ev.model_copy(update={**labels, **{k: _plain(v) for k, v in values.items()},
+                                 "normaliser_version": NORMALISER_VERSION})
+
+
 def _unparsed(ev: ExtractedValue, **labels: object) -> ExtractedValue:
     return ev.model_copy(update={"value": None, "value_low": None, "value_high": None, "normaliser_version": None,
                                  **labels})
@@ -380,12 +392,11 @@ def normalise(ev: ExtractedValue, *, context: str | None = None, language: str |
     if not spans:
         if quantity == "boolean":
             if any(w in ("no", "nahi") for w in words) or zero_phrase:
-                return ev.model_copy(update={**labels, "value": D(0), "normaliser_version": NORMALISER_VERSION})
+                return _parsed(ev, labels, value=D(0))
             if any(w in ("yes", "haan", "ha") for w in words):
-                return ev.model_copy(update={**labels, "value": D(1), "normaliser_version": NORMALISER_VERSION})
+                return _parsed(ev, labels, value=D(1))
         elif fee_like and (any(w in ZERO_WORDS for w in words) or zero_phrase):
-            return ev.model_copy(update={**labels, "value": D(0), "comparator": "eq",
-                                         "normaliser_version": NORMALISER_VERSION})
+            return _parsed(ev, {**labels, "comparator": "eq"}, value=D(0))
         return _unparsed(ev, **labels)
 
     def unit_convert(v: D) -> D:
@@ -400,8 +411,8 @@ def normalise(ev: ExtractedValue, *, context: str | None = None, language: str |
         if res is None:
             return _unparsed(ev, **labels)
         if tenure and quantity == "years" and not any(w in YEAR_WORDS | MONTH_WORDS for w in words):
-            return ev.model_copy(update={**labels, "value": res[0] * 12, "normaliser_version": NORMALISER_VERSION})
-        return ev.model_copy(update={**labels, "value": unit_convert(res[0]), "normaliser_version": NORMALISER_VERSION})
+            return _parsed(ev, labels, value=res[0] * 12)
+        return _parsed(ev, labels, value=unit_convert(res[0]))
     if len(spans) == 2:
         (a0, a1), (b0, b1) = spans
         between = words[a1:b0]
@@ -418,6 +429,5 @@ def normalise(ev: ExtractedValue, *, context: str | None = None, language: str |
             lo_v, hi_v = unit_convert(lo_v), unit_convert(hi_v)
             if lo_v >= hi_v:
                 return _unparsed(ev, **labels)
-            return ev.model_copy(update={**labels, "comparator": "eq", "value": None, "value_low": lo_v,
-                                         "value_high": hi_v, "normaliser_version": NORMALISER_VERSION})
+            return _parsed(ev, {**labels, "comparator": "eq"}, value=None, value_low=lo_v, value_high=hi_v)
     return _unparsed(ev, **labels)  # several unrelated numbers: ambiguous

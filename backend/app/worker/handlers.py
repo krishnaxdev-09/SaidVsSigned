@@ -13,6 +13,7 @@ def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | N
     from app.core.config import get_settings
     from app.llm.bedrock_mantle import from_settings as mantle_from_settings
     from app.modules.audio.ingest import make_ingest_handler
+    from app.modules.claims.job import make_extract_handler
     from app.modules.speakers.job import make_suggest_handler
     from app.modules.stt.elevenlabs import ElevenLabsSTT
     from app.modules.stt.job import make_stt_handler
@@ -26,3 +27,4 @@ def register_all(registry: Registry, store: ObjectStore, *, stt: STTProvider | N
         llm = mantle_from_settings()  # ADR-004 working provider: Gemma 4 31B on Bedrock Mantle
     registry.register("stt.batch", make_stt_handler(stt))  # T1.2, doc 03 §6
     registry.register("speakers.suggest", make_suggest_handler(llm))  # T1.3, doc 03 §5
+    registry.register("claims.extract", make_extract_handler(llm))  # T1.6, doc 04 §5
