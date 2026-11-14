@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 20 / 40 tasks done (50%).** Stage 0 complete; Stage 1 in progress.
+**Overall: 21 / 40 tasks done (52.5%).** Stage 0 complete; Stage 1 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -92,18 +92,18 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.7 | Claims UI, transcript view, snippet playback | ✅ | — |
 | T1.8 | Experiments E2/E3/E10 + LLM evaluation | ◐ | Reports done (synthetic TTS); E10 5-user usability test needs people |
 
-### Stage 2 — Documents and contract verification · 7 tasks · NOT STARTED (0/7)
+### Stage 2 — Documents and contract verification · 7 tasks · IN PROGRESS (1/7)
 Gate: HC-4 at stage exit.
 
 | Task | What | Status |
 |---|---|---|
-| T2.1 | Document upload (PDF + photos), sanitise, versioning | ⬜ |
+| T2.1 | Document upload (PDF + photos), sanitise, versioning | ✅ |
 | T2.2 | Docling/OCR + confidence pass | ⬜ |
 | T2.3 | Clause segmentation + doc_terms | ⬜ |
 | T2.4 | Chunks, embeddings, hybrid retrieval | ⬜ |
 | T2.5 | Orchestrator v1 (gates, merge, validators) — needs T1.4 | ⬜ |
 | T2.6 | Contract engine (said vs signed comparison) | ⬜ |
-| T2.7 | Results dashboard + evidence drawer | ⬜ |
+| T2.7 | Results dashboard + evidence drawer + document upload screen | ⬜ |
 
 ### Stage 3 — Finance, orchestration, reporting · 7 tasks · NOT STARTED (0/7)
 Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 package.

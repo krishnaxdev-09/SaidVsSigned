@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     MAX_UPLOAD_MB_DOC: int = 40
     MAX_DOC_PAGES: int = 60
     MAX_PHOTO_PAGES: int = 20
+    MAX_PHOTO_MB: int = 15  # doc 05 §4: each photo ≤ 15 MB
 
     # Jobs (doc 01 §4 step 8, doc 11 §2)
     JOB_LEASE_SECONDS: int = 600

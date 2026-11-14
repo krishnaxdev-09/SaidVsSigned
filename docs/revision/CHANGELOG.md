@@ -179,3 +179,7 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 - **HC-3 approved by the user.** ADR-003: ElevenLabs Scribe v2 batch only for the MVP (Q-8 closed). ADR-019: a numeric CONFLICT, in every language, needs the customer to play and confirm the original quote; ASR confidence alone is never enough. Hindi: not yet supported — no quote confirmation offered and no numeric CONFLICT; such results stay `UNCLEAR(low_asr_confidence)`. Languages: English Supported, Hinglish Beta, Hindi Not yet supported (doc 03 §8). No reason codes added or changed.
 - Accepted as open gaps (not complete): KG-1 (5-user usability test), KG-2 (no real-call evaluation). T1.8 stays partial.
 - Synthetic-speech limitations documented in the T1.8 report.
+
+## 2026-11-14 — T2.1 document upload, sanitise, versioning
+- Upload (PDF or ordered photos, doc 05 §4 limits), magic-byte sniffing, dedupe on ordered page hashes, idempotency, `doc.ingest` sanitising step (pikepdf strips JavaScript, embedded files, XFA, launch/JS links, file attachments; Pillow re-encodes photos without EXIF/GPS, decompression-bomb guard), photo page replace → new version, list/get endpoints, consent withdrawal stops unfinished documents. Migration `0006_documents`; deps `pikepdf`, `pillow`.
+- User decisions (2026-11-14): doc 05 applied strictly — every encrypted PDF returns `400 encrypted_pdf`, including owner-password-only PDFs; the document upload screen is part of T2.7, not T2.1.

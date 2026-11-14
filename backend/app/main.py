@@ -19,6 +19,7 @@ from app.modules.audio.router import router as audio_router
 from app.modules.auth.router import router as auth_router
 from app.modules.claims.router import router as claims_router
 from app.modules.consent.router import router as consent_router
+from app.modules.documents.router import router as documents_router
 from app.modules.realtime.bus import hub
 from app.modules.realtime.ws import router as ws_router
 from app.modules.sessions.router import router as sessions_router
@@ -57,6 +58,7 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
     app.include_router(stt_router)
     app.include_router(speakers_router)
     app.include_router(claims_router)
+    app.include_router(documents_router)
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict[str, str]:
