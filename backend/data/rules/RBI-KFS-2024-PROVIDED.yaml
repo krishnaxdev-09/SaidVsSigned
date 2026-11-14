@@ -1,15 +1,24 @@
 id: RBI-KFS-2024-PROVIDED
 version: 1
-retrieved_on: '2026-11-13'
-quote: null
-explain_en: null
-explain_hi: null
+retrieved_on: '2026-11-14'
+quote:
+- para: '2'
+  text: shall be applicable in cases of all retail and MSME term loan products
+- para: '4'
+  text: REs shall provide a KFS to all prospective borrowers to help them take an informed view before executing the loan
+    contract
+- para: '11'
+  text: all new retail and MSME term loans sanctioned on or after October 1, 2024, including fresh loans to existing customers
+explain_en: Your documents don't seem to include a Key Fact Statement. RBI's KFS circular (RBI/2024-25/18) asks lenders to
+  give one before you sign. Ask the lender for the KFS.
+explain_hi: आपके दस्तावेज़ों में की फ़ैक्ट स्टेटमेंट (KFS) नहीं दिखती। RBI के KFS सर्कुलर (RBI/2024-25/18) के अनुसार साइन
+  करने से पहले KFS दी जानी चाहिए। लेंडर से KFS माँगें।
 reviewed_by: null
 enabled: false
 title: A Key Fact Statement is provided for retail and MSME term loans
-instrument: RBI/2024-25/18 — Key Facts Statement for Loans & Advances (15 Apr 2024)
-source_url: https://www.rbi.org.in/
-source_url_verified: false
+instrument: RBI/2024-25/18 DOR.STR.REC.13/13.03.00/2024-25 — Key Facts Statement (KFS) for Loans & Advances (15 Apr 2024)
+source_url: https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12663&Mode=0
+source_url_verified: true
 effective_from: '2024-10-01'
 applies_when:
   loan_kind: retail_or_msme_term
@@ -19,3 +28,5 @@ checks:
   expect:
     document_kind_present: kfs
   on_violation: CONFLICT
+applicability_detail: All REs in the circular's scope; retail and MSME term loans sanctioned on or after 1 Oct 2024.
+quote_status: verbatim fragments retrieved 2026-11-14 from source_url; full paragraph to be confirmed by the HC-6 reviewer

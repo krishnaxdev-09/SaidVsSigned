@@ -1,16 +1,25 @@
 id: RBI-PENAL-2023-NOT-INTEREST
 version: 1
-retrieved_on: '2026-11-13'
-quote: null
-explain_en: null
-explain_hi: null
+retrieved_on: '2026-11-14'
+quote:
+- para: 3(i)
+  text: Penalty, if charged, for non-compliance of material terms and conditions of loan contract by the borrower shall be
+    treated
+- para: 3(i)
+  text: shall not be levied in the form of ‘penal interest’ that is added to the rate of interest
+- para: 3(viii)
+  text: These instructions shall come into effect from January 1, 2024.
+explain_en: Your documents mention 'penal interest'. This may not be consistent with RBI's circular on penal charges (RBI/2023-24/53),
+  which asks for penal charges instead of added interest. Ask the lender to confirm how late payments are charged.
+explain_hi: आपके दस्तावेज़ों में 'पेनल इंटरेस्ट' लिखा है। यह RBI के पेनल चार्ज सर्कुलर (RBI/2023-24/53) के अनुरूप न हो सकता
+  है। लेंडर से पूछें कि देर से भुगतान पर क्या चार्ज लगेगा।
 reviewed_by: null
 enabled: false
 title: Penal charges are not levied as penal interest added to the rate
-instrument: RBI circular on Penal Charges in Loan Accounts (Aug 2023) — [A] not retrieved;
-  verify at HC-6
-source_url: https://www.rbi.org.in/
-source_url_verified: false
+instrument: RBI/2023-24/53 DoR.MCS.REC.28/01.01.001/2023-24 — Fair Lending Practice - Penal Charges in Loan Accounts (18 Aug
+  2023)
+source_url: https://rbi.org.in/Scripts/NotificationUser.aspx?Id=12527&Mode=0
+source_url_verified: true
 effective_from: '2024-01-01'
 applies_when:
   sanction_date_gte: '2024-01-01'
@@ -20,3 +29,6 @@ checks:
     not_contains_any:
     - penal interest
   on_violation: CONFLICT
+applicability_detail: Commercial banks, co-operative banks, NBFCs and AIFIs (scope per the circular); from 1 Jan 2024 (an
+  RBI notice later extended the timeline for existing loans — reviewer to confirm the dates).
+quote_status: verbatim fragments retrieved 2026-11-14 from source_url; full paragraph to be confirmed by the HC-6 reviewer

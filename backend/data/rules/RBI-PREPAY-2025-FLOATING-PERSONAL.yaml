@@ -1,15 +1,27 @@
 id: RBI-PREPAY-2025-FLOATING-PERSONAL
 version: 1
-retrieved_on: '2026-11-13'
-quote: null
-explain_en: null
-explain_hi: null
+retrieved_on: '2026-11-14'
+quote:
+- para: '4'
+  text: These Directions shall apply to all commercial banks (excluding payments banks), co-operative banks, NBFCs
+- para: '5'
+  text: An RE shall adhere to the following Directions regarding levy of pre-payment charges on all floating rate loans
+- para: 5(i)
+  text: For all loans granted for purposes other than business to individuals, with or without co-obligant(s),
+- para: 5(i)
+  text: an RE shall not levy pre-payment charges;
+- para: 3(ii)
+  text: These Directions shall be applicable to all loans and advances sanctioned or renewed on or after January 1, 2026.
+explain_en: Your loan seems to be a floating-rate loan for personal use, but a prepayment charge is mentioned. This may not
+  be consistent with RBI's Pre-payment Charges Directions, 2025. Ask the lender to confirm.
+explain_hi: आपका लोन फ़्लोटिंग रेट वाला निजी लोन लगता है, फिर भी प्रीपेमेंट चार्ज बताया गया है। यह RBI के प्री-पेमेंट चार्ज
+  निर्देश, 2025 के अनुरूप न हो सकता है। लेंडर से पुष्टि करें।
 reviewed_by: null
 enabled: false
 title: No pre-payment charges on floating-rate loans to individuals (non-business)
-instrument: RBI (Pre-payment Charges on Loans) Directions, 2025
+instrument: RBI/2025-26/64 — Reserve Bank of India (Pre-payment Charges on Loans) Directions, 2025 (2 Jul 2025)
 source_url: https://www.rbi.org.in/scripts/FS_Notification.aspx?Id=12878
-source_url_verified: false
+source_url_verified: true
 effective_from: '2026-01-01'
 applies_when:
   borrower_type: individual
@@ -29,3 +41,7 @@ checks:
   expect:
     value_eq: 0
   on_violation: CONFLICT
+applicability_detail: Floating-rate loans to individuals for non-business purposes, sanctioned or renewed on or after 1 Jan
+  2026; commercial banks (excl. payments banks), co-operative banks, NBFCs and All India Financial Institutions (para 4).
+  Reviewer to confirm the full para 4 list and any exemptions.
+quote_status: verbatim fragments retrieved 2026-11-14 from source_url; full paragraph to be confirmed by the HC-6 reviewer

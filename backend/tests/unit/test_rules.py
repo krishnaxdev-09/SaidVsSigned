@@ -11,6 +11,7 @@ import yaml
 
 from app.modules.rules.engine import RuleFacts, evaluate, load_rules, user_visible
 from app.schemas.claims import ExtractedValue
+from app.schemas.wording import wording_violations
 from tests.unit.test_verify_merge import claim
 
 FIX = yaml.safe_load((Path(__file__).parents[1] / "fixtures" / "rules_fixtures.yaml").read_text())["cases"]
@@ -19,10 +20,13 @@ RULES = {r["id"]: r for r in load_rules()}
 
 def test_corpus_is_shadow_only() -> None:
     assert len(RULES) == 5
-    for r in RULES.values():
-        assert r["enabled"] is False and r["reviewed_by"] is None and r["quote"] is None and not user_visible(r)
-        assert r["source_url_verified"] is False and r["source_url"].startswith("https://www.rbi.org.in/")
-        assert r["explain_en"] is None  # wording is written and reviewed in the HC-6 package (T3.7)
+    for r in RULES.values():  # T3.7 filled sources, quotes and drafts; HC-6 has not approved any rule
+        assert r["enabled"] is False and r["reviewed_by"] is None and not user_visible(r)
+        assert r["source_url_verified"] is True and "rbi.org.in" in r["source_url"]
+        assert r["quote"] and all(q["text"] and q["para"] for q in r["quote"])
+        for lang in ("explain_en", "explain_hi"):
+            assert r[lang] and not wording_violations(r[lang])  # never "illegal" etc. (doc 07 §3.3)
+        assert "may not be consistent" in r["explain_en"] or "Ask the lender" in r["explain_en"]
 
 
 def test_at_least_four_fixtures_per_rule_covering_each_outcome() -> None:

@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 33 / 40 tasks done (82.5%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 in progress.
+**Overall: 34 / 40 tasks done (85%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 complete (7/7), HC-5 pending.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -105,7 +105,7 @@ Gate: HC-4 ✅ approved 2026-11-14.
 | T2.6 | Contract engine (said vs signed; 200 pairs, CONFLICT precision 1.000) | ✅ |
 | T2.7 | Results dashboard + evidence drawer + document upload screen (real-stack E2E demo) | ✅ |
 
-### Stage 3 — Finance, orchestration, reporting · 7 tasks · IN PROGRESS (6/7)
+### Stage 3 — Finance, orchestration, reporting · 7 tasks · ✅ COMPLETE (7/7) — HC-5 pending
 Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 package.
 
 | Task | What | Status |
@@ -116,7 +116,7 @@ Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 pa
 | T3.4 | Ask-lite with routing + citation validator (routing 50/50, 0 invalid citations) | ✅ |
 | T3.5 | Shadow rules + demo lenders (shadow never visible; fictional demo lenders) | ✅ |
 | T3.6 | Gated formulas built and tested, off for the whole MVP (E7 shadow) | ✅ |
-| T3.7 | HC-6 rule review package | ⬜ |
+| T3.7 | HC-6 rule review package (sources, verbatim fragments, drafts; nothing enabled) | ✅ |
 
 ### Stage 4 — Evaluation, security, release · 5 tasks · NOT STARTED (0/5)
 Gates: HC-6 (per rule), HC-7 (legal, before real users), HC-8 (release).
