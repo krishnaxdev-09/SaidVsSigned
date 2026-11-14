@@ -1,0 +1,92 @@
+dataset_version: agreements-v1
+id: AG02
+synthetic: true
+lender: Navkiran Credit Ltd. (fictional)
+borrower: Rohit Sharma (fictional)
+product: Personal Loan
+pages: 2
+language: en
+traps:
+- id: fee_in_footnote
+  description: a fee that appears only in a footnote
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '4236'
+  gst_on_fee: '763'
+  gst_rate_assumed: '0.18'
+  total_deductions: '6499'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '500000'
+  raw_text: Rs. 5,00,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '13.25'
+  raw_text: 13.25% p.a. (reducing, fixed)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '48'
+  raw_text: 48 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '13476'
+  raw_text: Rs. 13,476 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: amount_inr
+  value: '4999'
+  raw_text: Rs. 4,999 (inclusive of GST)
+  page: 1
+  location: kfs_table
+  includes_gst: true
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '493501'
+  raw_text: Rs. 4,93,501
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '646848'
+  raw_text: Rs. 6,46,848 over the tenure
+  page: 1
+  location: kfs_table
+- field: other_charge
+  quantity: amount_inr
+  value: '1500'
+  raw_text: ¹ A documentation and stamping charge of Rs. 1,500 is also payable and
+    will be deducted from the disbursement.
+  page: 1
+  location: footnote
+  of_what: documentation_charge
+  deducted_from_disbursement: true
+  period: one_time
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+files:
+  agreement.pdf:
+    sha256: 46ddbb9fbef491f7c92af959d5f52ac37591a479030d6c3a2efb050d7a386b41
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

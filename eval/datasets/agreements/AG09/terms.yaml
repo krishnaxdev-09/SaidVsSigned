@@ -1,0 +1,120 @@
+dataset_version: agreements-v1
+id: AG09
+synthetic: true
+lender: Sthir Property Finance Ltd. (fictional)
+borrower: Neha Kulkarni (fictional)
+product: Loan Against Property
+pages: 2
+language: en
+traps:
+- id: fee_pct_plus_gst
+  description: '"2% + GST" processing fee'
+- id: prepayment_on_floating
+  description: prepayment charge on a floating-rate loan
+- id: penal_interest
+  description: penal-interest clause
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '18000'
+  gst_on_fee: '3240'
+  gst_rate_assumed: '0.18'
+  total_deductions: '21240'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '1800000'
+  raw_text: Rs. 18,00,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '10.40'
+  raw_text: 10.40% p.a. (reducing, floating)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: floating
+  period: annual
+- field: tenure
+  quantity: months
+  value: '120'
+  raw_text: 120 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '24188'
+  raw_text: Rs. 24,188 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: percent
+  value: '1'
+  raw_text: 1% of loan amount + GST
+  page: 1
+  location: kfs_table
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '1778760'
+  raw_text: Rs. 17,78,760
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '2902560'
+  raw_text: Rs. 29,02,560 over the tenure
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '10.40'
+  raw_text: Interest is payable at a floating rate linked to the Lender's Prime Lending
+    Rate (PLR) - 4.10%, currently 10.40% p.a. on a reducing-balance basis, reset quarterly.
+  page: 2
+  location: clause
+  rate_basis: reducing
+  rate_type: floating
+  period: annual
+- field: processing_fee
+  quantity: percent
+  value: '1'
+  raw_text: A non-refundable processing fee of 1% of the loan amount plus applicable
+    GST will be deducted from the disbursement.
+  page: 2
+  location: clause
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: prepayment_charge
+  quantity: percent
+  value: '4'
+  raw_text: Part or full prepayment is permitted after 6 EMIs and attracts a prepayment
+    charge of 4% of the principal outstanding plus GST.
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+  includes_gst: false
+  period: one_time
+  rate_type: floating
+- field: penal_charge
+  quantity: percent
+  value: '2'
+  raw_text: On delay in payment of any EMI, penal interest at 2% per month shall be
+    levied on the overdue amount from the due date until payment.
+  page: 2
+  location: clause
+  of_what: overdue_amount
+  period: monthly
+files:
+  agreement.pdf:
+    sha256: a368e36909f4c69ab4c578d7baedcb9e2a11d69705dc2dacd67644965a1cc120
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

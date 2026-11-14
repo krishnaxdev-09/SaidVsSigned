@@ -1,0 +1,123 @@
+dataset_version: agreements-v1
+id: AG07
+synthetic: true
+lender: Udyam Capital Partners (fictional)
+borrower: Kavya Traders, prop. Kavya Nair (fictional)
+product: Business Loan
+pages: 2
+language: en
+traps:
+- id: fee_pct_plus_gst
+  description: '"2% + GST" processing fee'
+- id: insurance_deducted
+  description: insurance premium deducted from the disbursement
+- id: penal_interest
+  description: penal-interest clause
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '20000'
+  gst_on_fee: '3600'
+  gst_rate_assumed: '0.18'
+  total_deductions: '42100'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '1000000'
+  raw_text: Rs. 10,00,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '17.50'
+  raw_text: 17.50% p.a. (reducing, fixed)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '36'
+  raw_text: 36 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '35902'
+  raw_text: Rs. 35,902 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: percent
+  value: '2'
+  raw_text: 2% of loan amount + GST
+  page: 1
+  location: kfs_table
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: insurance_bundled
+  quantity: amount_inr
+  value: '18500'
+  raw_text: Rs. 18,500 (credit-shield premium, deducted from disbursement)
+  page: 1
+  location: kfs_table
+  deducted_from_disbursement: true
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '957900'
+  raw_text: Rs. 9,57,900
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '1292472'
+  raw_text: Rs. 12,92,472 over the tenure
+  page: 1
+  location: kfs_table
+- field: processing_fee
+  quantity: percent
+  value: '2'
+  raw_text: A non-refundable processing fee of 2% of the loan amount plus applicable
+    GST will be deducted from the disbursement.
+  page: 2
+  location: clause
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: insurance_bundled
+  quantity: amount_inr
+  value: '18500'
+  raw_text: The Borrower is enrolled in a group credit-shield cover; the single premium
+    of Rs. 18,500 is deducted from the loan amount at disbursement.
+  page: 2
+  location: clause
+  deducted_from_disbursement: true
+  period: one_time
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+- field: penal_charge
+  quantity: percent
+  value: '3'
+  raw_text: On delay in payment of any EMI, penal interest at 3% per month shall be
+    levied on the overdue amount from the due date until payment.
+  page: 2
+  location: clause
+  of_what: overdue_amount
+  period: monthly
+files:
+  agreement.pdf:
+    sha256: 01983001ec269a84c9d132a7aac6ee88dd97cf44830d001cf7ce2444ae5e2c8b
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

@@ -1,0 +1,101 @@
+dataset_version: agreements-v1
+id: AG01
+synthetic: true
+lender: Suryoday Finserv Pvt. Ltd. (fictional)
+borrower: Asha Verma (fictional)
+product: Personal Loan
+pages: 2
+language: en
+traps:
+- id: fee_pct_plus_gst
+  description: '"2% + GST" processing fee'
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '6000'
+  gst_on_fee: '1080'
+  gst_rate_assumed: '0.18'
+  total_deductions: '7080'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '300000'
+  raw_text: Rs. 3,00,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '14.50'
+  raw_text: 14.50% p.a. (reducing, fixed)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '36'
+  raw_text: 36 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '10326'
+  raw_text: Rs. 10,326 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: percent
+  value: '2'
+  raw_text: 2% of loan amount + GST
+  page: 1
+  location: kfs_table
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '292920'
+  raw_text: Rs. 2,92,920
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '371736'
+  raw_text: Rs. 3,71,736 over the tenure
+  page: 1
+  location: kfs_table
+- field: other_charge
+  quantity: amount_inr
+  value: '500'
+  raw_text: Rs. 500 per instance
+  page: 1
+  location: kfs_table
+  of_what: bounce_charge
+  period: per_instance
+- field: processing_fee
+  quantity: percent
+  value: '2'
+  raw_text: A non-refundable processing fee of 2% of the loan amount plus applicable
+    GST will be deducted from the disbursement.
+  page: 2
+  location: clause
+  of_what: loan_amount
+  includes_gst: false
+  period: one_time
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+files:
+  agreement.pdf:
+    sha256: 8c434de703270ffde9a75e8c0c4389adaefcd2eea8065c91f5cf3cd7531b4bf0
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

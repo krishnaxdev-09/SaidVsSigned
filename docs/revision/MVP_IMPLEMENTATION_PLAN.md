@@ -141,10 +141,10 @@ It then waits. No approval is recorded unless you give it.
 | T0.12 | CI (incl. feature-flag startup checks) | `.github/workflows/ci.yml` | Green | all |
 | T0.13 | Start eval datasets; draft consent/attestation texts (en/hi) for HC-7 | `eval/datasets/*`, `backend/data/consent_texts/*` | 10 agreements drafted; texts drafted (not approved) | — |
 
-#### Phase 0 implementation status (2026-11-13). Phase 0 is NOT marked complete
+#### Phase 0 implementation status (updated 2026-11-14). All 13 tasks are built and verified; Phase 0 exit is reported in `MVP_TASK_STATUS.md`
 | Task | Status | Evidence |
 |---|---|---|
-| T0.1 | ✅ built; ⚠ compose `up` blocked by Q-16 (MinIO images) | db/api/worker containers run; `/readyz` reports `storage: error` |
+| T0.1 | ✅ | Q-16 resolved (MinIO built from source); `make up`: all services healthy; `/readyz` all `ok`; SSE-S3 put/head/presign/delete smoke test |
 | T0.2 | ✅ | `0001_foundation`; upgrade→downgrade→upgrade test |
 | T0.3 | ✅ | `core/errors.py`, `core/retry.py`; unit tests for all 4 classes |
 | T0.4 | ✅ | register/login/refresh rotation + reuse detection/logout/ws-ticket tests |
@@ -155,8 +155,8 @@ It then waits. No approval is recorded unless you give it.
 | T0.9 | ✅ | audit rows asserted; append-only trigger test |
 | T0.10 | ✅ interfaces + fakes only | `llm/base.py`, `modules/stt/base.py`; no provider implemented |
 | T0.11 | ✅ skeleton | login/register, sessions, consent+attestation screens, events client; vitest; API-level smoke via Vite proxy (no browser E2E yet) |
-| T0.12 | ✅ locally | `make ci` exit 0; workflow file written but **not run on GitHub** (no git remote) |
-| T0.13 | ◐ partial | DRAFT consent/attestation texts (en/hi, HC-7 pending) + `eval/` skeleton; **synthetic datasets not started** |
+| T0.12 | ✅ | `make ci` exit 0 with 55/55 backend tests (0 skipped); `REQUIRE_DB=1` makes CI fail rather than skip; eval-dataset check job added. GitHub run: see `MVP_TASK_STATUS.md` |
+| T0.13 | ✅ | 10 synthetic agreements (`eval/datasets/agreements`, digital PDF + `terms.yaml`, all 6 traps, 101 terms checked); DRAFT consent/attestation texts (HC-7 pending). Scans/photos are manual, due before E5 |
 
 ### Phase 1 — Upload, STT, speakers, claims (gates: HC-2 at start, HC-3 at exit)
 | ID | Task | Done when | Depends |

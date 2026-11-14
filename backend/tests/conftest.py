@@ -63,6 +63,8 @@ def _db_available() -> bool:
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     if _db_available():
         return
+    if os.environ.get("REQUIRE_DB") == "1":  # CI and `make ci`: never let integration tests skip silently
+        raise pytest.UsageError("REQUIRE_DB=1 but Postgres is not reachable; start it with `make db`")
     skip = pytest.mark.skip(reason="Postgres not reachable (start infra/docker-compose.yml db)")
     for item in items:
         if "integration" in item.keywords:

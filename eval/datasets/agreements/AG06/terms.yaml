@@ -1,0 +1,99 @@
+dataset_version: agreements-v1
+id: AG06
+synthetic: true
+lender: Raftaar Two-Wheeler Finance (fictional)
+borrower: Sunil Yadav (fictional)
+product: Two-Wheeler Loan
+pages: 2
+language: en
+traps:
+- id: penal_interest
+  description: penal-interest clause
+derived_by_generator:
+  note: Generator arithmetic for the printed figures; not a validated finance engine
+    (HC-5 pending).
+  fee_before_gst: '1500'
+  gst_on_fee: '270'
+  gst_rate_assumed: '0.18'
+  total_deductions: '1770'
+terms:
+- field: loan_amount
+  quantity: amount_inr
+  value: '85000'
+  raw_text: Rs. 85,000
+  page: 1
+  location: kfs_table
+- field: interest_rate
+  quantity: percent
+  value: '16.00'
+  raw_text: 16.00% p.a. (reducing, fixed)
+  page: 1
+  location: kfs_table
+  basis_disclosed_in: kfs_table
+  rate_basis: reducing
+  rate_type: fixed
+  period: annual
+- field: tenure
+  quantity: months
+  value: '24'
+  raw_text: 24 months
+  page: 1
+  location: kfs_table
+- field: emi
+  quantity: amount_inr
+  value: '4162'
+  raw_text: Rs. 4,162 per month
+  page: 1
+  location: kfs_table
+  period: monthly
+- field: processing_fee
+  quantity: amount_inr
+  value: '1500'
+  raw_text: Rs. 1,500 + GST
+  page: 1
+  location: kfs_table
+  includes_gst: false
+  period: one_time
+- field: net_disbursement
+  quantity: amount_inr
+  value: '83230'
+  raw_text: Rs. 83,230
+  page: 1
+  location: kfs_table
+- field: total_cost
+  quantity: amount_inr
+  value: '99888'
+  raw_text: Rs. 99,888 over the tenure
+  page: 1
+  location: kfs_table
+- field: other_charge
+  quantity: amount_inr
+  value: '590'
+  raw_text: Rs. 590 per instance
+  page: 1
+  location: kfs_table
+  of_what: bounce_charge
+  period: per_instance
+- field: prepayment_charge
+  quantity: percent
+  value: '0'
+  raw_text: without any charge
+  page: 2
+  location: clause
+  of_what: principal_outstanding
+- field: penal_charge
+  quantity: percent
+  value: '2'
+  raw_text: On delay in payment of any EMI, penal interest at 2% per month shall be
+    levied on the overdue amount from the due date until payment.
+  page: 2
+  location: clause
+  of_what: overdue_amount
+  period: monthly
+files:
+  agreement.pdf:
+    sha256: 9ea4fd97fe8224f9ceeafc0500ac6ebe123777cd973b4963b8e27fb4624d1ebe
+  scan_print.pdf: 'TODO (manual: print and scan)'
+  photo_bright.jpg: TODO (manual)
+  photo_dim.jpg: TODO (manual)
+  photo_mixed.jpg: TODO (manual)

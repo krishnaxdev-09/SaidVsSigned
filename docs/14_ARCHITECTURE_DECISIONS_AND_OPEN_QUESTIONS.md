@@ -61,7 +61,7 @@ HC-1 approved: Architecture and upload-first scope, specifically ADR-001, ADR-00
 | Q-12 | Team size and deadline | Open — user |
 | **Q-13** | Policy when the uploader says the agent was **not** informed or is unsure | **Open — HC-7 legal**. MVP default: allow, warn, mark the report |
 | **Q-14** | Allow a one-time retention extension? | Open — user |
-| **Q-16** | **Phase 0 blocker (found 2026-11-13):** the pinned MinIO images (`minio/minio`, `minio/mc`) cannot be pulled from Docker Hub ("pull access denied") or Quay (401). The decision "S3-compatible storage, MinIO locally" is **unchanged**. Options: (a) you provide registry access or a mirror for MinIO; (b) build MinIO from source; (c) approve another S3-compatible local server. | **Open — your decision** |
+| **Q-16** | **Phase 0 blocker (found 2026-11-13):** the pinned MinIO images (`minio/minio`, `minio/mc`) cannot be pulled from Docker Hub ("pull access denied") or Quay (401). The decision "S3-compatible storage, MinIO locally" is **unchanged**. Options: (a) you provide registry access or a mirror for MinIO; (b) build MinIO from source; (c) approve another S3-compatible local server. | **Resolved 2026-11-14 — option (b).** The user told the agent to resolve it ("do whatsoever"). MinIO and mc are built from the same pinned upstream release tags (`infra/minio/Dockerfile`, unmodified source, AGPL-3.0) and the compose stack is healthy, with SSE-S3 confirmed. The architecture decision is unchanged. |
 | **Q-15** | Max speakers for diarization (2 default, up to 4?) | Open — HC-3 |
 
 ## Technical assumptions & experiments
