@@ -10,6 +10,7 @@ COPY . .
 # Docling/RapidOCR download their models on first use (T2.3 Docker smoke test: a system user without a writable
 # home or model dir could not store them).
 RUN useradd --system --create-home --uid 10001 app && chown -R app /srv \
+ && mkdir -p /home/app/.cache && chown -R app /home/app/.cache \
  && mkdir -p /opt/venv/lib/python3.12/site-packages/rapidocr/models \
  && chown app /opt/venv/lib/python3.12/site-packages/rapidocr/models  # RapidOCR caches models in its package dir
 ENV HOME=/home/app HF_HOME=/home/app/.cache/huggingface
