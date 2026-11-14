@@ -17,9 +17,9 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
 | 1 — Upload, STT, speakers, claims | 8 | 7 | 1 | 0 | 0 | 87.5% (7/8) |
 | 2 — Documents & contract verification | 7 | 7 | 0 | 0 | 0 | 100% (7/7) |
-| 3 — Finance, orchestration, reporting | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
+| 3 — Finance, orchestration, reporting | 7 | 1 | 0 | 6 | 0 | 14.3% (1/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **27** | **1** | **12** | **0** | **67.5% (27/40)** |
+| **Total** | **40** | **28** | **1** | **11** | **0** | **70% (28/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -32,7 +32,7 @@ Progress is reported as task completion only. Effort is not sized in any project
 | HC-1 | ✅ Approved 2026-11-13 | Phase 0 |
 | HC-2 | ✅ Approved 2026-11-14 (conditions: plan §4) | — |
 | HC-3 | ✅ Approved 2026-11-14 with conditions: ADR-019 (numeric CONFLICT only after quote confirmation, all languages; never for Hindi, no confirmation offered there), languages EN Supported / Hinglish Beta / Hindi Not yet supported, ADR-003 ElevenLabs only; KG-1 and KG-2 accepted as **open** gaps | — |
-| HC-4 | ✅ Approved 2026-11-14 as recommended: Docling + RapidOCR (ADR-013), multilingual-e5-small (ADR-005), hybrid retrieval, NLI + Gemma judge agreement, thresholds provisional until T4.1, photo guidance text. Known gap: evidence is synthetic (no real scans/photos yet) | T3.1 |
+| HC-4 | ✅ Approved 2026-11-14 as recommended: Docling + RapidOCR (ADR-013), multilingual-e5-small (ADR-005), hybrid retrieval, NLI + Gemma judge agreement, thresholds provisional until T4.1, photo guidance text. Known gap: evidence is synthetic (no real scans/photos yet) | T3.1 SourcedFactory + MVP formulas (synthetic only) | ✅ 2026-11-14 — `app/modules/finance/sourced.py` (`Sourced` with a factory-only private token, `require()`, copies with changed values refused; `SourcedFactory.from_claim_value` records gates incl. speaker, vagueness, ASR + ADR-019 quote confirmation; `from_doc_term` records the OCR gate; `assumption` for GST 18% (A11) and rate basis), `formulas.py` (Decimal: emi_reducing/flat, total_repayment, total_interest, fee_amount, gst_on_fee, net_disbursement, amortisation; missing inputs and assumptions recorded), `trace.py` + migration `0010_calculations` (immutable traces, `enabled` flag), tolerance table (T2.6). Finance flags + startup check from Phase 0 unchanged (visibility off, HC-5 pending). Tests `tests/unit/test_finance.py`: **golden 80/80** (`tests/golden/finance.yaml`, cross-checked with numpy-financial in tests only) + all 10 agreements' printed EMI / total / net within ₹1; `UnvalidatedInputError` for dict/float/Decimal/str/hand-built/model_construct/forged copy/unparsed; hypothesis properties (reducing ≤ flat, schedule closes, net ≤ P); `make ci` 876/876. Dev dep `numpy-financial==1.0.0` (tests only) |
 | HC-5 | ⬜ Pending (Phase 3 exit) | Phase 4; user-facing finance |
 | HC-6 | ⬜ Pending (Phase 4) | User-facing regulatory findings only |
 | HC-7 | ⬜ Pending | Real users; HC-8 |

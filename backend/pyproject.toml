@@ -35,6 +35,7 @@ dev = [
   "mypy==1.14.0",
   "types-PyYAML==6.0.12.20241221",
   "hypothesis==6.170.15",
+  "numpy-financial==1.0.0",
 ]
 
 [tool.pytest.ini_options]

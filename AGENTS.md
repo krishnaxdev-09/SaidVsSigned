@@ -48,7 +48,7 @@ backend/app/modules/     auth, sessions, consent, audit, realtime (events/WS), a
 backend/app/llm/         LLM provider interface, Bedrock Mantle provider (Gemma), fakes
 backend/app/schemas/     canonical doc 08 / doc 04 schemas, reason codes, CONFLICT validator, wording (T1.4)
 backend/app/worker/      Postgres job queue, runner, handlers.register_all
-backend/alembic/         migrations 0001 foundation … 0009 verification
+backend/alembic/         migrations 0001 foundation … 0010 calculations
 frontend/src/            React PWA: features/{auth,sessions,consent,recordings,speakers,claims,transcript,documents,results}, lib (api, events), i18n en/hi
 eval/                    synthetic datasets (agreements AG01–AG10), tools, reports
 infra/                   docker-compose, MinIO Dockerfile
@@ -57,7 +57,7 @@ infra/                   docker-compose, MinIO Dockerfile
 ## Stages (MVP = Stages 0–4, 40 tasks)
 Status as of 2026-11-14. Legend: ✅ done · ⬜ not started · ⛔ blocked (needs approval or input).
 
-**Overall: 27 / 40 tasks done (67.5%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 in progress.
+**Overall: 28 / 40 tasks done (70%).** Stage 0 complete; Stage 1 7/8 (T1.8 partial); Stage 2 complete (7/7), HC-4 approved; Stage 3 in progress.
 
 ### Stage 0 — Foundation · 13 tasks · ✅ COMPLETE (13/13)
 Gate: HC-1 ✅ approved 2026-11-13.
@@ -105,12 +105,12 @@ Gate: HC-4 ✅ approved 2026-11-14.
 | T2.6 | Contract engine (said vs signed; 200 pairs, CONFLICT precision 1.000) | ✅ |
 | T2.7 | Results dashboard + evidence drawer + document upload screen (real-stack E2E demo) | ✅ |
 
-### Stage 3 — Finance, orchestration, reporting · 7 tasks · NOT STARTED (0/7)
+### Stage 3 — Finance, orchestration, reporting · 7 tasks · IN PROGRESS (1/7)
 Gate: HC-5 at stage exit (finance stays hidden until then). Produces the HC-6 package.
 
 | Task | What | Status |
 |---|---|---|
-| T3.1 | Finance engine (synthetic data only, hidden) — needs HC-3, HC-4 | ⬜ |
+| T3.1 | Finance engine: SourcedFactory, MVP formulas, traces (golden 80/80; hidden until HC-5) | ✅ |
 | T3.2 | Merge v2 | ⬜ |
 | T3.3 | Results UI v2 + PDF report | ⬜ |
 | T3.4 | Ask-lite with routing + citations | ⬜ |
