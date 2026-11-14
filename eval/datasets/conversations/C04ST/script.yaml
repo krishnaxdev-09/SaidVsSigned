@@ -1,0 +1,88 @@
+dataset_version: conversations-v1
+id: C04ST
+synthetic_tts: true
+language: hi
+layout: stereo_split
+agreement: AG04
+variant: 2
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Gharsaaz Consumer Finance से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 4.267
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 4.867
+  end_s: 6.597
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 2 प्रतिशत है।
+  start_s: 7.197
+  end_s: 9.701
+- speaker: agent
+  text: आपका 60,000 रुपये का लोन approve हो गया है।
+  start_s: 10.301
+  end_s: 13.38
+- speaker: agent
+  text: आपकी EMI 5,550 रुपये होगी, 12 महीने के लिए।
+  start_s: 13.98
+  end_s: 18.825
+- speaker: agent
+  text: अगर आप हर EMI टाइम पर भरेंगे, तो पेनल चार्ज कोई नहीं।
+  start_s: 19.425
+  end_s: 23.375
+- speaker: customer
+  text: To EMI 5,550 rupees hai na?
+  start_s: 23.975
+  end_s: 27.543
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '60000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '5550'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '12'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: penal_charge
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: question
+  value: '5550'
+  speaker: customer
+  vague: false
+  optional: false

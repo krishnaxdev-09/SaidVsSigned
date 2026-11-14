@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C10HI
+synthetic_tts: true
+language: hi
+layout: mono
+agreement: AG10
+variant: 1
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Sahaj Finance से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 3.524
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 4.124
+  end_s: 5.854
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 2 प्रतिशत है।
+  start_s: 6.454
+  end_s: 8.958
+- speaker: agent
+  text: आपका 2,00,000 रुपये का लोन approve हो गया है।
+  start_s: 9.558
+  end_s: 12.486
+- speaker: agent
+  text: आपकी EMI 9,485 रुपये होगी, 24 महीने के लिए।
+  start_s: 13.086
+  end_s: 17.838
+- speaker: agent
+  text: अगर आपका सैलरी अकाउंट होता, तो रेट 12 प्रतिशत होता।
+  start_s: 18.438
+  end_s: 22.423
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '200000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '9485'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '24'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: hypothetical
+  value: '12'
+  speaker: agent
+  vague: false
+  optional: false

@@ -90,7 +90,7 @@ Gates: HC-2 ✅ approved 2026-11-14 (conditions: plan §4) · HC-3 at stage exit
 | T1.5 | Deterministic normaliser (422-case table, Hinglish, Devanagari) | ✅ | — |
 | T1.6 | Claim extraction (Gemma) with verbatim quote anchors; few-shots approved | ✅ | — |
 | T1.7 | Claims UI, transcript view, snippet playback | ✅ | — |
-| T1.8 | Experiments E2/E3/E10 + LLM evaluation | ⬜ | T1.2, T1.6 |
+| T1.8 | Experiments E2/E3/E10 + LLM evaluation | ◐ | Reports done (synthetic TTS); E10 5-user usability test needs people |
 
 ### Stage 2 — Documents and contract verification · 7 tasks · NOT STARTED (0/7)
 Gate: HC-4 at stage exit.

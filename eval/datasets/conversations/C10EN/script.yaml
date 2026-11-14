@@ -1,0 +1,90 @@
+dataset_version: conversations-v1
+id: C10EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG10
+variant: 4
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Sahaj Finance.
+  start_s: 0.0
+  end_s: 3.593
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.193
+  end_s: 5.82
+- speaker: agent
+  text: The processing fee is only 2 percent.
+  start_s: 6.42
+  end_s: 9.1
+- speaker: agent
+  text: Your loan of 2,00,000 rupees is approved.
+  start_s: 9.7
+  end_s: 12.416
+- speaker: agent
+  text: Your EMI will be 9,485 rupees for 24 months.
+  start_s: 13.016
+  end_s: 18.368
+- speaker: agent
+  text: The interest will be around 13 to 14 percent.
+  start_s: 18.968
+  end_s: 22.448
+- speaker: agent
+  text: There is no insurance charge.
+  start_s: 23.048
+  end_s: 24.834
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '200000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '9485'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '24'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value:
+  - '13'
+  - '14'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: insurance_bundled
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false

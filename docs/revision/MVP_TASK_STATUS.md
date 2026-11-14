@@ -15,11 +15,11 @@ Task counts come from the plan's inventory (MVP_IMPLEMENTATION_PLAN.md §5: 40 t
 | Phase | Tasks | ✅ | ◐ | ⬜ | ⛔ | Task completion |
 |---|---|---|---|---|---|---|
 | 0 — Foundation | 13 | 13 | 0 | 0 | 0 | 100% (13/13) |
-| 1 — Upload, STT, speakers, claims | 8 | 7 | 0 | 1 | 0 | 87.5% (7/8) |
+| 1 — Upload, STT, speakers, claims | 8 | 7 | 1 | 0 | 0 | 87.5% (7/8) |
 | 2 — Documents & contract verification | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 3 — Finance, orchestration, reporting | 7 | 0 | 0 | 7 | 0 | 0% (0/7) |
 | 4 — Eval, security, release | 5 | 0 | 0 | 5 | 0 | 0% (0/5) |
-| **Total** | **40** | **20** | **0** | **20** | **0** | **50% (20/40)** |
+| **Total** | **40** | **20** | **1** | **19** | **0** | **50% (20/40)** |
 
 ⛔ means blocked on an approval or input that the tracker names. ⬜ means not started; many ⬜ tasks still wait on earlier tasks (see the dependency graph in the plan §3).
 
@@ -88,7 +88,7 @@ All 13 tasks meet their "Done when" criterion from the plan §5. Each row cites 
 | T1.5 Normaliser | ✅ 2026-11-14 | Done. `app/modules/claims/normalize.py` (`norm-1.0`, doc 04 §6 incl. the user-approved "without (any) charge" extension). Evidence: `tests/unit/test_normaliser.py` 452 pass: **444-case table** (328 parse, 116 must stay unparsed) covering digits and Indian/western grouping, English and Hindi words (Latin and Devanagari), dedh/dhai/sava/saadhe/paune, multipliers, years → months, zero words (fee/charge fields only, incl. exactly "without charge" / "without any charge"; a zero expression next to a number stays unparsed), ranges, comparators, GST, rate basis vs type ("fixed" never becomes "flat"), negations and ambiguity left unparsed; labels read only next to the value; LLM values/labels replaced; property tests; all 101 synthetic-agreement terms: **97 exact, 0 wrong, 4 unparsed** (whole clauses with several numbers). `make ci` green. Limits: Hindi number words cover 0–20 and round numbers only (others unparsed) |
 | T1.6 Claim extraction | ✅ 2026-11-14 | Done; **few-shots approved by the user 2026-11-14** (HC-2 condition) with clarifications (EN09 = assertion; customer questions kept for context, never verifiable or CONFLICT; vague claims value-less → Needs clarification only; corrections keep both values, earlier linked as superseded with its quote; kind variation allowed only when eligibility is unchanged, qualifiers kept independently). `app/modules/claims/{extract,eligibility,job,service,router}.py`, `fewshots_v2.json` (12 English + 12 Hinglish), migration `0005_claims`, `app/llm/redact.py`. Evidence: `test_claim_extraction.py` 81 pass, `test_claims.py` 7 pass, `make ci` green (see commit). Real Gemma: AG07 call → 6 correct claims, 0 drops; prompt-injection line ignored; leave-one-out on the 24 few-shots: strict 36/37, eligibility-equivalent 37/37, 0 invented (`eval/reports/2026-11-14_claim_extract_fewshot_loo.md`). Limits: `verify:{claim_id}` enqueue and gate application are T2.5; claims UI is T1.7 |
 | T1.7 Claims UI, transcript, snippets | ✅ 2026-11-14 | Done. `frontend/src/features/{claims/ClaimList,transcript/TranscriptView}.tsx`, shared `lib/snippet.ts`. Evidence: `claims/flow.test.tsx` (E2E with fakes: confirm agent → claim badges update → quote playback ±0.5 s → dismiss PATCH → per-segment speaker fix PATCH; unparsed/range display); `make ci` 778/778 backend, 9/9 frontend, build OK. Limit: not exercised in a real browser (no browser E2E tooling; none added) |
-| T1.8 Experiments E2, E3, E10 + LLM eval | ⬜ | T1.2, T1.6 |
+| T1.8 Experiments E2, E3, E10 + LLM eval | ◐ reports produced; 5-user test not run | `eval/reports/2026-11-14_phase1_E2_E3_E10_extraction.md` on 30 synthetic TTS conversations (`eval/datasets/conversations`, 15 EN + 15 Hinglish, 20 mono + 10 stereo; real ElevenLabs + Gemma). Numeric-token accuracy EN 100%, Hinglish 97.3%; confidences present on 100% of words but do not separate errors; diarization 100%, auto-role 20/20; extraction recall/precision 100% on reference text, 99% end to end. **Critical HC-3 finding:** a Hindi number misheard (60,000 → ₹7000) at confidence 0.975 passes T_asr_num, so a false numeric CONFLICT is possible (supports ADR-019). E10 fix: role keyword cross-check per word → absolute counts. **Not done:** E10 confirmation-screen usability with 5 users; real (non-TTS) recordings |
 
 ### Known issues
 | ID | Found | Issue | Impact | Required fix | Planned |

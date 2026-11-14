@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C07EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG07
+variant: 1
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Udyam Capital Partners.
+  start_s: 0.0
+  end_s: 4.034
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.634
+  end_s: 6.262
+- speaker: agent
+  text: The processing fee is only 2 percent.
+  start_s: 6.862
+  end_s: 9.541
+- speaker: agent
+  text: Your loan of 10,00,000 rupees is approved.
+  start_s: 10.141
+  end_s: 12.915
+- speaker: agent
+  text: Your EMI will be 35,902 rupees for 36 months.
+  start_s: 13.515
+  end_s: 18.856
+- speaker: agent
+  text: If you had a salary account with us, the rate would have been 17 percent.
+  start_s: 19.456
+  end_s: 24.399
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '1000000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '35902'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '36'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: hypothetical
+  value: '17'
+  speaker: agent
+  vague: false
+  optional: false

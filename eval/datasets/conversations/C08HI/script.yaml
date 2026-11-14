@@ -1,0 +1,90 @@
+dataset_version: conversations-v1
+id: C08HI
+synthetic_tts: true
+language: hi
+layout: mono
+agreement: AG08
+variant: 4
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Swarnim Gold & Personal Loans से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 4.58
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 5.18
+  end_s: 6.91
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 2.5 प्रतिशत है।
+  start_s: 7.51
+  end_s: 10.896
+- speaker: agent
+  text: आपका 1,50,000 रुपये का लोन approve हो गया है।
+  start_s: 11.496
+  end_s: 15.377
+- speaker: agent
+  text: आपकी EMI 7,750 रुपये होगी, 24 महीने के लिए।
+  start_s: 15.977
+  end_s: 20.798
+- speaker: agent
+  text: इंटरेस्ट लगभग 12 से 13 प्रतिशत रहेगा।
+  start_s: 21.398
+  end_s: 24.429
+- speaker: agent
+  text: इंश्योरेंस चार्ज कोई नहीं है।
+  start_s: 25.029
+  end_s: 27.035
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '150000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '7750'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '24'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value:
+  - '12'
+  - '13'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: insurance_bundled
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false

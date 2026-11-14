@@ -1,0 +1,88 @@
+dataset_version: conversations-v1
+id: C09EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG09
+variant: 3
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Sthir Property Finance.
+  start_s: 0.0
+  end_s: 3.964
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.564
+  end_s: 6.192
+- speaker: agent
+  text: The processing fee is only 1 percent.
+  start_s: 6.792
+  end_s: 9.518
+- speaker: agent
+  text: Your loan of 18,00,000 rupees is approved.
+  start_s: 10.118
+  end_s: 13.148
+- speaker: agent
+  text: Your EMI will be 24,188 rupees for 120 months.
+  start_s: 13.748
+  end_s: 19.993
+- speaker: agent
+  text: Our interest rate is the lowest in the market.
+  start_s: 20.593
+  end_s: 23.555
+- speaker: agent
+  text: Sorry, I mean the processing fee is 2 percent.
+  start_s: 24.155
+  end_s: 27.553
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '1'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '1800000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '24188'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '120'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: true
+  optional: false
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false

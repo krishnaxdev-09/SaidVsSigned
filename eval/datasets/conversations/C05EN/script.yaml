@@ -1,0 +1,90 @@
+dataset_version: conversations-v1
+id: C05EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG05
+variant: 4
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Aangan Home Finance.
+  start_s: 0.0
+  end_s: 3.918
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.518
+  end_s: 6.145
+- speaker: agent
+  text: The processing fee is only 0.5 percent.
+  start_s: 6.745
+  end_s: 10.168
+- speaker: agent
+  text: Your loan of 25,00,000 rupees is approved.
+  start_s: 10.768
+  end_s: 14.053
+- speaker: agent
+  text: Your EMI will be 22,093 rupees for 240 months.
+  start_s: 14.653
+  end_s: 20.237
+- speaker: agent
+  text: The interest will be around 9 to 10 percent.
+  start_s: 20.837
+  end_s: 23.935
+- speaker: agent
+  text: There is no insurance charge.
+  start_s: 24.535
+  end_s: 26.32
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '0.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '2500000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '22093'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '240'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value:
+  - '9'
+  - '10'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: insurance_bundled
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false

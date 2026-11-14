@@ -1,0 +1,90 @@
+dataset_version: conversations-v1
+id: C03HI
+synthetic_tts: true
+language: hi
+layout: mono
+agreement: AG03
+variant: 4
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Prakash Lending Co. से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 3.988
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 4.588
+  end_s: 6.318
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 1.5 प्रतिशत है।
+  start_s: 6.918
+  end_s: 10.293
+- speaker: agent
+  text: आपका 4,00,000 रुपये का लोन approve हो गया है।
+  start_s: 10.893
+  end_s: 13.868
+- speaker: agent
+  text: आपकी EMI 13,866 रुपये होगी, 36 महीने के लिए।
+  start_s: 14.468
+  end_s: 19.475
+- speaker: agent
+  text: इंटरेस्ट लगभग 15 से 16 प्रतिशत रहेगा।
+  start_s: 20.075
+  end_s: 23.199
+- speaker: agent
+  text: इंश्योरेंस चार्ज कोई नहीं है।
+  start_s: 23.799
+  end_s: 25.804
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '1.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '400000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '13866'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '36'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value:
+  - '15'
+  - '16'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: insurance_bundled
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false

@@ -1,0 +1,88 @@
+dataset_version: conversations-v1
+id: C03EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG03
+variant: 2
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Prakash Lending Co..
+  start_s: 0.0
+  end_s: 3.894
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.494
+  end_s: 6.122
+- speaker: agent
+  text: The processing fee is only 1.5 percent.
+  start_s: 6.722
+  end_s: 10.11
+- speaker: agent
+  text: Your loan of 4,00,000 rupees is approved.
+  start_s: 10.71
+  end_s: 13.531
+- speaker: agent
+  text: Your EMI will be 13,866 rupees for 36 months.
+  start_s: 14.131
+  end_s: 19.75
+- speaker: agent
+  text: If you pay every EMI on time, there is no penal charge.
+  start_s: 20.35
+  end_s: 24.155
+- speaker: customer
+  text: So the EMI is 13,866 rupees, right?
+  start_s: 24.755
+  end_s: 29.414
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '1.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '400000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '13866'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '36'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: penal_charge
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: question
+  value: '13866'
+  speaker: customer
+  vague: false
+  optional: false

@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C01EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG01
+variant: 0
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Suryoday Finserv.
+  start_s: 0.0
+  end_s: 3.72
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.32
+  end_s: 5.948
+- speaker: agent
+  text: The processing fee is only 2 percent.
+  start_s: 6.548
+  end_s: 9.227
+- speaker: agent
+  text: Your loan of 3,00,000 rupees is approved.
+  start_s: 9.827
+  end_s: 12.648
+- speaker: agent
+  text: Your EMI will be 10,326 rupees for 36 months.
+  start_s: 13.248
+  end_s: 18.623
+- speaker: agent
+  text: The interest rate is 14 percent reducing.
+  start_s: 19.223
+  end_s: 22.356
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '300000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '10326'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '36'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value: '14'
+  speaker: agent
+  vague: false
+  optional: false

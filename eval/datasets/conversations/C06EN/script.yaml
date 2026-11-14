@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C06EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG06
+variant: 0
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Raftaar Two-Wheeler Finance.
+  start_s: 0.0
+  end_s: 4.185
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.785
+  end_s: 6.413
+- speaker: agent
+  text: The processing fee is only 2 percent.
+  start_s: 7.013
+  end_s: 9.692
+- speaker: agent
+  text: Your loan of 85,000 rupees is approved.
+  start_s: 10.292
+  end_s: 13.635
+- speaker: agent
+  text: Your EMI will be 4,162 rupees for 24 months.
+  start_s: 14.235
+  end_s: 19.448
+- speaker: agent
+  text: The interest rate is 16 percent reducing.
+  start_s: 20.048
+  end_s: 23.296
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '85000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '4162'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '24'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value: '16'
+  speaker: agent
+  vague: false
+  optional: false

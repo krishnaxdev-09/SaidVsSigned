@@ -169,3 +169,8 @@ Doc headers bumped to **v0.2.1** where changed: 01, 05, 06, 07, 08, 09, 10, 11, 
 
 ## 2026-11-14 — T1.7 claims UI, transcript view, snippet playback
 - `ClaimList` (quote + playback, value as spoken → understood, speaker badge, not-checked/vague/approximate/correction labels, dismiss), `TranscriptView` (timestamps, speaker chips, playback, per-segment speaker fix), shared `lib/snippet.ts`. Speaker confirmation now also refreshes claims and transcript directly. Flow test with fakes; no new dependencies.
+
+## 2026-11-14 — T1.8 experiments (reports produced; 5-user test pending)
+- Dataset `conversations-v1` (30 synthetic TTS calls) and `eval/tools/{gen_conversations,run_phase1_eval}.py`; report `eval/reports/2026-11-14_phase1_E2_E3_E10_extraction.md`.
+- Critical finding for HC-3: a high-confidence Hindi number error (60,000 → ₹7000, confidence 0.975) passes the ASR gate; supports ADR-019 before numeric CONFLICTs.
+- Fix found by E10: speaker-role keyword cross-check used per-word density, flagging every correct suggestion uncertain; now absolute counts (regression test added).

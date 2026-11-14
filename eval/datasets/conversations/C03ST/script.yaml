@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C03ST
+synthetic_tts: true
+language: en
+layout: stereo_split
+agreement: AG03
+variant: 1
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Prakash Lending Co..
+  start_s: 0.0
+  end_s: 3.894
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.494
+  end_s: 6.122
+- speaker: agent
+  text: The processing fee is only 1.5 percent.
+  start_s: 6.722
+  end_s: 10.11
+- speaker: agent
+  text: Your loan of 4,00,000 rupees is approved.
+  start_s: 10.71
+  end_s: 13.531
+- speaker: agent
+  text: Your EMI will be 13,866 rupees for 36 months.
+  start_s: 14.131
+  end_s: 19.75
+- speaker: agent
+  text: If you had a salary account with us, the rate would have been 14 percent.
+  start_s: 20.35
+  end_s: 25.177
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '1.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '400000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '13866'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '36'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: hypothetical
+  value: '14'
+  speaker: agent
+  vague: false
+  optional: false

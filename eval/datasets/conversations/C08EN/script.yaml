@@ -1,0 +1,88 @@
+dataset_version: conversations-v1
+id: C08EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG08
+variant: 2
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Swarnim Gold & Personal Loans.
+  start_s: 0.0
+  end_s: 4.487
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 5.087
+  end_s: 6.714
+- speaker: agent
+  text: The processing fee is only 2.5 percent.
+  start_s: 7.314
+  end_s: 10.667
+- speaker: agent
+  text: Your loan of 1,50,000 rupees is approved.
+  start_s: 11.267
+  end_s: 14.901
+- speaker: agent
+  text: Your EMI will be 7,750 rupees for 24 months.
+  start_s: 15.501
+  end_s: 20.678
+- speaker: agent
+  text: If you pay every EMI on time, there is no penal charge.
+  start_s: 21.278
+  end_s: 25.084
+- speaker: customer
+  text: So the EMI is 7,750 rupees, right?
+  start_s: 25.684
+  end_s: 29.971
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '150000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '7750'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '24'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: penal_charge
+  kind: verifiable
+  value: '0'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: question
+  value: '7750'
+  speaker: customer
+  vague: false
+  optional: false

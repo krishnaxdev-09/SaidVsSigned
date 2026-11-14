@@ -156,3 +156,16 @@ def test_fenced_json_reply_is_accepted() -> None:
     ("unknown", "user_confirmed", False), ("unknown", "auto", False)])
 def test_conflict_gate(role: str, assignment: str, allowed: bool) -> None:
     assert conflict_allowed(ResolvedRole(role, "diarized", assignment, 1.0, None)) is allowed  # type: ignore[arg-type]
+
+
+def test_short_customer_question_does_not_outscore_the_agent() -> None:
+    """E10 finding (2026-11-14): per-word density let "What is the processing fee?" outscore the agent, so every
+    correct Gemma suggestion was flagged uncertain."""
+    segs = [SimpleNamespace(speaker_label="a", text="Hello, this is Rahul calling from Sahaj Finance.", start_ms=0, end_ms=3000),
+            SimpleNamespace(speaker_label="c", text="What is the processing fee?", start_ms=3600, end_ms=5000),
+            SimpleNamespace(speaker_label="a", text="The processing fee is only 2 percent. Your EMI will be 9,500 rupees.",
+                            start_ms=5600, end_ms=9000)]
+    scores = service.heuristic_scores(service.excerpts(segs))
+    assert scores["a"] > scores["c"]
+    sugg, _ = asyncio.run(service.suggest(_llm_says(("a", "agent", 0.95), ("c", "customer", 0.95)), segs))
+    assert all(s.role_confidence >= service.CONFIDENT for s in sugg)  # agreement: not uncertain

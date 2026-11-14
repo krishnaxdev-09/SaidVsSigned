@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C02EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG02
+variant: 1
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Navkiran Credit.
+  start_s: 0.0
+  end_s: 3.384
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 3.984
+  end_s: 5.611
+- speaker: agent
+  text: The processing fee is only 2 percent.
+  start_s: 6.211
+  end_s: 8.891
+- speaker: agent
+  text: Your loan of 5,00,000 rupees is approved.
+  start_s: 9.491
+  end_s: 12.346
+- speaker: agent
+  text: Your EMI will be 13,476 rupees for 48 months.
+  start_s: 12.946
+  end_s: 18.484
+- speaker: agent
+  text: If you had a salary account with us, the rate would have been 12 percent.
+  start_s: 19.084
+  end_s: 23.795
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '500000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '13476'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '48'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: hypothetical
+  value: '12'
+  speaker: agent
+  vague: false
+  optional: false

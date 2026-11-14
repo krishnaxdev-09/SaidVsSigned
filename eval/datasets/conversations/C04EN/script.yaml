@@ -1,0 +1,88 @@
+dataset_version: conversations-v1
+id: C04EN
+synthetic_tts: true
+language: en
+layout: mono
+agreement: AG04
+variant: 3
+voices:
+  agent: Rishi
+  customer: Samantha
+turns:
+- speaker: agent
+  text: Hello, this is Rahul calling from Gharsaaz Consumer Finance.
+  start_s: 0.0
+  end_s: 4.266
+- speaker: customer
+  text: What is the processing fee?
+  start_s: 4.866
+  end_s: 6.494
+- speaker: agent
+  text: The processing fee is only 2 percent.
+  start_s: 7.094
+  end_s: 9.773
+- speaker: agent
+  text: Your loan of 60,000 rupees is approved.
+  start_s: 10.373
+  end_s: 13.415
+- speaker: agent
+  text: Your EMI will be 5,550 rupees for 12 months.
+  start_s: 14.015
+  end_s: 18.96
+- speaker: agent
+  text: Our interest rate is the lowest in the market.
+  start_s: 19.56
+  end_s: 22.522
+- speaker: agent
+  text: Sorry, I mean the processing fee is 3 percent.
+  start_s: 23.122
+  end_s: 26.601
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '60000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '5550'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '12'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: true
+  optional: false
+- claim_type: processing_fee
+  kind: verifiable
+  value: '3'
+  speaker: agent
+  vague: false
+  optional: false

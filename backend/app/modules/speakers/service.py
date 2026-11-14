@@ -77,12 +77,12 @@ def excerpts(segments: list[Any]) -> dict[str, str]:
 
 
 def heuristic_scores(ex: dict[str, str]) -> dict[str, float]:
-    """Loan-term cues and numbers per word: agents quote rates, fees and amounts."""
+    """Loan-term cues plus numbers (counted double): agents quote rates, fees and amounts. Absolute counts, not per
+    word: a short customer question such as "What is the processing fee?" must not outscore the agent (found in E10)."""
     scores = {}
     for label, txt in ex.items():
-        words = txt.split()
-        hits = sum(1 for w in words if w.strip(".,!?").lower() in AGENT_CUES or is_numeric_token(w))
-        scores[label] = hits / max(1, len(words))
+        words = [w.strip(".,!?").lower() for w in txt.split()]
+        scores[label] = float(sum(1 for w in words if w in AGENT_CUES) + 2 * sum(1 for w in words if is_numeric_token(w)))
     return scores
 
 

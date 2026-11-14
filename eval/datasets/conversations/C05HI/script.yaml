@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C05HI
+synthetic_tts: true
+language: hi
+layout: mono
+agreement: AG05
+variant: 1
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Aangan Home Finance से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 3.849
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 4.449
+  end_s: 6.179
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 0.5 प्रतिशत है।
+  start_s: 6.779
+  end_s: 10.351
+- speaker: agent
+  text: आपका 25,00,000 रुपये का लोन approve हो गया है।
+  start_s: 10.951
+  end_s: 14.089
+- speaker: agent
+  text: आपकी EMI 22,093 रुपये होगी, 240 महीने के लिए।
+  start_s: 14.689
+  end_s: 19.579
+- speaker: agent
+  text: अगर आपका सैलरी अकाउंट होता, तो रेट 8 प्रतिशत होता।
+  start_s: 20.179
+  end_s: 24.106
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '0.5'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '2500000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '22093'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '240'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: hypothetical
+  value: '8'
+  speaker: agent
+  vague: false
+  optional: false

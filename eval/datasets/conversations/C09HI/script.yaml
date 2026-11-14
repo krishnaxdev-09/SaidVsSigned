@@ -1,0 +1,78 @@
+dataset_version: conversations-v1
+id: C09HI
+synthetic_tts: true
+language: hi
+layout: mono
+agreement: AG09
+variant: 0
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Sthir Property Finance से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 3.977
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 4.577
+  end_s: 6.307
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 1 प्रतिशत है।
+  start_s: 6.907
+  end_s: 9.399
+- speaker: agent
+  text: आपका 18,00,000 रुपये का लोन approve हो गया है।
+  start_s: 9.999
+  end_s: 13.229
+- speaker: agent
+  text: आपकी EMI 24,188 रुपये होगी, 120 महीने के लिए।
+  start_s: 13.829
+  end_s: 19.057
+- speaker: agent
+  text: इंटरेस्ट रेट 10 प्रतिशत है।
+  start_s: 19.657
+  end_s: 21.747
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '1'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '1800000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '24188'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '120'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value: '10'
+  speaker: agent
+  vague: false
+  optional: false

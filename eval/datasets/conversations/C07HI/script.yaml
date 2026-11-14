@@ -1,0 +1,88 @@
+dataset_version: conversations-v1
+id: C07HI
+synthetic_tts: true
+language: hi
+layout: mono
+agreement: AG07
+variant: 3
+voices:
+  agent: Lekha
+  customer: Rishi
+turns:
+- speaker: agent
+  text: नमस्ते, मैं Udyam Capital Partners से राहुल बोल रहा हूँ।
+  start_s: 0.0
+  end_s: 4.093
+- speaker: customer
+  text: Processing fee kitni hai?
+  start_s: 4.693
+  end_s: 6.423
+- speaker: agent
+  text: प्रोसेसिंग फीस सिर्फ 2 प्रतिशत है।
+  start_s: 7.023
+  end_s: 9.527
+- speaker: agent
+  text: आपका 10,00,000 रुपये का लोन approve हो गया है।
+  start_s: 10.127
+  end_s: 13.137
+- speaker: agent
+  text: आपकी EMI 35,902 रुपये होगी, 36 महीने के लिए।
+  start_s: 13.737
+  end_s: 18.372
+- speaker: agent
+  text: हमारा इंटरेस्ट रेट मार्केट में सबसे कम है।
+  start_s: 18.972
+  end_s: 22.091
+- speaker: agent
+  text: माफ़ कीजिए, प्रोसेसिंग फीस 3 प्रतिशत है।
+  start_s: 22.691
+  end_s: 25.971
+expected_claims:
+- claim_type: lender_identity
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: processing_fee
+  kind: question
+  value: null
+  speaker: customer
+  vague: false
+  optional: true
+- claim_type: processing_fee
+  kind: verifiable
+  value: '2'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: loan_amount
+  kind: verifiable
+  value: '1000000'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: emi
+  kind: verifiable
+  value: '35902'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: tenure
+  kind: verifiable
+  value: '36'
+  speaker: agent
+  vague: false
+  optional: false
+- claim_type: interest_rate
+  kind: verifiable
+  value: null
+  speaker: agent
+  vague: true
+  optional: false
+- claim_type: processing_fee
+  kind: verifiable
+  value: '3'
+  speaker: agent
+  vague: false
+  optional: false
