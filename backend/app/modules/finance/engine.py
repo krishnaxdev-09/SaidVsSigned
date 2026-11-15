@@ -70,13 +70,10 @@ class FinanceEngine:
             return Outcome(_nv(ReasonCode.MISSING_INPUTS, missing=["the amount the agent said"]))
         spoken = fac.from_claim_value(vals[0], claim)
         field = claim.claim_type.value
-        rows = (await ctx.conn.execute(text(
-            f"SELECT t.*, c.text AS clause_text, c.text_source, c.ocr_conf, c.ocr_min_numeric_conf, c.page_start, "
-            f"c.page_end, c.bboxes, c.document_id AS c_document_id, c.version AS c_version, c.id AS c_id {_SCOPE} "
-            "ORDER BY c.ord"), {"s": ctx.session_id, "u": ctx.owner_id})).mappings().all()
-        if not rows:
+        loaded = await load_document_inputs(ctx.conn, ctx.session_id, ctx.owner_id, fac)
+        if loaded is None:
             return await self._internal(claim, spoken, fac, ctx, visible)
-        inp, clause_of = self._doc_inputs(list(rows), fac)
+        inp, clause_of = loaded
         if field != "net_disbursement" and inp.rate_basis == "unspecified":
             results = {b: _compute(field, inp, b) for b in ("reducing", "flat")}
         else:
@@ -127,7 +124,8 @@ class FinanceEngine:
         impact = abs(spoken.value - r0.outputs[OUTPUT[field]])
         return Outcome(v, inr_impact=impact * (int(inp.tenure_months.value) if field == "emi" and inp.tenure_months else 1))
 
-    def _doc_inputs(self, rows: list[Any], fac: SourcedFactory) -> tuple[LoanInputs, dict[str, Any]]:
+    @staticmethod
+    def _doc_inputs(rows: list[Any], fac: SourcedFactory) -> tuple[LoanInputs, dict[str, Any]]:
         first: dict[str, Any] = {}
         deductions: dict[str, Any] = {}
         for r in rows:
@@ -198,6 +196,19 @@ class FinanceEngine:
                                      finding_kind=FindingKind.CALCULATION_INTERNAL,
                                      reason=REASON_TEXT[ReasonCode.INTERNAL_INCONSISTENCY], evidence=[],
                                      suggested_question="Ask the agent to confirm the EMI in writing."))
+
+
+async def load_document_inputs(conn: Any, session_id: Any, owner_id: Any, fac: SourcedFactory
+                               ) -> tuple[LoanInputs, dict[str, Any]] | None:
+    """Factory-built LoanInputs from the current versions of the session's ready documents (None: no document terms).
+    Shared by the finance engine and the Ask finance route; `clause_of` maps doc_term id → its clause row."""
+    rows = (await conn.execute(text(
+        f"SELECT t.*, c.text AS clause_text, c.text_source, c.ocr_conf, c.ocr_min_numeric_conf, c.page_start, "
+        f"c.page_end, c.bboxes, c.document_id AS c_document_id, c.version AS c_version, c.id AS c_id {_SCOPE} "
+        "ORDER BY c.ord"), {"s": session_id, "u": owner_id})).mappings().all()
+    if not rows:
+        return None
+    return FinanceEngine._doc_inputs(list(rows), fac)
 
 
 def _clause(r: Any) -> dict[str, Any]:

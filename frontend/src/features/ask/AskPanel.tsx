@@ -53,7 +53,7 @@ export default function AskPanel({ sessionId }: { sessionId: string }) {
             {!x.answer && <p className="text-slate-500">{t("ask_thinking")}</p>}
             {x.answer && <p>{x.answer.answer_text}</p>}
             {x.answer?.citations.map((c, i) => (
-              <blockquote key={i} className="border-l-4 border-amber-400 pl-2 text-xs">“{c.quote}”</blockquote>))}
+              <blockquote key={i} className="rounded-lg bg-[#FFF8E6] px-3 py-2 font-mono text-xs">“{c.quote}”</blockquote>))}
             {x.answer?.fallback_clauses.map((c) => (
               <blockquote key={c.chunk_id} className="border-l-4 border-slate-300 pl-2 text-xs">
                 {t("page_n", { n: c.page })}: {c.text}</blockquote>))}

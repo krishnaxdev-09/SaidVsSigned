@@ -26,9 +26,9 @@ export default function NewSessionPage() {
   }
   return (
     <div className="mx-auto max-w-lg space-y-6">
-      <div>
+      <div className="border-b border-slate-200 pb-5">
         <h1>{t("new_session")}</h1>
-        <p className="muted mt-1">{t("new_session_sub")}</p>
+        <p className="muted mt-0.5">{t("new_session_sub")}</p>
       </div>
       <form className="card space-y-5" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <label className="label">{t("product_type")}
@@ -48,7 +48,7 @@ export default function NewSessionPage() {
           <input className="input" maxLength={200} placeholder={t("lender_placeholder")} value={lender}
             onChange={(e) => setLender(e.target.value)} /></label>
         {error && <p role="alert" className="alert-error">{error}</p>}
-        <button className="btn-primary w-full" type="submit" disabled={busy}>{busy ? t("auth_working") : t("create")}</button>
+        <button className="btn-primary w-full sm:w-auto" type="submit" disabled={busy}>{busy ? t("auth_working") : t("create")}</button>
       </form>
     </div>
   );

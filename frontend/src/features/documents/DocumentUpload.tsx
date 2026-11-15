@@ -59,7 +59,7 @@ export default function DocumentUpload({ sessionId }: { sessionId: string }) {
                 <span data-testid="document-stage">{d.status === "ready" ? t("doc_ready")
                   : d.status === "failed" ? t("doc_failed", { code: d.status_code ?? "" }) : d.stage}</span></p>
               {[...new Set(pages)].map((n) => (
-                <div key={n} className="mt-1 flex flex-wrap items-center gap-2 text-amber-800">
+                <div key={n} className="mt-1 flex flex-wrap items-center gap-2 text-clarify-fg">
                   <span>{t("retake_hint", { n })}</span>
                   {d.source === "photos" && (
                     <label className="btn-secondary h-9 cursor-pointer">{t("replace_page", { n })}

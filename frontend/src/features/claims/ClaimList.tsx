@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../lib/api";
 import { mmss, playSnippet } from "../../lib/snippet";
+import { PlayIcon } from "../results/status";
 import type { Claim, ClaimValue } from "../../lib/types";
 
 const VERIFIABLE = new Set(["promise", "assertion", "conditional"]);
@@ -57,7 +58,7 @@ export default function ClaimList({ sessionId }: { sessionId: string }) {
             </div>
             <p className="flex gap-2">
               <button aria-label={`play ${mmss(c.start_ms)}`} className="btn-play"
-                onClick={() => playSnippet(sessionId, c.start_ms - 500, c.end_ms + 500)}>▶</button>
+                onClick={() => playSnippet(sessionId, c.start_ms - 500, c.end_ms + 500)}><PlayIcon size={14} /></button>
               <span>“{c.quote}” <span className="text-slate-500">({mmss(c.start_ms)})</span></span>
             </p>
             {c.values.map((v, i) => (

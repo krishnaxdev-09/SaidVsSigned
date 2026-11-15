@@ -26,7 +26,7 @@ from app.worker.runner import Handler, JobContext
 
 router = APIRouter(prefix="/api/v1", tags=["qa"])
 SUGGESTED = ["What is the processing fee?", "Is there a foreclosure charge?", "What happens if I pay an EMI late?",
-             "Is insurance deducted from my loan?"]
+             "How much will I get in hand after fees?"]
 
 
 class AskIn(BaseModel):
@@ -70,14 +70,20 @@ async def list_qa(session_id: uuid.UUID, user_id: uuid.UUID = Depends(current_us
 
 @router.get("/sessions/{session_id}/qa/suggestions", response_model=list[str])
 async def suggestions(session_id: uuid.UUID, user_id: uuid.UUID = Depends(current_user)) -> list[str]:
-    """Suggested questions: clarification questions from UNCLEAR / NOT_VERIFIED results plus a fixed list."""
+    """Suggested questions about the documents (doc 09 §6): for each claim type whose result is UNCLEAR or
+    NOT_VERIFIED, "What do my documents say about the {field}?", then a fixed list. (Results' suggested_question is
+    advice to ask the agent, not a document question, so it isn't offered here.)"""
+    from app.schemas.wording import FIELD_LABELS
+
     async with get_engine().connect() as conn:
         await get_owned_session(conn, session_id, user_id)
-        qs = (await conn.execute(text(
-            "SELECT DISTINCT r.suggested_question FROM verification_results r JOIN claims c ON c.id = r.claim_id "
-            "WHERE c.session_id = :s AND r.is_current AND r.status IN ('UNCLEAR', 'NOT_VERIFIED') "
-            "AND r.suggested_question IS NOT NULL AND r.reason_code <> 'not_agent_claim'"), {"s": session_id})).scalars().all()
-    return [*sorted(qs)[:3], *SUGGESTED]
+        types = (await conn.execute(text(
+            "SELECT DISTINCT c.claim_type FROM verification_results r JOIN claims c ON c.id = r.claim_id "
+            "WHERE c.session_id = :s AND c.state = 'active' AND r.is_current AND r.status IN ('UNCLEAR', 'NOT_VERIFIED') "
+            "AND r.reason_code NOT IN ('not_agent_claim', 'no_document')"), {"s": session_id})).scalars().all()
+    asked = [f"What do my documents say about the {FIELD_LABELS[t]}?" for t in sorted(types)
+             if t in FIELD_LABELS and t not in ("lender_identity", "general_assurance", "document_assurance")]
+    return list(dict.fromkeys([*asked[:3], *SUGGESTED]))
 
 
 def make_qa_handler(embedder: EmbeddingProvider, llm: LLMProvider | None) -> Handler:
@@ -94,8 +100,9 @@ def make_qa_handler(embedder: EmbeddingProvider, llm: LLMProvider | None) -> Han
                              user_id=row.owner_id, finance_visible=visibility()[0])
         await ctx.checkpoint()
         payload = {k: v for k, v in asdict(a).items() if k not in ("validator_errors", "attempts")}
-        await ctx.conn.execute(text("UPDATE qa_messages SET route = :r, answer = CAST(:a AS jsonb), status = 'done' "
-                                    "WHERE id = :id"), {"r": a.route, "a": json.dumps(payload), "id": qid})
+        await ctx.conn.execute(text("UPDATE qa_messages SET route = :r, answer = CAST(:a AS jsonb), status = 'done', "
+                                    "calculation_id = CAST(:c AS uuid) WHERE id = :id"),
+                               {"r": a.route, "a": json.dumps(payload), "c": a.calculation_id, "id": qid})
         await publish(ctx.conn, row.session_id, EventType.QA_ANSWER, {"qa_id": str(qid), "status": "done", "answer": payload})
 
     return handle

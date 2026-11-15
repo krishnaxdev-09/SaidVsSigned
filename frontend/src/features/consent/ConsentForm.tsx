@@ -27,7 +27,7 @@ export default function ConsentForm({ sessionId }: { sessionId: string }) {
   }
   return (
     <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-      <p className="text-sm text-amber-700">{t("draft_notice")}</p>
+      <p className="text-sm text-clarify-fg">{t("draft_notice")}</p>
       <h2 className="font-semibold">{t("consent_title")}</h2>
       <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-700">{processing.body}</pre>
       <label className="flex gap-2"><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />{t("consent_accept")}</label>

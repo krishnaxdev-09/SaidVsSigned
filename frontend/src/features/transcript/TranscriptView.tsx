@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../lib/api";
 import { mmss, playSnippet } from "../../lib/snippet";
+import { PlayIcon } from "../results/status";
 import type { SpeakerRole, Speakers, Transcript } from "../../lib/types";
 
 export default function TranscriptView({ sessionId }: { sessionId: string }) {
@@ -35,7 +36,7 @@ export default function TranscriptView({ sessionId }: { sessionId: string }) {
           return (
             <li key={g.id} className="flex gap-2 text-sm" data-testid="segment">
               <button aria-label={`play ${mmss(g.start_ms)}`} className="btn-play"
-                onClick={() => playSnippet(sessionId, g.start_ms, g.end_ms)}>▶</button>
+                onClick={() => playSnippet(sessionId, g.start_ms, g.end_ms)}><PlayIcon size={14} /></button>
               <div className="flex-1">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span>{mmss(g.start_ms)}</span>

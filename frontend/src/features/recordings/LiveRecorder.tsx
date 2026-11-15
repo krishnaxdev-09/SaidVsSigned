@@ -117,11 +117,11 @@ export default function LiveRecorder({ sessionId, onFinished }: { sessionId: str
       {phase === "recording" || phase === "finishing" ? (
         <div className="space-y-2">
           <p className="flex items-center gap-2 text-sm" aria-live="polite">
-            <span className="inline-block h-3 w-3 animate-pulse rounded-full bg-red-600" aria-hidden="true" />
+            <span className="inline-block h-3 w-3 animate-pulse rounded-full bg-mismatch-fg" aria-hidden="true" />
             {t("live_recording")} <strong data-testid="live-timer">{mm}</strong> · {t("live_sent", { n: sent })}
           </p>
           <div className="h-2 w-full rounded bg-slate-200" aria-hidden="true">
-            <div className="h-2 rounded bg-green-600" style={{ width: `${Math.round(level * 100)}%` }} />
+            <div className="h-2 rounded bg-match-fg" style={{ width: `${Math.round(level * 100)}%` }} />
           </div>
           <div className="flex gap-2">
             <button className="btn-primary" disabled={phase === "finishing"}
