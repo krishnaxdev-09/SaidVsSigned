@@ -128,5 +128,20 @@
   "ask_placeholder": "जैसे: क्या फ़ोरक्लोज़र चार्ज है?",
   "ask_send": "पूछें",
   "ask_thinking": "दस्तावेज़ों में देखा जा रहा है…",
-  "ask_failed": "सवाल नहीं भेजा जा सका। फिर कोशिश करें।"
+  "ask_failed": "सवाल नहीं भेजा जा सका। फिर कोशिश करें।",
+  "pipeline": "प्रगति",
+  "activity": "गतिविधि लॉग",
+  "step_consent": "सहमति",
+  "step_recording": "कॉल रिकॉर्डिंग",
+  "step_speakers": "एजेंट कौन है?",
+  "step_claims": "एजेंट ने क्या कहा",
+  "step_documents": "लोन दस्तावेज़",
+  "step_results": "नतीजे",
+  "step_ask": "पूछें और रिपोर्ट",
+  "step_state_done": "पूरा",
+  "step_state_working": "चल रहा है",
+  "step_state_todo": "करना है",
+  "step_state_failed": "ध्यान दें",
+  "step_state_locked": "लॉक",
+  "step_locked": "पहले चरण {{n}} पूरा करें।"
 }

@@ -128,5 +128,20 @@
   "ask_placeholder": "e.g. Is there a foreclosure charge?",
   "ask_send": "Ask",
   "ask_thinking": "Looking in your documents…",
-  "ask_failed": "Couldn't send the question. Try again."
+  "ask_failed": "Couldn't send the question. Try again.",
+  "pipeline": "Progress",
+  "activity": "Activity log",
+  "step_consent": "Consent",
+  "step_recording": "Call recording",
+  "step_speakers": "Who is the agent?",
+  "step_claims": "What the agent said",
+  "step_documents": "Loan documents",
+  "step_results": "Results",
+  "step_ask": "Ask & report",
+  "step_state_done": "Done",
+  "step_state_working": "In progress",
+  "step_state_todo": "To do",
+  "step_state_failed": "Needs attention",
+  "step_state_locked": "Locked",
+  "step_locked": "Finish step {{n}} first."
 }
