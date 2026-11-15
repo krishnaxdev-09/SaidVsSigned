@@ -17,11 +17,21 @@ export const _setFetch = (f: Fetch) => { fetchImpl = f; };
 
 export const newIdempotencyKey = () => crypto.randomUUID();
 
-async function refresh(): Promise<boolean> {
-  const r = await fetchImpl("/api/v1/auth/refresh", { method: "POST", credentials: "same-origin" });
-  if (!r.ok) { accessToken = null; return false; }
-  accessToken = (await r.json()).access_token;
-  return true;
+// One refresh at a time: refresh tokens rotate, so two concurrent refreshes would present the old token twice and the
+// server would treat it as reuse and revoke the session (seen on page reload under React StrictMode).
+let inFlight: Promise<boolean> | null = null;
+function refresh(): Promise<boolean> {
+  inFlight ??= (async () => {
+    try {
+      const r = await fetchImpl("/api/v1/auth/refresh", { method: "POST", credentials: "same-origin" });
+      if (!r.ok) { accessToken = null; return false; }
+      accessToken = (await r.json()).access_token;
+      return true;
+    } finally {
+      inFlight = null;
+    }
+  })();
+  return inFlight;
 }
 
 export async function api<T>(path: string, opts: { method?: string; body?: unknown; idempotencyKey?: string } = {},

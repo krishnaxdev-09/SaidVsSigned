@@ -33,22 +33,22 @@ export default function AskPanel({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <section className="space-y-3 rounded border border-slate-200 p-4" aria-labelledby="ask-title">
+    <section className="space-y-3" aria-labelledby="ask-title">
       <h2 id="ask-title" className="font-semibold">{t("ask_title")}</h2>
-      <p className="text-xs text-slate-600">{t("ask_help")}</p>
+      <p className="muted text-xs">{t("ask_help")}</p>
       <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); void send(q); }}>
-        <input aria-label={t("ask_title")} className="h-11 flex-1 rounded border px-2" value={q}
+        <input aria-label={t("ask_title")} className="input mt-0 flex-1" value={q}
           onChange={(e) => setQ(e.target.value)} placeholder={t("ask_placeholder")} />
-        <button className="h-11 rounded bg-slate-900 px-4 text-white" type="submit">{t("ask_send")}</button>
+        <button className="btn-primary" type="submit">{t("ask_send")}</button>
       </form>
       <div className="flex flex-wrap gap-2">
         {(sugg.data ?? []).slice(0, 5).map((s) => (
-          <button key={s} className="rounded-full border px-3 py-1 text-xs" onClick={() => send(s)}>{s}</button>))}
+          <button key={s} className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs text-slate-700 transition hover:border-brand-500 hover:text-brand-700" onClick={() => send(s)}>{s}</button>))}
       </div>
-      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="alert-error">{error}</p>}
       <ul className="space-y-3">
         {[...(list.data ?? [])].reverse().map((x) => (
-          <li key={x.qa_id} data-testid="qa" className="space-y-1 rounded border p-3 text-sm">
+          <li key={x.qa_id} data-testid="qa" className="card-tight space-y-1.5 text-sm">
             <p className="font-semibold">{x.question}</p>
             {!x.answer && <p className="text-slate-500">{t("ask_thinking")}</p>}
             {x.answer && <p>{x.answer.answer_text}</p>}

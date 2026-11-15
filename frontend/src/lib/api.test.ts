@@ -27,3 +27,13 @@ describe("api client", () => {
     await expect(api("/api/v1/x")).rejects.toMatchObject({ status: 403, code: "consent_required" });
   });
 });
+
+it("concurrent refreshes share one request (rotating refresh tokens)", async () => {
+  const { _setFetch, tryRestore } = await import("./api");
+  let n = 0;
+  _setFetch(async () => { n++; await new Promise((r) => setTimeout(r, 10));
+    return new Response(JSON.stringify({ access_token: "t" }), { status: 200, headers: { "content-type": "application/json" } }); });
+  const [a, b] = await Promise.all([tryRestore(), tryRestore()]);
+  expect(a && b).toBe(true);
+  expect(n).toBe(1);
+});

@@ -43,7 +43,7 @@ export default function RecordingPanel({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <section className="space-y-3 rounded border border-slate-200 p-4" aria-labelledby="rec-title">
+    <section className="space-y-3" aria-labelledby="rec-title">
       <h2 id="rec-title" className="font-semibold">{t("recording_title")}</h2>
       {rec && (
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 text-sm" data-testid="recording">
@@ -56,11 +56,11 @@ export default function RecordingPanel({ sessionId }: { sessionId: string }) {
           {rec.warnings.length > 0 && (<><dt>{t("warnings")}</dt><dd>{rec.warnings.join(", ")}</dd></>)}
         </dl>
       )}
-      {rec?.stage === "failed" && <p className="text-sm text-amber-800">{t("recording_failed")}</p>}
+      {rec?.stage === "failed" && <p className="alert-warn">{t("recording_failed")}</p>}
       {!replaceable && (
         <div role="radiogroup" aria-label={t("recording_mode")} className="flex flex-wrap gap-2 text-sm">
           {(["upload", "live"] as const).map((m) => (
-            <label key={m} className={`flex items-center gap-2 rounded border px-3 py-2 ${mode === m ? "border-slate-900" : ""}`}>
+            <label key={m} className={`choice ${mode === m ? "choice-on" : ""}`}>
               <input type="radio" name="rec-mode" checked={mode === m} onChange={() => setMode(m)} />
               {t(m === "upload" ? "mode_upload" : "mode_live")}
             </label>))}
@@ -73,15 +73,15 @@ export default function RecordingPanel({ sessionId }: { sessionId: string }) {
       ) : (<>
       <label className="block text-sm">
         {t("choose_file")}
-        <input type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.webm,.ogg" className="mt-1 block"
+        <input type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.webm,.ogg" className="mt-1.5 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100"
           onChange={(e) => { setFile(e.target.files?.[0] ?? null); key.current = null; }} />
       </label>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={split} onChange={(e) => setSplit(e.target.checked)} /> {t("stereo_split")}
       </label>
-      <button className="rounded bg-slate-900 px-3 py-2 text-white disabled:opacity-50" disabled={!file || busy}
+      <button className="btn-primary" disabled={!file || busy}
         onClick={submit}>{busy ? t("uploading") : replaceable ? t("replace") : t("upload")}</button>
-      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="alert-error">{error}</p>}
       </>)}
     </section>
   );

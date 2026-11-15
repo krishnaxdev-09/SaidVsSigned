@@ -10,8 +10,12 @@ import type { Claim, SpokenEvidence, Status, VerificationResult } from "../../li
 import EvidenceDrawer from "./EvidenceDrawer";
 
 const ORDER: Status[] = ["CONFLICT", "UNCLEAR", "MATCH", "NOT_VERIFIED"];
-const TONE: Record<Status, string> = { CONFLICT: "border-red-600 bg-red-50", UNCLEAR: "border-amber-500 bg-amber-50",
-  MATCH: "border-green-600 bg-green-50", NOT_VERIFIED: "border-slate-400 bg-slate-50" };
+const TONE: Record<Status, string> = { CONFLICT: "border-rose-200 bg-rose-50 text-rose-900",
+  UNCLEAR: "border-amber-200 bg-amber-50 text-amber-900", MATCH: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  NOT_VERIFIED: "border-slate-200 bg-slate-50 text-slate-700" };
+const BAR: Record<Status, string> = { CONFLICT: "bg-rose-500", UNCLEAR: "bg-amber-500", MATCH: "bg-emerald-500",
+  NOT_VERIFIED: "bg-slate-400" };
+const SEV: Record<string, string> = { high: "badge-red", medium: "badge-amber", low: "badge-slate" };
 
 export default function ResultsDashboard({ sessionId }: { sessionId: string }) {
   const { t } = useTranslation();
@@ -45,25 +49,26 @@ export default function ResultsDashboard({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <section className="space-y-3 rounded border border-slate-200 p-4" aria-labelledby="results-title">
-      <div className="flex items-center justify-between">
+    <section className="space-y-3" aria-labelledby="results-title">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="results-title" className="font-semibold">{t("results_title")}</h2>
-        <div className="flex gap-2">
-          <button className="h-11 rounded border px-3 text-sm" onClick={async () => {
+        <div className="flex flex-wrap gap-2 [&>button]:whitespace-nowrap">
+          <button className="btn-secondary" onClick={async () => {
             await api(`/api/v1/sessions/${sessionId}/reverify`, { method: "POST" });
           }}>{t("reverify")}</button>
-          <button className="h-11 rounded bg-slate-900 px-3 text-sm text-white disabled:opacity-50"
+          <button className="btn-primary"
             disabled={report === "working"} onClick={downloadReport}>
             {report === "working" ? t("report_working") : t("report_download")}</button>
         </div>
       </div>
-      {report === "failed" && <p role="alert" className="text-sm text-red-700">{t("report_failed")}</p>}
-      <ul className="flex flex-wrap gap-2 text-sm" aria-label="summary">
+      {report === "failed" && <p role="alert" className="alert-error">{t("report_failed")}</p>}
+      <ul className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4" aria-label="summary">
         {ORDER.map((s) => (
-          <li key={s} data-testid={`count-${s}`} className={`rounded border px-2 py-1 ${TONE[s]}`}>
-            {t(`status_${s}`)}: <strong>{results.filter((r) => r.status === s).length}</strong></li>))}
+          <li key={s} data-testid={`count-${s}`} className={`rounded-xl border px-3 py-2.5 ${TONE[s]}`}>
+            <span className="block text-xs font-medium opacity-80">{t(`status_${s}`)}:</span>
+            <strong className="text-2xl font-semibold leading-tight">{results.filter((r) => r.status === s).length}</strong></li>))}
       </ul>
-      {results.length === 0 && <p className="text-sm text-slate-600">{t("no_results")}</p>}
+      {results.length === 0 && <p className="muted">{t("no_results")}</p>}
       <ul className="space-y-2">
         {results.map((r) => {
           const spoken = r.evidence.find((e): e is SpokenEvidence => e.kind === "spoken");
@@ -72,25 +77,27 @@ export default function ResultsDashboard({ sessionId }: { sessionId: string }) {
           const canConfirm = r.reason_code === "low_asr_confidence" && spoken && !claim?.quote_confirmed_by_user
             && (r.engine_verdicts ?? []).some((v) => v.missing.includes("quote_confirmation"));
           return (
-            <li key={r.id} data-testid="result" className={`space-y-1 rounded border-l-4 p-3 ${TONE[r.status]}`}>
+            <li key={r.id} data-testid="result"
+              className="relative space-y-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 pl-5 shadow-sm">
+              <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1.5 ${BAR[r.status]}`} />
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <strong>{r.headline}</strong>
-                {r.severity !== "info" && <span className="text-xs">{t(`severity_${r.severity}`)}</span>}
+                <strong className="text-[15px]">{r.headline}</strong>
+                {r.severity !== "info" && <span className={SEV[r.severity] ?? "badge-slate"}>{t(`severity_${r.severity}`)}</span>}
               </div>
               <p className="text-sm">{r.reason}</p>
               {r.changed_because.previous_status && (
-                <p className="text-xs text-slate-600">{t("updated_because", { trigger: t(`trigger_${r.changed_because.trigger}`),
+                <p className="muted text-xs">{t("updated_because", { trigger: t(`trigger_${r.changed_because.trigger}`),
                   previous: t(`status_${r.changed_because.previous_status}`) })}</p>)}
               {r.suggested_question && <p className="text-sm"><strong>{t("ask_this")}:</strong> {r.suggested_question}</p>}
               {canConfirm && (
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span>{t("confirm_quote_q")}</span>
-                  <button className="h-11 min-w-11 rounded border px-2" aria-label="play quote"
+                  <button className="btn-play" aria-label="play quote"
                     onClick={() => playSnippet(sessionId, spoken.start_ms - 500, spoken.end_ms + 500)}>▶</button>
-                  <button className="h-11 rounded border px-3" onClick={() => confirmQuote(r)}>{t("confirm_quote_yes")}</button>
+                  <button className="btn-secondary" onClick={() => confirmQuote(r)}>{t("confirm_quote_yes")}</button>
                 </div>)}
               {claim?.quote_confirmed_by_user && <p className="text-xs">{t("quote_confirmed")}</p>}
-              <button className="text-sm underline" onClick={() => setOpen(r)}>{t("evidence")}</button>
+              <button className="btn-ghost -ml-2 text-brand-700" onClick={() => setOpen(r)}>{t("evidence")}<span aria-hidden="true">→</span></button>
             </li>);
         })}
       </ul>

@@ -4,7 +4,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ConsentForm from "../consent/ConsentForm";
 import RecordingPanel from "../recordings/RecordingPanel";
 import SpeakerConfirm from "../speakers/SpeakerConfirm";
@@ -19,8 +19,14 @@ import { applyEvent } from "../../lib/eventLog";
 import type { Claim, ConsentStatus, EventEnvelope, LoanDocument, Recording, Session, Speakers,
   VerificationResult } from "../../lib/types";
 import { currentStep, pipelineSteps, unlocked, type Step, type StepId } from "./pipeline";
+import { STATE_BADGE as SESSION_BADGE } from "./SessionListPage";
 
 const ICON: Record<Step["state"], string> = { done: "✓", working: "…", todo: "●", failed: "!", locked: "🔒" };
+const DOT: Record<Step["state"], string> = {
+  done: "bg-emerald-600 text-white", working: "bg-brand-600 text-white animate-pulse", todo: "bg-brand-600 text-white",
+  failed: "bg-rose-600 text-white", locked: "bg-slate-200 text-slate-500" };
+const STATE_BADGE: Record<Step["state"], string> = { done: "badge-green", working: "badge-brand", todo: "badge-brand",
+  failed: "badge-red", locked: "badge-slate" };
 
 export default function SessionPage() {
   const { id = "" } = useParams();
@@ -79,28 +85,51 @@ export default function SessionPage() {
     const isOpen = shown === sid && s.state !== "locked";
     return (
       <section key={sid} data-testid={`step-${sid}`} data-state={s.state}
-        className={`rounded border ${isOpen ? "border-slate-400" : "border-slate-200"}`}>
-        <button className="flex w-full items-center justify-between gap-2 p-3 text-left disabled:cursor-not-allowed"
+        className={`overflow-hidden rounded-2xl border bg-white transition ${isOpen ? "border-brand-500/40 shadow-card" : "border-slate-200"}
+          ${s.state === "locked" ? "opacity-70" : ""}`}>
+        <button className="flex w-full items-center gap-3 p-4 text-left disabled:cursor-not-allowed"
           disabled={s.state === "locked"} aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : sid)}>
-          <span className="font-semibold">{n}. {t(`step_${sid}`)}</span>
-          <span className="text-xs text-slate-600">
-            {ICON[s.state]} {t(`step_state_${s.state}`)}{s.detail ? ` · ${s.detail}` : ""}</span>
+          <span aria-hidden="true" className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-semibold ${DOT[s.state]}`}>
+            {s.state === "done" ? "✓" : s.state === "locked" ? n : s.state === "failed" ? "!" : n}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">{t(`step_${sid}`)}</span>
+            {s.state === "locked" && <span className="block text-xs text-slate-500">{t("step_locked", { n: n - 1 })}</span>}
+          </span>
+          <span className={STATE_BADGE[s.state]}>{t(`step_state_${s.state}`)}{s.detail ? ` · ${s.detail}` : ""}</span>
+          {s.state !== "locked" && <span aria-hidden="true" className={`text-slate-400 transition ${isOpen ? "rotate-180" : ""}`}>⌄</span>}
         </button>
-        {s.state === "locked" && <p className="px-3 pb-3 text-xs text-slate-500">{t("step_locked", { n: n - 1 })}</p>}
-        {isOpen && <div className="space-y-3 px-3 pb-3">{body}</div>}
+        {isOpen && <div className="space-y-4 border-t border-slate-100 bg-slate-50/40 p-4 sm:p-5">{body}</div>}
       </section>
     );
   };
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm">{t("state")}: <strong data-testid="state">{session.state}</strong>
-        {session.state_reason ? ` (${session.state_reason})` : ""}</p>
-      <ol aria-label={t("pipeline")} className="flex flex-wrap gap-2 text-xs">
-        {steps.map((s, i) => (
-          <li key={s.id} className={`rounded-full border px-2 py-1 ${s.id === current ? "border-slate-900 font-semibold" : ""}
-            ${s.state === "locked" ? "opacity-50" : ""}`}>{ICON[s.state]} {i + 1}. {t(`step_${s.id}`)}</li>))}
-      </ol>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <Link to="/sessions" className="text-sm text-slate-500 hover:text-slate-700">← {t("sessions")}</Link>
+          <h1 className="mt-1 truncate">{session.lender_name ?? t(`product_${session.product_type ?? "other_loan"}`)}</h1>
+          <p className="muted">{t(`product_${session.product_type ?? "other_loan"}`)}</p>
+        </div>
+        <span className={SESSION_BADGE[session.state]}>{t(`session_state_${session.state}`)}
+          <span className="sr-only">{t("state")}: </span><span data-testid="state" className="sr-only">{session.state}</span></span>
+      </div>
+      {session.state_reason && <p className="alert-warn">{session.state_reason}</p>}
+      <div className="card-tight space-y-2 p-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium">{t("pipeline")}</span>
+          <span className="text-slate-500">{steps.filter((s) => s.state === "done").length}/{steps.length}</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+          <div className="h-full rounded-full bg-brand-600 transition-all"
+            style={{ width: `${(steps.filter((s) => s.state === "done").length / steps.length) * 100}%` }} />
+        </div>
+        <ol aria-label={t("pipeline")} className="flex flex-wrap gap-1.5 text-xs">
+          {steps.map((s, i) => (
+            <li key={s.id} className={`rounded-full px-2 py-0.5 ${s.id === current ? "bg-brand-50 font-semibold text-brand-700"
+              : s.state === "done" ? "text-emerald-700" : "text-slate-500"}`}>{ICON[s.state]} {i + 1}. {t(`step_${s.id}`)}</li>))}
+        </ol>
+      </div>
       {panel("consent", consent?.active
         ? <p className="text-sm">{consent.attestation_note}</p>
         : <ConsentForm sessionId={id} />)}
@@ -111,10 +140,10 @@ export default function SessionPage() {
       {panel("results", unlocked(steps, "results") ? <ResultsDashboard sessionId={id} /> : null)}
       {panel("ask", unlocked(steps, "ask") ? <AskPanel sessionId={id} /> : null)}
       {consent?.active && (
-        <button className="rounded border border-red-700 px-3 py-2 text-red-700"
+        <button className="btn-danger"
           onClick={() => api(`/api/v1/sessions/${id}/consents/customer`, { method: "DELETE" })}>{t("revoke")}</button>
       )}
-      <details className="text-xs text-slate-500"><summary>{t("activity")}</summary>
+      <details className="text-xs text-slate-500"><summary className="cursor-pointer">{t("activity")}</summary>
         <ul aria-label="events">{events.map((e) => <li key={e.seq}>#{e.seq} {e.type}</li>)}</ul></details>
     </div>
   );

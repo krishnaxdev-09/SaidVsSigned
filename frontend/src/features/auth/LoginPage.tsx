@@ -32,7 +32,7 @@ function Field({ id, label, icon, hint, children }:
 }
 
 const input = "h-12 w-full rounded-lg border border-slate-300 bg-white pl-10 pr-3 text-base text-slate-900 placeholder:text-slate-400 " +
-  "shadow-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/15";
+  "shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20";
 
 export default function LoginPage({ onAuthed }: { onAuthed: () => void }) {
   const { t } = useTranslation();
@@ -66,8 +66,9 @@ export default function LoginPage({ onAuthed }: { onAuthed: () => void }) {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
         <div className="mb-6 text-center">
+          <span aria-hidden="true" className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-xl bg-brand-600 text-lg font-bold text-white">S</span>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
             {register ? t("auth_title_register") : t("auth_title_login")}</h1>
           <p className="mt-1 text-sm text-slate-500">{t("auth_tagline")}</p>
@@ -101,13 +102,13 @@ export default function LoginPage({ onAuthed }: { onAuthed: () => void }) {
           {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>}
 
           <button type="submit" disabled={busy}
-            className="h-12 w-full rounded-lg bg-slate-900 text-base font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60">
+            className="h-12 w-full rounded-lg bg-brand-600 text-base font-medium text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60">
             {busy ? t("auth_working") : register ? t("register") : t("login")}</button>
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-500">
           {register ? t("auth_have_account") : t("auth_no_account")}{" "}
-          <button type="button" className="font-medium text-slate-900 underline-offset-2 hover:underline"
+          <button type="button" className="link"
             onClick={() => switchTo(register ? "login" : "register")}>{register ? t("login") : t("register")}</button>
         </p>
       </div>

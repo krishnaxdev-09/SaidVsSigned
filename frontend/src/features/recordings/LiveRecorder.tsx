@@ -113,7 +113,7 @@ export default function LiveRecorder({ sessionId, onFinished }: { sessionId: str
   const mm = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`;
   return (
     <div className="space-y-2" data-testid="live-recorder">
-      <p className="text-xs text-amber-800">{t("live_notice")}</p>
+      <p className="alert-warn text-xs">{t("live_notice")}</p>
       {phase === "recording" || phase === "finishing" ? (
         <div className="space-y-2">
           <p className="flex items-center gap-2 text-sm" aria-live="polite">
@@ -124,16 +124,16 @@ export default function LiveRecorder({ sessionId, onFinished }: { sessionId: str
             <div className="h-2 rounded bg-green-600" style={{ width: `${Math.round(level * 100)}%` }} />
           </div>
           <div className="flex gap-2">
-            <button className="h-11 rounded bg-slate-900 px-4 text-white disabled:opacity-50" disabled={phase === "finishing"}
+            <button className="btn-primary" disabled={phase === "finishing"}
               onClick={stop}>{phase === "finishing" ? t("live_finishing") : t("live_stop")}</button>
-            <button className="h-11 rounded border px-4" disabled={phase === "finishing"} onClick={cancel}>{t("live_cancel")}</button>
+            <button className="btn-secondary" disabled={phase === "finishing"} onClick={cancel}>{t("live_cancel")}</button>
           </div>
         </div>
       ) : (
-        <button className="h-11 rounded bg-red-700 px-4 text-white disabled:opacity-50" disabled={phase === "starting"}
+        <button className="btn-record" disabled={phase === "starting"}
           onClick={start}>{phase === "starting" ? t("live_starting") : t("live_start")}</button>
       )}
-      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="alert-error">{error}</p>}
     </div>
   );
 }

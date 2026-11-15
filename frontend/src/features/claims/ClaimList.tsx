@@ -32,31 +32,31 @@ export default function ClaimList({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <section className="space-y-3 rounded border border-slate-200 p-4" aria-labelledby="claims-title">
+    <section className="space-y-3" aria-labelledby="claims-title">
       <div className="flex items-center justify-between">
         <h2 id="claims-title" className="font-semibold">{t("claims_title")}</h2>
         <label className="text-sm"><input type="checkbox" checked={showDismissed}
           onChange={(e) => setShowDismissed(e.target.checked)} /> {t("show_dismissed")}</label>
       </div>
-      {claims.length === 0 && <p className="text-sm text-slate-600">{t("no_claims")}</p>}
+      {claims.length === 0 && <p className="muted">{t("no_claims")}</p>}
       <ul className="space-y-2">
         {claims.map((c) => (
-          <li key={c.id} data-testid="claim" className={`space-y-1 rounded border p-3 ${c.state === "dismissed" ? "opacity-60" : ""}`}>
+          <li key={c.id} data-testid="claim" className={`card-tight space-y-1.5 ${c.state === "dismissed" ? "opacity-60" : ""}`}>
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <strong className="text-sm">{c.claim_type.replaceAll("_", " ")}</strong>
-              <span className="rounded bg-slate-100 px-2">
+              <span className="badge-slate">
                 {c.speaker_role === "agent" ? t("agent") : c.speaker_role === "customer" ? t("customer") : t("unknown_speaker")}
                 {c.role_assignment === "auto" ? ` (${t("auto_detected")})` : ""}
               </span>
               {!VERIFIABLE.has(c.utterance_kind) && (
-                <span className="rounded bg-slate-200 px-2">{t("not_checked", { kind: t(`kind_${c.utterance_kind}`) })}</span>)}
-              {c.vagueness === "vague" && <span className="rounded bg-amber-100 px-2">{t("vague")}</span>}
-              {c.vagueness === "approximate" && <span className="rounded bg-slate-100 px-2">{t("approximate")}</span>}
-              {c.supersedes_claim_id && <span className="rounded bg-slate-100 px-2">{t("corrects_earlier")}</span>}
-              {correctedLater.has(c.id) && <span className="rounded bg-slate-100 px-2">{t("corrected_later")}</span>}
+                <span className="badge-slate">{t("not_checked", { kind: t(`kind_${c.utterance_kind}`) })}</span>)}
+              {c.vagueness === "vague" && <span className="badge-amber">{t("vague")}</span>}
+              {c.vagueness === "approximate" && <span className="badge-slate">{t("approximate")}</span>}
+              {c.supersedes_claim_id && <span className="badge-slate">{t("corrects_earlier")}</span>}
+              {correctedLater.has(c.id) && <span className="badge-slate">{t("corrected_later")}</span>}
             </div>
             <p className="flex gap-2">
-              <button aria-label={`play ${mmss(c.start_ms)}`} className="h-11 min-w-11 rounded border px-2"
+              <button aria-label={`play ${mmss(c.start_ms)}`} className="btn-play"
                 onClick={() => playSnippet(sessionId, c.start_ms - 500, c.end_ms + 500)}>▶</button>
               <span>“{c.quote}” <span className="text-slate-500">({mmss(c.start_ms)})</span></span>
             </p>
@@ -65,10 +65,10 @@ export default function ClaimList({ sessionId }: { sessionId: string }) {
                 “{v.raw_text}” → {v.normaliser_version ? <strong>{valueText(v)}</strong> : <em>{t("unparsed")}</em>}
               </p>
             ))}
-            {c.conditions.map((cd, i) => <p key={i} className="text-sm text-slate-600">{t("condition")}: {cd.text}</p>)}
+            {c.conditions.map((cd, i) => <p key={i} className="muted">{t("condition")}: {cd.text}</p>)}
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span>{c.verifiable && c.readiness === "needs_document" ? t("needs_document") : ""}</span>
-              <button className="underline" onClick={() => setState(c.id, c.state === "dismissed" ? "active" : "dismissed")}>
+              <button className="link" onClick={() => setState(c.id, c.state === "dismissed" ? "active" : "dismissed")}>
                 {c.state === "dismissed" ? t("restore") : t("dismiss")}</button>
             </div>
           </li>

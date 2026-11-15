@@ -18,11 +18,11 @@ function PageImage({ ev }: { ev: DocumentEvidence }) {
     queryFn: () => api<{ url: string }>(`/api/v1/documents/${ev.document_id}/pages/${ev.page}/image`) });
   return (
     <figure className="space-y-1">
-      <figcaption className="text-xs text-slate-600">{t("page_n", { n: ev.page })}</figcaption>
-      <div className="relative w-full overflow-hidden rounded border" data-testid="page-image">
+      <figcaption className="muted text-xs">{t("page_n", { n: ev.page })}</figcaption>
+      <div className="relative w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" data-testid="page-image">
         {q.data && <img src={q.data.url} alt={t("page_n", { n: ev.page })} className="block w-full" />}
         {ev.bboxes.map((b, i) => (
-          <div key={i} data-testid="bbox" className="pointer-events-none absolute rounded-sm bg-yellow-300/40 ring-2 ring-amber-500"
+          <div key={i} data-testid="bbox" className="pointer-events-none absolute rounded-sm bg-amber-300/40 ring-2 ring-amber-500"
             style={bboxStyle(b)} />))}
       </div>
     </figure>
@@ -40,18 +40,18 @@ export default function EvidenceDrawer({ sessionId, result, onClose }:
     queryFn: () => api<VerificationResult[]>(`/api/v1/results/${result.id}/history`) });
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="drawer-title"
-      className="fixed inset-0 z-20 flex justify-end bg-black/30" onClick={onClose}>
-      <aside className="h-full w-full max-w-xl space-y-4 overflow-y-auto bg-white p-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+      className="fixed inset-0 z-20 flex justify-end bg-slate-900/40 backdrop-blur-[2px]" onClick={onClose}>
+      <aside className="h-full w-full max-w-xl space-y-5 overflow-y-auto bg-white p-5 shadow-2xl sm:rounded-l-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-2">
           <h3 id="drawer-title" className="font-semibold">{result.headline}</h3>
-          <button className="h-11 min-w-11 rounded border px-3" onClick={onClose}>{t("close")}</button>
+          <button className="btn-secondary" onClick={onClose}>{t("close")}</button>
         </div>
         <p className="text-sm">{result.reason}</p>
         {spoken && (
           <section className="space-y-1">
             <h4 className="text-sm font-semibold">{t("what_agent_said")}</h4>
             <p className="flex gap-2 text-sm">
-              <button aria-label={`play ${mmss(spoken.start_ms)}`} className="h-11 min-w-11 rounded border px-2"
+              <button aria-label={`play ${mmss(spoken.start_ms)}`} className="btn-play"
                 onClick={() => playSnippet(sessionId, spoken.start_ms - 500, spoken.end_ms + 500)}>▶</button>
               <span>“{spoken.quote}” <span className="text-slate-500">({mmss(spoken.start_ms)})</span>
                 {spoken.role_assignment === "auto" && <span className="ml-1 text-xs">({t("auto_detected")})</span>}</span>

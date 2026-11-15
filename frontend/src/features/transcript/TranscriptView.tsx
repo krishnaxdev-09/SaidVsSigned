@@ -25,7 +25,7 @@ export default function TranscriptView({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <section className="space-y-2 rounded border border-slate-200 p-4" aria-labelledby="tr-title">
+    <section className="space-y-2" aria-labelledby="tr-title">
       <h2 id="tr-title" className="font-semibold">{t("transcript_title")}</h2>
       <ol className="space-y-2">
         {tq.data.segments.map((g) => {
@@ -34,12 +34,12 @@ export default function TranscriptView({ sessionId }: { sessionId: string }) {
           const auto = !override.has(g.id) && sp?.role_assignment !== "user_confirmed";
           return (
             <li key={g.id} className="flex gap-2 text-sm" data-testid="segment">
-              <button aria-label={`play ${mmss(g.start_ms)}`} className="h-11 min-w-11 rounded border px-2"
+              <button aria-label={`play ${mmss(g.start_ms)}`} className="btn-play"
                 onClick={() => playSnippet(sessionId, g.start_ms, g.end_ms)}>▶</button>
               <div className="flex-1">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span>{mmss(g.start_ms)}</span>
-                  <span className="rounded bg-slate-100 px-2" data-testid="speaker-chip">
+                  <span className="badge-slate" data-testid="speaker-chip">
                     {label(role)}{auto ? ` (${t("auto_detected")})` : ""}</span>
                   <select aria-label={t("fix_speaker")} className="text-xs" value=""
                     onChange={(e) => e.target.value && fix(g.id, e.target.value as SpeakerRole)}>

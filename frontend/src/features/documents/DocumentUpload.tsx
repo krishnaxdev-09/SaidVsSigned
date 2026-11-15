@@ -48,13 +48,13 @@ export default function DocumentUpload({ sessionId }: { sessionId: string }) {
   });
 
   return (
-    <section className="space-y-3 rounded border border-slate-200 p-4" aria-labelledby="docs-title">
+    <section className="space-y-3" aria-labelledby="docs-title">
       <h2 id="docs-title" className="font-semibold">{t("documents_title")}</h2>
       <ul className="space-y-2">
         {(q.data ?? []).map((d) => {
           const pages = d.warnings.map((w) => PAGE_WARNING.exec(w)).filter(Boolean).map((m) => Number(m![2]));
           return (
-            <li key={d.document_id} data-testid="document" className="rounded border p-3 text-sm">
+            <li key={d.document_id} data-testid="document" className="card-tight text-sm">
               <p><strong>{t(`kind_${d.kind}`)}</strong> · v{d.version} · {d.page_count ?? "?"} p ·{" "}
                 <span data-testid="document-stage">{d.status === "ready" ? t("doc_ready")
                   : d.status === "failed" ? t("doc_failed", { code: d.status_code ?? "" }) : d.stage}</span></p>
@@ -62,7 +62,7 @@ export default function DocumentUpload({ sessionId }: { sessionId: string }) {
                 <div key={n} className="mt-1 flex flex-wrap items-center gap-2 text-amber-800">
                   <span>{t("retake_hint", { n })}</span>
                   {d.source === "photos" && (
-                    <label className="rounded border px-2 py-1">{t("replace_page", { n })}
+                    <label className="btn-secondary h-9 cursor-pointer">{t("replace_page", { n })}
                       <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" className="sr-only"
                         onChange={(e) => e.target.files?.[0] && retake(d, n, e.target.files[0])} />
                     </label>)}
@@ -72,19 +72,19 @@ export default function DocumentUpload({ sessionId }: { sessionId: string }) {
         })}
       </ul>
       <label className="block text-sm">{t("doc_kind")}
-        <select className="mt-1 block rounded border p-2" value={kind} onChange={(e) => setKind(e.target.value as DocumentKind)}>
+        <select className="input" value={kind} onChange={(e) => setKind(e.target.value as DocumentKind)}>
           {KINDS.map((k) => <option key={k} value={k}>{t(`kind_${k}`)}</option>)}
         </select>
       </label>
       <label className="block text-sm">{t("choose_doc_files")}
-        <input type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp" className="mt-1 block"
+        <input type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp" className="mt-1.5 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100"
           aria-describedby="doc-help" onChange={(e) => { setFiles([...(e.target.files ?? [])]); key.current = null; }} />
       </label>
-      <p id="doc-help" className="text-xs text-slate-600">{t("doc_files_help")}</p>
+      <p id="doc-help" className="muted text-xs">{t("doc_files_help")}</p>
       {files.length > 0 && <ol className="list-decimal pl-5 text-xs">{files.map((f) => <li key={f.name}>{f.name}</li>)}</ol>}
-      <button className="h-11 rounded bg-slate-900 px-4 text-white disabled:opacity-50" disabled={!files.length || busy}
+      <button className="btn-primary" disabled={!files.length || busy}
         onClick={submit}>{busy ? t("uploading") : t("upload")}</button>
-      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="alert-error">{error}</p>}
     </section>
   );
 }

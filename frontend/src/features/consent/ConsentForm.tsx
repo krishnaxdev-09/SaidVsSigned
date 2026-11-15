@@ -26,20 +26,20 @@ export default function ConsentForm({ sessionId }: { sessionId: string }) {
     } catch (e) { setError(e instanceof ApiError ? e.message : String(e)); }
   }
   return (
-    <form className="space-y-4 rounded border p-4" onSubmit={(e) => { e.preventDefault(); submit(); }}>
+    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); submit(); }}>
       <p className="text-sm text-amber-700">{t("draft_notice")}</p>
       <h2 className="font-semibold">{t("consent_title")}</h2>
-      <pre className="whitespace-pre-wrap text-sm">{processing.body}</pre>
+      <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-700">{processing.body}</pre>
       <label className="flex gap-2"><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />{t("consent_accept")}</label>
       <h2 className="font-semibold">{t("attestation_title")}</h2>
-      <pre className="whitespace-pre-wrap text-sm">{attestation.body}</pre>
+      <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-700">{attestation.body}</pre>
       <label className="flex gap-2"><input type="checkbox" checked={party} onChange={(e) => setParty(e.target.checked)} />{t("i_was_party")}</label>
       <fieldset><legend>{t("agent_informed_q")}</legend>
         {(["yes", "no", "unsure"] as const).map((v) => (
           <label key={v} className="mr-4"><input type="radio" name="informed" checked={informed === v} onChange={() => setInformed(v)} /> {t(v)}</label>))}
       </fieldset>
-      {error && <p role="alert" className="text-red-700">{error}</p>}
-      <button className="rounded bg-slate-800 px-4 py-2 text-white disabled:opacity-50" disabled={!accepted || !party || !informed} type="submit">{t("submit_consent")}</button>
+      {error && <p role="alert" className="alert-error">{error}</p>}
+      <button className="btn-primary" disabled={!accepted || !party || !informed} type="submit">{t("submit_consent")}</button>
     </form>
   );
 }
