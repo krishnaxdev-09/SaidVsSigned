@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError, api, newIdempotencyKey, upload } from "../../lib/api";
 import type { Recording } from "../../lib/types";
+import LiveRecorder from "./LiveRecorder";
 
 export default function RecordingPanel({ sessionId }: { sessionId: string }) {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function RecordingPanel({ sessionId }: { sessionId: string }) {
   const [split, setSplit] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"upload" | "live">("upload");
   const key = useRef<string | null>(null); // one Idempotency-Key per chosen file, reused on retry
 
   const rec = q.data ?? null;
@@ -55,6 +57,20 @@ export default function RecordingPanel({ sessionId }: { sessionId: string }) {
         </dl>
       )}
       {rec?.stage === "failed" && <p className="text-sm text-amber-800">{t("recording_failed")}</p>}
+      {!replaceable && (
+        <div role="radiogroup" aria-label={t("recording_mode")} className="flex flex-wrap gap-2 text-sm">
+          {(["upload", "live"] as const).map((m) => (
+            <label key={m} className={`flex items-center gap-2 rounded border px-3 py-2 ${mode === m ? "border-slate-900" : ""}`}>
+              <input type="radio" name="rec-mode" checked={mode === m} onChange={() => setMode(m)} />
+              {t(m === "upload" ? "mode_upload" : "mode_live")}
+            </label>))}
+        </div>)}
+      {mode === "live" && !replaceable ? (
+        <LiveRecorder sessionId={sessionId} onFinished={async () => {
+          await qc.invalidateQueries({ queryKey: ["recording", sessionId] });
+          await qc.invalidateQueries({ queryKey: ["state", sessionId] });
+        }} />
+      ) : (<>
       <label className="block text-sm">
         {t("choose_file")}
         <input type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.webm,.ogg" className="mt-1 block"
@@ -66,6 +82,7 @@ export default function RecordingPanel({ sessionId }: { sessionId: string }) {
       <button className="rounded bg-slate-900 px-3 py-2 text-white disabled:opacity-50" disabled={!file || busy}
         onClick={submit}>{busy ? t("uploading") : replaceable ? t("replace") : t("upload")}</button>
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      </>)}
     </section>
   );
 }

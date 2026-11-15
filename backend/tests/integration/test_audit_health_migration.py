@@ -54,7 +54,7 @@ def test_migration_upgrade_downgrade_upgrade():
                       "audio_streams", "transcript_revisions", "transcript_segments", "transcript_words",
                       "speaker_assignments", "claims", "claim_values",
                       "documents", "document_pages", "clauses", "doc_terms", "chunks", "calculations", "reports",
-                      "qa_messages", "rules", "public_entities", "public_snapshots",
+                      "qa_messages", "rules", "public_entities", "public_snapshots", "live_captures", "live_chunks",
                       "verification_runs", "verification_results", "evidence_links", "shadow_verdicts"}
     with psycopg.connect(admin, autocommit=True) as c:
         c.execute(f"DROP DATABASE IF EXISTS {scratch} WITH (FORCE)")

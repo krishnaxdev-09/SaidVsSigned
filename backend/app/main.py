@@ -15,6 +15,7 @@ from app.core.db import dispose_engine, get_engine, init_engine
 from app.core.errors import install_error_handlers
 from app.core.logging import RequestIdMiddleware, configure_logging
 from app.core.storage import ObjectStore, S3ObjectStore
+from app.modules.audio.live import router as live_router
 from app.modules.audio.router import router as audio_router
 from app.modules.auth.router import router as auth_router
 from app.modules.claims.router import router as claims_router
@@ -66,6 +67,7 @@ def create_app(settings: Settings | None = None, *, store: ObjectStore | None = 
     app.include_router(results_router)
     app.include_router(reports_router)
     app.include_router(qa_router)
+    app.include_router(live_router)
     app.include_router(lenders_router)
 
     @app.get("/healthz", tags=["ops"])

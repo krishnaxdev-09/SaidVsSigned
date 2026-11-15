@@ -60,3 +60,14 @@ export async function login(email: string, password: string) {
 }
 export const tryRestore = () => refresh();
 export async function logout() { await api("/api/v1/auth/logout", { method: "POST" }); setAccessToken(null); }
+
+// Raw binary PUT (live microphone chunks). Safe to retry: the server replaces a chunk re-sent with the same number.
+export async function putBlob<T>(path: string, blob: Blob, retried = false): Promise<T> {
+  const headers: Record<string, string> = { "content-type": "application/octet-stream" };
+  if (accessToken) headers.authorization = `Bearer ${accessToken}`;
+  const r = await fetchImpl(path, { method: "PUT", headers, credentials: "same-origin", body: blob });
+  if (r.status === 401 && !retried && await refresh()) return putBlob<T>(path, blob, true);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new ApiError(r.status, data.code ?? "internal_error", data.detail ?? r.statusText);
+  return data as T;
+}

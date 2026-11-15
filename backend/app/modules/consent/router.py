@@ -152,6 +152,9 @@ async def revoke_consent(session_id: uuid.UUID, request: Request,
         for rec in stopped:
             await publish(conn, session_id, EventType.RECORDING_STATUS,
                           {"recording_id": str(rec.id), "stage": "failed", "progress": 1.0, "code": "consent_revoked"})
+        await conn.execute(text(  # an open live microphone capture stops accepting audio
+            "UPDATE live_captures SET status = 'aborted', finished_at = now() WHERE session_id = :s AND status = 'open'"),
+            {"s": session_id})
         docs = (await conn.execute(text(  # same rule for documents still being processed (T2.1)
             "UPDATE documents SET status = 'failed', status_code = 'consent_revoked' WHERE session_id = :s "
             "AND deleted_at IS NULL "

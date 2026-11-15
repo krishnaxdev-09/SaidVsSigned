@@ -143,5 +143,19 @@
   "step_state_todo": "To do",
   "step_state_failed": "Needs attention",
   "step_state_locked": "Locked",
-  "step_locked": "Finish step {{n}} first."
+  "step_locked": "Finish step {{n}} first.",
+  "recording_mode": "How do you want to add the call?",
+  "mode_upload": "Upload a recording file",
+  "mode_live": "Record live from the microphone",
+  "live_notice": "Tell everyone on the call that you are recording. Keep this tab open until you press Stop.",
+  "live_start": "Start recording",
+  "live_starting": "Starting…",
+  "live_recording": "Recording",
+  "live_sent": "{{n}} parts saved",
+  "live_stop": "Stop and check the call",
+  "live_finishing": "Saving…",
+  "live_cancel": "Discard",
+  "live_failed": "The live recording couldn't be saved",
+  "live_mic_denied": "Microphone access was blocked. Allow it in the browser and try again.",
+  "live_unsupported": "This browser can't record audio. Upload a file instead."
 }
