@@ -157,5 +157,21 @@
   "live_cancel": "Discard",
   "live_failed": "The live recording couldn't be saved",
   "live_mic_denied": "Microphone access was blocked. Allow it in the browser and try again.",
-  "live_unsupported": "This browser can't record audio. Upload a file instead."
+  "live_unsupported": "This browser can't record audio. Upload a file instead.",
+  "auth_title_login": "Welcome back",
+  "auth_title_register": "Create your account",
+  "auth_tagline": "Check what the agent said against what you're signing.",
+  "auth_mode": "Log in or create an account",
+  "auth_password_hint": "At least 10 characters.",
+  "auth_show": "Show",
+  "auth_hide": "Hide",
+  "auth_working": "Please wait…",
+  "auth_no_account": "New here?",
+  "auth_have_account": "Already have an account?",
+  "auth_err_credentials": "That email and password don't match. Try again.",
+  "auth_err_taken": "An account with this email already exists. Log in instead.",
+  "auth_err_short": "Use a password with at least 10 characters.",
+  "auth_err_invalid": "Check the email address and use a password of at least 10 characters.",
+  "auth_err_rate": "Too many attempts. Wait a minute and try again.",
+  "auth_err_generic": "Something went wrong. Please try again."
 }
